@@ -38,6 +38,9 @@ DB_HOST=localhost DB_PORT=14330 npm run seed
   1. `COMPATIBILITY_LEVEL = 160`.
   2. `CREATE DATABASE` sin rutas `FILENAME` de Windows (SSMS las exporta apuntando a
      `C:\...\SQLEXPRESS\...`); el contenedor usa las rutas por defecto.
+  3. Sin `ALTER DATABASE ... SET OPTIMIZED_LOCKING` (opción exclusiva de SQL Server 2025).
+- **Init idempotente:** el servicio `db-init` ejecuta `../database/init.sh`, que aplica el
+  esquema solo si la base aún no tiene tablas (seguro para reinicios con el volumen poblado).
 - **Credenciales SA:** el usuario `api_user` de la BD es `WITHOUT LOGIN`; en el entorno
   Docker la API se conecta como `sa` (solo para desarrollo/demo).
 - **Volúmenes:** `mssql-data` (datos de la BD) y `uploads` (archivos subidos).
