@@ -24,6 +24,7 @@ consume la base de datos `RentaCarDB`.
 | [`docs/DESPLIEGUE.md`](docs/DESPLIEGUE.md) | Entornos, Docker, CI/CD, Render. |
 | [`docs/TESTING.md`](docs/TESTING.md) | Estrategia de pruebas. |
 | [`docs/SKILLS.md`](docs/SKILLS.md) | Skills recomendadas (documentadas, no instaladas). |
+| [`docs/COLABORACION.md`](docs/COLABORACION.md) | Repositorio, ramas, protección y flujo de trabajo en equipo. |
 
 ## Estructura de carpetas
 

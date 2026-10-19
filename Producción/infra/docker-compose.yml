@@ -1,0 +1,80 @@
+name: rentacardb
+
+# Levantar desde la raíz del repo:
+#   cp .env.example .env   (completar DB_PASSWORD y JWT_SECRET)
+#   docker compose -f Producción/infra/docker-compose.yml up --build
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_PID: Developer
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
+    ports:
+      # Puerto del host configurable para evitar choques con un SQL Server local en 1433.
+      - '${MSSQL_HOST_PORT:-14330}:1433'
+    volumes:
+      - mssql-data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' -b 2>/dev/null || /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' -b 2>/dev/null",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
+  # Ejecuta el esquema una sola vez, cuando la BD ya acepta conexiones.
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
+    volumes:
+      - ../database:/scripts:ro
+    entrypoint: ['/bin/bash', '/scripts/init.sh']
+    restart: 'no'
+
+  api:
+    build:
+      context: ../backend
+    environment:
+      NODE_ENV: production
+      API_PORT: 3000
+      DB_HOST: db
+      DB_PORT: 1433
+      DB_USER: sa
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
+      DB_DATABASE: ${DB_DATABASE:-RentaCarDB}
+      DB_ENCRYPT: 'true'
+      DB_TRUST_SERVER_CERTIFICATE: 'true'
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el .env}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - '3000:3000'
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+      db-init:
+        condition: service_completed_successfully
+
+  web:
+    build:
+      context: ../frontend
+    ports:
+      - '5173:80'
+    depends_on:
+      - api
+
+volumes:
+  mssql-data:
+  uploads:

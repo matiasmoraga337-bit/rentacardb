@@ -1,0 +1,30 @@
+import { LogOut } from 'lucide-react';
+import { Link, Outlet } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/features/auth/AuthContext';
+
+export function AppLayout() {
+  const { usuario, logout } = useAuth();
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <header className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+          <Link to="/panel" className="text-lg font-semibold text-brand">
+            RentaCarDB
+          </Link>
+          <div className="flex items-center gap-3">
+            <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
+            <Button variant="outline" size="sm" onClick={logout}>
+              <LogOut className="h-4 w-4" />
+              Salir
+            </Button>
+          </div>
+        </div>
+      </header>
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <Outlet />
+      </main>
+    </div>
+  );
+}
