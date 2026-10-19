@@ -12,7 +12,8 @@ services:
       MSSQL_PID: Developer
       MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
     ports:
-      - '1433:1433'
+      # Puerto del host configurable para evitar choques con un SQL Server local en 1433.
+      - '${MSSQL_HOST_PORT:-14330}:1433'
     volumes:
       - mssql-data:/var/opt/mssql
     healthcheck:
