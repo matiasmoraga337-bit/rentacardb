@@ -33,8 +33,11 @@ DB_HOST=localhost DB_PORT=14330 npm run seed
 ## Notas
 
 - **Compatibilidad:** el contenedor Linux usa SQL Server 2022 (`COMPATIBILITY_LEVEL = 160`).
-  Por eso `Producción/database/RentacarFinal.sql` es una copia con nivel 160; la raíz
-  (`RentacarFinal.sql`) conserva el nivel 170 del SQL Server 2025 del equipo.
+  Por eso `Producción/database/RentacarFinal.sql` es una copia con dos ajustes respecto del
+  script raíz (que conserva el nivel 170 del SQL Server 2025 del equipo):
+  1. `COMPATIBILITY_LEVEL = 160`.
+  2. `CREATE DATABASE` sin rutas `FILENAME` de Windows (SSMS las exporta apuntando a
+     `C:\...\SQLEXPRESS\...`); el contenedor usa las rutas por defecto.
 - **Credenciales SA:** el usuario `api_user` de la BD es `WITHOUT LOGIN`; en el entorno
   Docker la API se conecta como `sa` (solo para desarrollo/demo).
 - **Volúmenes:** `mssql-data` (datos de la BD) y `uploads` (archivos subidos).
