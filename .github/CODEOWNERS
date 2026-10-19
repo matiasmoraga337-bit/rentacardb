@@ -1,0 +1,13 @@
+# CODEOWNERS — dueños de áreas del código.
+# Formato: <patrón> <@usuario>. Se usa para auto‑asignar revisores en los PR.
+# Completar con los usuarios reales del equipo (ver Producción/docs/EQUIPO.md).
+
+# Por defecto, el maintainer del repositorio revisa todo.
+*                       @matiasmoraga337-bit
+
+# --- Reemplazar por el usuario de cada persona ---
+# Backend  (P1):  /Producción/backend/    @usuario-P1
+# Frontend (P2):  /Producción/frontend/   @usuario-P2
+# Infra/BD (P3):  /Producción/infra/      @usuario-P3
+#                 /sql/                   @usuario-P3
+#                 /Producción/database/   @usuario-P3

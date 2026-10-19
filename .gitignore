@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+
+# Entorno y secretos (NUNCA subir .env)
+.env
+.env.*
+!.env.example
+
+# Builds
+dist/
+build/
+out/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Uploads y datos locales
+uploads/
+*.bak
+*.bacpac
+*.mdf
+*.ldf
+
+# Volúmenes de Docker (datos de SQL Server)
+Producción/infra/data/
+infra/data/
+
+# Cobertura de tests
+coverage/
+
+# Editores y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

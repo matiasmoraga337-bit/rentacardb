@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detectar backend
+        id: check
+        run: |
+          if [ -f "Producción/backend/package.json" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Omitir (sin backend todavía)
+        if: steps.check.outputs.run == 'false'
+        run: echo "Producción/backend/package.json no existe aún; se omite el job."
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.run == 'true'
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Producción/backend/package-lock.json
+
+      - name: Instalar dependencias
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/backend
+        run: npm ci
+
+      - name: Lint
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/backend
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/backend
+        run: npm run typecheck --if-present
+
+      - name: Tests
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/backend
+        run: npm test --if-present
+
+      - name: Build
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/backend
+        run: npm run build --if-present
+
+  frontend:
+    name: Frontend (lint, typecheck, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detectar frontend
+        id: check
+        run: |
+          if [ -f "Producción/frontend/package.json" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Omitir (sin frontend todavía)
+        if: steps.check.outputs.run == 'false'
+        run: echo "Producción/frontend/package.json no existe aún; se omite el job."
+
+      - uses: actions/setup-node@v4
+        if: steps.check.outputs.run == 'true'
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Producción/frontend/package-lock.json
+
+      - name: Instalar dependencias
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/frontend
+        run: npm ci
+
+      - name: Lint
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/frontend
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/frontend
+        run: npm run typecheck --if-present
+
+      - name: Tests
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/frontend
+        run: npm test --if-present
+
+      - name: Build
+        if: steps.check.outputs.run == 'true'
+        working-directory: Producción/frontend
+        run: npm run build --if-present

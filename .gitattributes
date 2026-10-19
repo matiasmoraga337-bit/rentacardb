@@ -1,0 +1,22 @@
+# Normaliza saltos de línea a LF en el repo (Windows edita con CRLF, git guarda LF).
+* text=auto eol=lf
+
+# Scripts SQL: RentacarFinal.sql es UTF-16 LE; se tratan como binarios para no corromperlos.
+*.sql binary
+
+# Scripts de PowerShell: CRLF en Windows.
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios explícitos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary

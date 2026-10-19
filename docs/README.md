@@ -1,0 +1,29 @@
+﻿# Documentación — RentaCarDB
+
+Proyecto universitario de Base de Datos: sistema web de reserva/renta de vehículos
+con múltiples sedes y dueños por región de Chile.
+
+- **Motor:** Microsoft SQL Server 2025 (`COMPATIBILITY_LEVEL = 170`)
+- **Base de datos:** `RentaCarDB`
+- **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
+- Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
+- **Conteo:** 82 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 54 procedimientos almacenados · 3 funciones · 6 vistas.
+
+## Índice
+
+| # | Documento | Contenido |
+|---|-----------|-----------|
+| — | [`GLOSSARY.md`](GLOSSARY.md) | Glosario de términos del dominio. |
+| 1 | [`01-ModeloRelacional.md`](01-ModeloRelacional.md) | Diccionario de datos (núcleo detallado + catálogos resumidos). |
+| 2 | [`02-Relaciones.md`](02-Relaciones.md) | Relaciones y cardinalidades (`#` 1 · `∞` muchos). |
+| 3 | [`03-Normalizacion-3FN.md`](03-Normalizacion-3FN.md) | Justificación de 1FN/2FN/3FN y desnormalizaciones controladas. |
+| 4 | [`04-Clasificacion-Tablas.md`](04-Clasificacion-Tablas.md) | Maestras / Transaccionales / Asociativas / Técnicas. |
+| 5 | [`05-Alcance.md`](05-Alcance.md) | Alcance, supuestos y límites del proyecto. |
+| 6 | [`06-ERD.md`](06-ERD.md) | Diagramas entidad‑relación por módulo (Mermaid) + pasos para SSMS. |
+| — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
+
+## Convenciones de nombres
+- Clave primaria: `ID_<entidad>` (ej. `ID_reserva`).
+- Clave foránea: `ID_<referencia>_<tabla>` (ej. `ID_vehiculo_reserva` = FK a `Vehiculo` desde `Reserva`).
+- Restricciones: `PK_*`, `FK_*`, `UQ_*`, `CK_*`, `DF_*`.
+- Booleanos: `bit` (1/0). Fechas: `date` (día) / `datetime2(0)` (instante). Montos: `decimal`.
