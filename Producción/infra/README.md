@@ -16,7 +16,7 @@ docker compose -f Producción/infra/docker-compose.yml up --build
 | Web | http://localhost:5173 |
 | API | http://localhost:3000/api |
 | API docs (Swagger) | http://localhost:3000/api/docs |
-| SQL Server | localhost:1433 |
+| SQL Server | localhost:14330 (host) → 1433 (contenedor) |
 
 Al primer arranque, el servicio `db-init` aplica `../database/RentacarFinal.sql`
 (esquema completo) cuando la BD ya responde. Para poder iniciar sesión, crear los usuarios
@@ -24,7 +24,7 @@ demo contra la BD del contenedor:
 
 ```bash
 cd Producción/backend
-DB_HOST=localhost npm run seed
+DB_HOST=localhost DB_PORT=14330 npm run seed
 ```
 
 > `npm run seed` usa las mismas variables de entorno; apuntá `DB_HOST=localhost` para
