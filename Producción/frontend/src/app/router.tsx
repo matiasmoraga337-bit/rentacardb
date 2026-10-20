@@ -10,6 +10,9 @@ import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
 import { PanelProveedorPage } from '@/features/proveedores/PanelProveedorPage';
 import { RegistrarProveedorPage } from '@/features/proveedores/RegistrarProveedorPage';
+import { MisVehiculosPage } from '@/features/vehiculos/MisVehiculosPage';
+import { VehiculoDetallePage } from '@/features/vehiculos/VehiculoDetallePage';
+import { VehiculoFormPage } from '@/features/vehiculos/VehiculoFormPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 
 export const router = createBrowserRouter([
@@ -30,6 +33,9 @@ export const router = createBrowserRouter([
       { path: 'perfil', element: <PerfilPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       { path: 'proveedor/panel', element: <PanelProveedorPage /> },
+      { path: 'proveedor/vehiculos', element: <MisVehiculosPage /> },
+      { path: 'proveedor/vehiculos/nuevo', element: <VehiculoFormPage /> },
+      { path: 'proveedor/vehiculos/:id', element: <VehiculoDetallePage /> },
       {
         path: 'admin/proveedores',
         element: (
