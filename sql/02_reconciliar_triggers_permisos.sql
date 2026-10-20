@@ -95,7 +95,6 @@ BEGIN
           AND er.nombre_estado_reserva  IN ('PENDIENTE','CONFIRMADA','EN_CURSO')
     )
     BEGIN
-        ROLLBACK TRANSACTION;
         THROW 70900, 'Solapamiento: el vehiculo ya tiene una reserva activa en ese rango de fechas.', 1;
     END
 END
@@ -122,7 +121,6 @@ BEGIN
         WHERE i.activo_bloqueo = 1
     )
     BEGIN
-        ROLLBACK TRANSACTION;
         THROW 70901, 'Solapamiento: el vehiculo ya tiene un bloqueo activo en ese rango de fechas.', 1;
     END
 END
