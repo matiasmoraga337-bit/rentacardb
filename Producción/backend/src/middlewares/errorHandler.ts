@@ -26,9 +26,18 @@ export function errorHandler(
     return;
   }
 
+  const uploadErr = err as { name?: string; code?: string; message?: string };
+  if (uploadErr?.name === 'MulterError') {
+    const message =
+      uploadErr.code === 'LIMIT_FILE_SIZE'
+        ? 'El archivo supera el tamaño maximo permitido.'
+        : 'Error al procesar el archivo subido.';
+    res.status(400).json({ error: { code: 'UPLOAD_ERROR', message, details: [] } });
+    return;
+  }
+
   const sqlErr = err as { number?: number; message?: string };
-  if (sqlErr?.number && SQL_ERROR_MAP[sqlErr.number]) {
-    const mapped = SQL_ERROR_MAP[sqlErr.number];
+  if (sqlErr?.number && SQL_ERROR_MAP[sqlErr.number]) {    const mapped = SQL_ERROR_MAP[sqlErr.number];
     res.status(mapped.status).json({
       error: { code: mapped.code, message: sqlErr.message ?? 'Error de negocio.', details: [] },
     });
