@@ -7,7 +7,7 @@ const config: sql.config = {
   user: env.DB_USER,
   password: env.DB_PASSWORD,
   database: env.DB_DATABASE,
-  connectionTimeout: 10000,
+  connectionTimeout: env.NODE_ENV === 'test' ? 1000 : 10000,
   requestTimeout: 30000,
   options: {
     encrypt: env.DB_ENCRYPT,
