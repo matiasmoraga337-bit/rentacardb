@@ -14,6 +14,9 @@ export function AppLayout() {
             RentaCarDB
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
+              Mi perfil
+            </Link>
             <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="h-4 w-4" />

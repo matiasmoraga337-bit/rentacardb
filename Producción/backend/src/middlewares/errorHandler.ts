@@ -10,7 +10,11 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   51105: { status: 409, code: 'RUT_DUPLICADO' },
   51106: { status: 409, code: 'EMAIL_DUPLICADO' },
   51107: { status: 400, code: 'ROL_INVALIDO' },
+  51120: { status: 400, code: 'TOKEN_INVALIDO' },
   51130: { status: 401, code: 'CREDENCIALES_INVALIDAS' },
+  51140: { status: 404, code: 'EMAIL_NO_REGISTRADO' },
+  51150: { status: 400, code: 'PASSWORD_INVALIDO' },
+  51151: { status: 400, code: 'TOKEN_INVALIDO' },
 };
 
 export function errorHandler(

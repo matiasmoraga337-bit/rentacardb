@@ -1,10 +1,10 @@
 import { type NextFunction, type Request, type Response } from 'express';
-import { type AnyZodObject } from 'zod';
+import { type ZodTypeAny } from 'zod';
 import { AppError } from '../utils/AppError';
 
 type Source = 'body' | 'params' | 'query';
 
-export function validate(schema: AnyZodObject, source: Source = 'body') {
+export function validate(schema: ZodTypeAny, source: Source = 'body') {
   return (req: Request, _res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req[source]);
     if (!result.success) {

@@ -1,6 +1,11 @@
 import bcrypt from 'bcryptjs';
+import { buildAppLink, sendMail } from '../config/mailer';
 import * as repo from '../repositories/auth.repository';
-import { type LoginInput, type RegistroInput } from '../schemas/auth.schema';
+import {
+  type LoginInput,
+  type PerfilInput,
+  type RegistroInput,
+} from '../schemas/auth.schema';
 import { AppError } from '../utils/AppError';
 import { signToken } from '../utils/jwt';
 
@@ -78,7 +83,62 @@ export async function registrar(input: RegistroInput): Promise<repo.RegistrarUsu
   if (!row) {
     throw new AppError(500, 'REGISTRO_FALLIDO', 'No se pudo registrar el usuario.');
   }
+
+  if (row.token_verificacion) {
+    const link = buildAppLink('/verificar-email', row.token_verificacion);
+    await sendMail({
+      to: row.email_usuario,
+      subject: 'Verifica tu email - RentaCarDB',
+      html: `<p>Hola ${row.nombres_persona},</p><p>Gracias por registrarte en RentaCarDB. Confirma tu email:</p><p><a href="${link}">Verificar email</a></p><p>El enlace expira en 24 horas.</p>`,
+      text: `Verifica tu email: ${link}`,
+    }).catch((err: unknown) =>
+      console.warn('No se pudo enviar el correo de verificacion:', (err as Error).message),
+    );
+  }
+
   return row;
+}
+
+export async function verificarEmail(token: string): Promise<void> {
+  await repo.verificarEmail(token);
+}
+
+export async function solicitarReset(email: string): Promise<void> {
+  let token: string | null = null;
+  try {
+    token = await repo.solicitarReset(email);
+  } catch (err) {
+    if ((err as { number?: number }).number === 51140) return;
+    throw err;
+  }
+  if (!token) return;
+
+  const link = buildAppLink('/reset-password', token);
+  await sendMail({
+    to: email,
+    subject: 'Recuperar contrasena - RentaCarDB',
+    html: `<p>Recibimos una solicitud para restablecer tu contrasena.</p><p><a href="${link}">Restablecer contrasena</a></p><p>El enlace expira en 1 hora. Si no lo solicitaste, ignora este correo.</p>`,
+    text: `Restablece tu contrasena: ${link}`,
+  }).catch((err: unknown) =>
+    console.warn('No se pudo enviar el correo de reset:', (err as Error).message),
+  );
+}
+
+export async function confirmarReset(token: string, password: string): Promise<void> {
+  const nuevoHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  await repo.confirmarReset(token, nuevoHash);
+}
+
+export async function actualizarPerfil(id: number, data: PerfilInput): Promise<repo.PerfilRow> {
+  const row = await repo.actualizarPerfil(id, data);
+  if (!row) {
+    throw new AppError(404, 'USUARIO_NO_ENCONTRADO', 'Usuario no encontrado.');
+  }
+  return row;
+}
+
+export async function rolesDeUsuario(id: number): Promise<string[]> {
+  return repo.listarRolesUsuario(id);
 }
 
 export async function me(id: number): Promise<repo.UsuarioRow> {
