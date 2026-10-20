@@ -126,3 +126,27 @@ export async function listarDocumentos(req: Request, res: Response): Promise<voi
   const id = parseId(req.params.id, 'id');
   res.status(200).json(await vehiculoService.listarDocumentos(req.user!.id, id));
 }
+
+const parseOptionalNumber = (value: unknown): number | undefined => {
+  if (typeof value !== 'string' || value.length === 0) return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+};
+
+const parseOptionalDate = (value: unknown): string | undefined => {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  return value;
+};
+
+export async function buscar(req: Request, res: Response): Promise<void> {
+  res.status(200).json(
+    await vehiculoService.buscar({
+      fecha_inicio: parseOptionalDate(req.query.fecha_inicio),
+      fecha_fin: parseOptionalDate(req.query.fecha_fin),
+      ID_comuna: parseOptionalNumber(req.query.ID_comuna),
+      ID_tipo_vehiculo: parseOptionalNumber(req.query.ID_tipo_vehiculo),
+      precio_maximo: parseOptionalNumber(req.query.precio_maximo),
+      ID_caracteristica: parseOptionalNumber(req.query.ID_caracteristica),
+    }),
+  );
+}

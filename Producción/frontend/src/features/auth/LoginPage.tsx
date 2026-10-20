@@ -75,6 +75,11 @@ export function LoginPage() {
                 Olvide mi contrasena
               </Link>
             </p>
+            <p className="text-center text-sm">
+              <Link to="/catalogo" className="text-slate-600 hover:text-brand">
+                Ver catalogo de vehiculos
+              </Link>
+            </p>
           </form>
         </CardContent>
       </Card>

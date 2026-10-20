@@ -11,8 +11,10 @@ import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPag
 import { PanelProveedorPage } from '@/features/proveedores/PanelProveedorPage';
 import { RegistrarProveedorPage } from '@/features/proveedores/RegistrarProveedorPage';
 import { MisVehiculosPage } from '@/features/vehiculos/MisVehiculosPage';
+import { CatalogoPage } from '@/features/vehiculos/CatalogoPage';
 import { VehiculoDetallePage } from '@/features/vehiculos/VehiculoDetallePage';
 import { VehiculoFormPage } from '@/features/vehiculos/VehiculoFormPage';
+import { VehiculoPublicoPage } from '@/features/vehiculos/VehiculoPublicoPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 
 export const router = createBrowserRouter([
@@ -20,6 +22,8 @@ export const router = createBrowserRouter([
   { path: '/recuperar', element: <RecuperarPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
   { path: '/verificar-email', element: <VerificarEmailPage /> },
+  { path: '/catalogo', element: <CatalogoPage /> },
+  { path: '/catalogo/:id', element: <VehiculoPublicoPage /> },
   {
     path: '/',
     element: (
