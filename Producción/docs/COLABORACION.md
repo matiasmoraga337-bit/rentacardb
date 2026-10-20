@@ -32,7 +32,8 @@ Sobre `main` y `develop` rige el ruleset **`proteccion-ramas`**:
 - **Conversaciones resueltas** y aprobaciones obsoletas descartadas al recibir nuevos push.
 - Prohibido **force‑push** y **borrar** la rama.
 - **Historial lineal** → se fusiona con **squash**.
-- Al fusionar, la rama de origen se **borra automáticamente**.
+- Las ramas `feat/*` y `fix/*` se **borran al fusionar** su PR (activar la opción al hacer el
+  merge). `develop` **no** se borra: es la base de los releases `develop → main`.
 
 > El **administrador** del repositorio puede hacer *bypass* en emergencias (p. ej. durante
 > el arranque, antes de que estén todos los colaboradores). Los demás integrantes **no**.
