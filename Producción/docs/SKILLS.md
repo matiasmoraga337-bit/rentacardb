@@ -1,12 +1,12 @@
-﻿# SKILLS recomendadas (documentadas, NO instaladas)
+﻿# SKILLS — instaladas y recomendadas
 
-Skills útiles para el desarrollo full‑stack. **No se instalaron**; aquí queda documentado
-qué hace cada una y el comando para instalarla si se decide usarla.
+Skills instaladas **globalmente** (`~\.agents\skills\`) el **2026‑10‑20** para el desarrollo
+full‑stack. Aquí se documenta qué hace cada una y su comando de reinstalación.
 
 > Recordatorio: las skills son instrucciones en Markdown que se cargan en el contexto del
 > agente. Revisar antes de usar (se ejecutan con permisos del agente).
 
-## Externas (skills.sh) — recomendadas
+## Externas (skills.sh) — instaladas
 
 | Skill | Instalaciones | Para qué | Instalar |
 |---|---|---|---|
@@ -17,6 +17,10 @@ qué hace cada una y el comando para instalarla si se decide usarla.
 | `sickn33/agentic-awesome-skills@react-nextjs-development` | 1.9K | React/Next.js | `npx skills add sickn33/agentic-awesome-skills@react-nextjs-development -g -y` |
 | `alirezarezvani/claude-skills@senior-frontend` | 1.6K | Buenas prácticas frontend | `npx skills add alirezarezvani/claude-skills@senior-frontend -g -y` |
 | `alirezarezvani/claude-skills@senior-backend` | 1.6K | Buenas prácticas backend | `npx skills add alirezarezvani/claude-skills@senior-backend -g -y` |
+
+> **Seguridad:** `senior-frontend` y `senior-backend` incluyen scripts Python auxiliares
+> (`scripts/*.py`); `api_load_tester.py` realiza peticiones HTTP. No se ejecutan
+> automáticamente: revisarlos antes de invocarlos. Las demás son solo Markdown.
 
 ## Ya instaladas (usar sin instalar)
 
