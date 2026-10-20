@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -70,6 +70,11 @@ export function LoginPage() {
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Ingresando…' : 'Ingresar'}
             </Button>
+            <p className="text-center text-sm">
+              <Link to="/recuperar" className="text-brand hover:underline">
+                Olvide mi contrasena
+              </Link>
+            </p>
           </form>
         </CardContent>
       </Card>

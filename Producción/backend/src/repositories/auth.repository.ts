@@ -89,8 +89,7 @@ export async function registrarUsuario(
   return result.recordset[0] ?? null;
 }
 
-export async function findUserById(id: number): Promise<UsuarioRow | null> {
-  const pool = await getPool();
+export async function findUserById(id: number): Promise<UsuarioRow | null> {  const pool = await getPool();
   const result = await pool
     .request()
     .input('id', sql.Int, id)
@@ -114,4 +113,82 @@ export async function findUserById(id: number): Promise<UsuarioRow | null> {
       `,
     );
   return result.recordset[0] ?? null;
+}
+
+export async function verificarEmail(
+  tokenHash: string,
+): Promise<{ ID_usuario: number; verificado: number } | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('token_hash', sql.Char(64), tokenHash)
+    .execute<{ ID_usuario: number; verificado: number }>('sp_VerificarEmail');
+  return result.recordset[0] ?? null;
+}
+
+export async function solicitarReset(email: string): Promise<string | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('email', sql.VarChar(150), email)
+    .execute<{ token_reset: string }>('sp_SolicitarResetPassword');
+  return result.recordset[0]?.token_reset ?? null;
+}
+
+export async function confirmarReset(tokenHash: string, nuevoHash: string): Promise<void> {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('token_hash', sql.Char(64), tokenHash)
+    .input('nuevo_hash', sql.VarChar(255), nuevoHash)
+    .execute('sp_ConfirmarResetPassword');
+}
+
+export interface PerfilRow {
+  ID_usuario: number;
+  rut_persona: string;
+  nombres_persona: string;
+  apellido_paterno_persona: string | null;
+  apellido_materno_persona: string | null;
+  telefono_persona: string | null;
+  email_usuario: string;
+  email_confirmado_usuario: boolean;
+}
+
+export interface PerfilInput {
+  nombres?: string;
+  apellidoPaterno?: string;
+  apellidoMaterno?: string;
+  telefono?: string;
+}
+
+export async function actualizarPerfil(
+  idUsuario: number,
+  data: PerfilInput,
+): Promise<PerfilRow | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_usuario', sql.Int, idUsuario)
+    .input('nombres', sql.NVarChar(80), data.nombres ?? null)
+    .input('apellido_paterno', sql.NVarChar(50), data.apellidoPaterno ?? null)
+    .input('apellido_materno', sql.NVarChar(50), data.apellidoMaterno ?? null)
+    .input('telefono', sql.VarChar(20), data.telefono ?? null)
+    .execute<PerfilRow>('sp_ActualizarPerfilUsuario');
+  return result.recordset[0] ?? null;
+}
+
+export async function listarRolesUsuario(idUsuario: number): Promise<string[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idUsuario)
+    .query<{ nombre_rol: string }>(
+      `SELECT r.nombre_rol
+       FROM UsuarioRol ur
+       INNER JOIN Rol r ON r.ID_rol = ur.ID_rol_usuario_rol
+       WHERE ur.ID_usuario_usuario_rol = @id
+       ORDER BY r.nombre_rol`,
+    );
+  return result.recordset.map((r) => r.nombre_rol);
 }
