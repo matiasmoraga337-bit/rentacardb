@@ -218,3 +218,7 @@ export async function listarDocumentos(idUsuario: number, idVehiculo: number): P
   await assertVehiculo(idUsuario, idVehiculo);
   return repo.listarDocumentos(idVehiculo);
 }
+
+export async function buscar(params: repo.BusquedaParams): Promise<unknown[]> {
+  return repo.buscarVehiculos(params);
+}

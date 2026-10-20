@@ -154,8 +154,7 @@ export async function obtenerVehiculo(idVehiculo: number): Promise<unknown | nul
   return result.recordset[0] ?? null;
 }
 
-export async function listarVehiculosProveedor(idProveedor: number): Promise<unknown[]> {
-  const pool = await getPool();
+export async function listarVehiculosProveedor(idProveedor: number): Promise<unknown[]> {  const pool = await getPool();
   const result = await pool
     .request()
     .input('idProveedor', sql.Int, idProveedor)
@@ -395,5 +394,28 @@ export async function listarDocumentos(idVehiculo: number): Promise<unknown[]> {
        WHERE d.ID_vehiculo_documento_vehiculo = @id AND d.activo_documento = 1
        ORDER BY d.fecha_vencimiento_documento`,
     );
+  return result.recordset;
+}
+
+export interface BusquedaParams {
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  ID_comuna?: number;
+  ID_tipo_vehiculo?: number;
+  precio_maximo?: number;
+  ID_caracteristica?: number;
+}
+
+export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('fecha_inicio', sql.Date, params.fecha_inicio ?? null)
+    .input('fecha_fin', sql.Date, params.fecha_fin ?? null)
+    .input('ID_comuna', sql.Int, params.ID_comuna ?? null)
+    .input('ID_tipo_vehiculo', sql.Int, params.ID_tipo_vehiculo ?? null)
+    .input('precio_maximo', sql.Decimal(14, 2), params.precio_maximo ?? null)
+    .input('ID_caracteristica', sql.Int, params.ID_caracteristica ?? null)
+    .execute('sp_V5_BuscarVehiculos');
   return result.recordset;
 }

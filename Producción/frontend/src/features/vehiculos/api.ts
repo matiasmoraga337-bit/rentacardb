@@ -106,3 +106,37 @@ export const agregarCaracteristica = (
 
 export const quitarCaracteristica = (id: number, idCaracteristica: number): Promise<void> =>
   apiFetch<void>(`/vehiculos/${id}/caracteristicas/${idCaracteristica}`, { method: 'DELETE' });
+
+export interface BusquedaParams {
+  fecha_inicio?: string;
+  fecha_fin?: string;
+  ID_comuna?: number;
+  ID_tipo_vehiculo?: number;
+  precio_maximo?: number;
+}
+
+export interface BusquedaItem {
+  ID_vehiculo: number;
+  patente_vehiculo: string;
+  precio_diario_base_vehiculo: number;
+  precio_cotizado?: number | null;
+  calificacion_promedio_vehiculo: number | null;
+  anio_vehiculo: number;
+  nombre_marca: string;
+  nombre_modelo: string;
+  nombre_tipo_vehiculo: string;
+  nombre_sede_proveedor: string | null;
+  nombre_comuna: string | null;
+  nombre_region: string | null;
+  nombre_comercial_proveedor: string;
+  dias?: number | null;
+}
+
+export async function buscarVehiculos(params: BusquedaParams): Promise<BusquedaItem[]> {
+  const qs = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== '' && value !== null) qs.set(key, String(value));
+  });
+  const suffix = qs.toString() ? `?${qs.toString()}` : '';
+  return apiFetch<BusquedaItem[]>(`/vehiculos/buscar${suffix}`);
+}
