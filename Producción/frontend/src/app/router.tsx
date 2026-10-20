@@ -4,8 +4,12 @@ import { LoginPage } from '@/features/auth/LoginPage';
 import { PerfilPage } from '@/features/auth/PerfilPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RecuperarPage } from '@/features/auth/RecuperarPage';
+import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
+import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
+import { PanelProveedorPage } from '@/features/proveedores/PanelProveedorPage';
+import { RegistrarProveedorPage } from '@/features/proveedores/RegistrarProveedorPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 
 export const router = createBrowserRouter([
@@ -24,6 +28,16 @@ export const router = createBrowserRouter([
       { index: true, element: <Navigate to="/panel" replace /> },
       { path: 'panel', element: <DashboardPage /> },
       { path: 'perfil', element: <PerfilPage /> },
+      { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
+      { path: 'proveedor/panel', element: <PanelProveedorPage /> },
+      {
+        path: 'admin/proveedores',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminProveedoresPage />
+          </RequireRole>
+        ),
+      },
     ],
   },
   { path: '*', element: <Navigate to="/panel" replace /> },

@@ -14,6 +14,14 @@ export function AppLayout() {
             RentaCarDB
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
+              Proveedor
+            </Link>
+            {usuario?.roles.includes('ADMIN') && (
+              <Link to="/admin/proveedores" className="text-sm text-slate-600 hover:text-brand">
+                Admin
+              </Link>
+            )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil
             </Link>
