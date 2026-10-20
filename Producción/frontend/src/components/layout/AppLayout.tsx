@@ -14,6 +14,9 @@ export function AppLayout() {
             RentaCarDB
           </Link>
           <div className="flex items-center gap-3">
+            <Link to="/proveedor/vehiculos" className="text-sm text-slate-600 hover:text-brand">
+              Vehiculos
+            </Link>
             <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
               Proveedor
             </Link>
