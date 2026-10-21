@@ -98,7 +98,28 @@ Renombrado manual por grupos. **Grupo 1 — `Auditoria`** (aplicado):
 Se actualizaron tabla, PK, índices (`IX_auditoria_*`), `DF_auditoria_fecha`, `CK_auditoria_*`,
 `FK_auditoria_usuario` (la FK local; `Usuario(ID_usuario)` se mantiene) y los triggers
 `trg_Pago_AfterInsert_Auditoria` / `trg_Reserva_AfterUpdate_Auditoria`.
-Pendientes: `OutboxEvento`, `ReservaSnapshot`, `LiquidacionProveedor`, `Configuracion*`,
+
+**Grupo 2 — `OutboxEvento`** (aplicado):
+
+| Antes | Después |
+|---|---|
+| `agregado_tipo` | `agregado_tipo_outbox_evento` |
+| `agregado_id` | `agregado_id_outbox_evento` |
+| `payload` | `payload_outbox_evento` |
+| `fecha_creacion` | `fecha_creacion_outbox_evento` |
+| `fecha_procesamiento` | `fecha_procesamiento_outbox_evento` |
+| `estado` | `estado_outbox_evento` |
+| `intentos` | `intentos_outbox_evento` |
+| `ultimo_error` | `ultimo_error_outbox_evento` |
+| `lock_id` | `lock_id_outbox_evento` |
+| `fecha_lock` | `fecha_lock_outbox_evento` |
+
+Se actualizaron tabla, índices `IX_outbox_*`, defaults, `CK_outbox_*`, INSERTs de outbox en
+reservas/pagos y los SPs `u_sp_PublicarEvento`, `u_sp_ObtenerOutboxPendiente`,
+`u_sp_MarcarEventoProcesado`, `u_sp_ReintentarOutboxError` (sin tocar `@payload`, `@lock_id`
+ni literales como `'PENDIENTE'`).
+
+Pendientes: `ReservaSnapshot`, `LiquidacionProveedor`, `Configuracion*`,
 `TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
 
 ## 5) Comentarios
