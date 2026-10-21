@@ -41,6 +41,10 @@ cubra **todo el modelo** (82 tablas), desplegable con Docker.
 | H4 — Extensiones + QA | 16 nov | Liquidaciones/disputas/multas + tests + docs |
 | **Entrega** | **17 nov** | Presentación |
 
+> **Estado (21-oct-2026):** H0, H1 y H2 completados y verificados. H2 incluye
+> reservas, WebPay simulado, cancelación con reembolso, panel proveedor y demo
+> reproducible. Ver `../docs/DEMO-S2.md` y `../docs/PRUEBAS-BD.md`.
+
 ## 5) Roadmap por sprints (detalle en `docs/CRONOGRAMA.md`)
 
 - **S0 (18–20 oct):** setup, docker, esqueletos, conexión a BD, auth base.
