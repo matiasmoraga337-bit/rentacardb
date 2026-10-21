@@ -74,7 +74,7 @@ S3 arriendos/paneles/chat, S4 extensiones + QA + demo).
 - **Endpoints y su SP:** `Producción/docs/API.md`.
 - **Tablas/columnas/reglas:** `docs/01-ModeloRelacional.md` y `docs/06-ERD.md`.
 - **Reglas de negocio que YA están en la BD (no reimplementar):** precio
-  (`fn_V5_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`),
+  (`fn_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`),
   solapamiento (trigger + SP), transiciones de estado, reembolsos, liquidaciones, auditoría.
 - **Backlog y estimaciones:** `Producción/docs/BACKLOG.md`.
 - **Seguridad:** `Producción/docs/SEGURIDAD.md` (OWASP, secretos, Ley 19.628).

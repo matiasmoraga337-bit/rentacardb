@@ -64,8 +64,8 @@ Las columnas (Regla 2) y `ErrorLog` (Regla 5) se documentan en fases posteriores
 ## 2) Vistas y funciones
 | Antes | Después |
 |---|---|
-| `vw_V5_VehiculosDisponibles` | `vw_VehiculosDisponibles` |
-| `fn_V5_PrecioAplicable` | `fn_PrecioAplicable` |
+| `vw_VehiculosDisponibles` | `vw_VehiculosDisponibles` |
+| `fn_PrecioAplicable` | `fn_PrecioAplicable` |
 
 ## 3) Constraints e índices
 Se eliminaron los sufijos `_v5` y `_v6` de todos los nombres (70 ocurrencias). Ejemplos:

@@ -53,7 +53,7 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET/POST | `/vehiculos/:id/caracteristicas` | ROL(PROVEEDOR) | `VehiculoCaracteristica` |
 | GET/POST | `/vehiculos/:id/tarifas` | ROL(PROVEEDOR) | `TarifaVehiculo` |
 | GET/POST | `/vehiculos/:id/documentos` | ROL(PROVEEDOR) | `u_sp_RegistrarDocumentoVehiculo` |
-| GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_V5_VehiculosDisponibles` |
+| GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_VehiculosDisponibles` |
 | GET | `/vehiculos/buscar` | PÚBLICO | `u_sp_BuscarVehiculos` |
 | GET/POST/DELETE | `/favoritos[/:vehiculoId]` | AUTH | `FavoritoVehiculo` |
 

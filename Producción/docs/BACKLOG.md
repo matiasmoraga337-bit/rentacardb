@@ -54,7 +54,7 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
 | E6.1 | Buscar vehículos con filtros | 8 | `u_sp_BuscarVehiculos`/`vw_VehiculosPublicados`, UI filtros |
-| E6.2 | Ver disponibilidad por fechas | 5 | `vw_V5_VehiculosDisponibles` |
+| E6.2 | Ver disponibilidad por fechas | 5 | `vw_VehiculosDisponibles` |
 | E6.3 | Favoritos | 3 | `FavoritoVehiculo`, UI |
 | E6.4 | Búsquedas guardadas | 3 | `BusquedaGuardada`, UI |
 
