@@ -165,7 +165,22 @@ Se actualizaron índices (incluido el computed column y el índice filtrado de c
 - Se agregó el bloque de convención de códigos de error (`51xxx`…`709xx`).
 
 ## 6) Objetos nuevos
-- `ErrorLog` + `u_sp_RegistrarError` + logging en SPs críticos: pendiente de la fase 3.
+- **`ErrorLog`** (tabla) con `PK_error_log`, `FK_error_log_usuario`, `CK_error_log_origen`
+  (`API/JOB/TRIGGER/SP/SISTEMA`) e índices `IX_error_log_fecha`, `IX_error_log_sp_fecha`,
+  `IX_error_log_no_revisados`, `IX_error_log_correlation`.
+- **`u_sp_RegistrarError`** (helper): inserta el error técnico; su `CATCH` es intencionalmente
+  vacío para no enmascarar el error original. Toma `usuario_id` y `correlation_id` de
+  `SESSION_CONTEXT` si están disponibles.
+- **Logging aplicado** en: `u_sp_Login`, `u_sp_RegistrarUsuario`, `u_sp_WebPay_IniciarTransaccion`,
+  `u_sp_WebPay_ConfirmarTransaccion`, `u_sp_CrearReserva`, `u_sp_CancelarReserva`,
+  `u_sp_RegistrarPago`, `u_sp_IniciarArriendo`, `u_sp_RegistrarDevolucion`,
+  `u_sp_CrearReembolso`, `u_sp_MarcarReembolsoCompletado`, `u_sp_GenerarLiquidacion`
+  y `u_sp_ExpirarReservas` (reemplaza el `PRINT`, `@origen='JOB'`).
+- `u_sp_Login` se envolvió en `TRY/CATCH` (no lo tenía).
+- **Permisos:** `GRANT SELECT ON ErrorLog` a `db_rentacar_rw` y `db_rentacar_ro`;
+  la escritura va por `u_sp_RegistrarError` (EXECUTE por esquema). No se otorga `INSERT` directo.
+- **Verificado:** login inválido -> error 51130 propagado **y** fila en `ErrorLog`
+  (`parametros_json_log` solo con email, sin hash).
 
 ## 7) Notas para el backend
 - Todas las llamadas deben usar `u_sp_*`. Los repositorios ya fueron actualizados.
