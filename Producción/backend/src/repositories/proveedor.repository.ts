@@ -161,17 +161,17 @@ const PROVEEDOR_SELECT = `
          p.email_proveedor AS email,
          tp.nombre_tipo_proveedor AS tipo,
          ep.nombre_estado_proveedor AS estado,
-         c.permite_devolucion_otra_sede AS permiteDevolucionOtraSede,
-         c.permite_entrega_domicilio AS permiteEntregaDomicilio,
-         c.permite_retiro_domicilio AS permiteRetiroDomicilio,
-         c.radio_maximo_km AS radioMaximoKm,
-         c.minutos_expiracion_reserva AS minutosExpiracionReserva,
-         c.edad_minima_arriendo AS edadMinimaArriendo,
-         c.requiere_deposito AS requiereDeposito,
-         c.monto_deposito AS montoDeposito,
-         c.dias_minimos_arriendo AS diasMinimosArriendo,
-         c.dias_maximos_arriendo AS diasMaximosArriendo,
-         c.moneda_operacion AS monedaOperacion
+         c.permite_devolucion_otra_sede_configuracion_proveedor AS permiteDevolucionOtraSede,
+         c.permite_entrega_domicilio_configuracion_proveedor AS permiteEntregaDomicilio,
+         c.permite_retiro_domicilio_configuracion_proveedor AS permiteRetiroDomicilio,
+         c.radio_maximo_km_configuracion_proveedor AS radioMaximoKm,
+         c.minutos_expiracion_reserva_configuracion_proveedor AS minutosExpiracionReserva,
+         c.edad_minima_arriendo_configuracion_proveedor AS edadMinimaArriendo,
+         c.requiere_deposito_configuracion_proveedor AS requiereDeposito,
+         c.monto_deposito_configuracion_proveedor AS montoDeposito,
+         c.dias_minimos_arriendo_configuracion_proveedor AS diasMinimosArriendo,
+         c.dias_maximos_arriendo_configuracion_proveedor AS diasMaximosArriendo,
+         c.moneda_operacion_configuracion_proveedor AS monedaOperacion
   FROM Proveedor p
   INNER JOIN TipoProveedor tp ON tp.ID_tipo_proveedor = p.ID_tipo_proveedor_proveedor
   INNER JOIN EstadoProveedor ep ON ep.ID_estado_proveedor = p.ID_estado_proveedor_proveedor
