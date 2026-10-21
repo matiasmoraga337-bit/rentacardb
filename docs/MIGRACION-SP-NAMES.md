@@ -77,8 +77,29 @@ Se eliminaron los sufijos `_v5` y `_v6` de todos los nombres (70 ocurrencias). E
 `IX_auditoria_entidad_fecha_v6`, `IX_auditoria_origen_fecha_v6`, y todos los `FK_*_v5` / `CK_*_v5`.
 
 ## 4) Columnas (Regla 2)
-Pendiente de la fase 2 (renombrado manual de columnas sin sufijo de entidad).
-Se documentará aquí la lista `tabla.columna_antes → tabla.columna_despues`.
+Renombrado manual por grupos. **Grupo 1 — `Auditoria`** (aplicado):
+
+| Antes | Después |
+|---|---|
+| `entidad` | `entidad_auditoria` |
+| `ID_registro` | `ID_registro_auditoria` |
+| `accion` | `accion_auditoria` |
+| `ID_usuario` | `ID_usuario_auditoria` |
+| `fecha` | `fecha_auditoria` |
+| `valor_anterior` | `valor_anterior_auditoria` |
+| `valor_nuevo` | `valor_nuevo_auditoria` |
+| `descripcion` | `descripcion_auditoria` |
+| `correlation_id` | `correlation_id_auditoria` |
+| `origen` | `origen_auditoria` |
+| `ip_origen` | `ip_origen_auditoria` |
+| `user_agent` | `user_agent_auditoria` |
+| `motivo` | `motivo_auditoria` |
+
+Se actualizaron tabla, PK, índices (`IX_auditoria_*`), `DF_auditoria_fecha`, `CK_auditoria_*`,
+`FK_auditoria_usuario` (la FK local; `Usuario(ID_usuario)` se mantiene) y los triggers
+`trg_Pago_AfterInsert_Auditoria` / `trg_Reserva_AfterUpdate_Auditoria`.
+Pendientes: `OutboxEvento`, `ReservaSnapshot`, `LiquidacionProveedor`, `Configuracion*`,
+`TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
