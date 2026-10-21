@@ -3,7 +3,13 @@ import rateLimit from 'express-rate-limit';
 import * as authController from '../controllers/auth.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { validate } from '../middlewares/validate';
-import { loginSchema, registroSchema } from '../schemas/auth.schema';
+import {
+  loginSchema,
+  recuperarSchema,
+  registroSchema,
+  resetPasswordSchema,
+  verificarEmailSchema,
+} from '../schemas/auth.schema';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const router = Router();
@@ -22,6 +28,24 @@ router.post(
   authLimiter,
   validate(registroSchema),
   asyncHandler(authController.registro),
+);
+router.post(
+  '/verificar-email',
+  authLimiter,
+  validate(verificarEmailSchema),
+  asyncHandler(authController.verificarEmail),
+);
+router.post(
+  '/recuperar',
+  authLimiter,
+  validate(recuperarSchema),
+  asyncHandler(authController.recuperar),
+);
+router.post(
+  '/recuperar/confirmar',
+  authLimiter,
+  validate(resetPasswordSchema),
+  asyncHandler(authController.recuperarConfirmar),
 );
 router.get('/me', authenticate, asyncHandler(authController.me));
 
