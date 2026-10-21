@@ -150,3 +150,13 @@ export async function buscar(req: Request, res: Response): Promise<void> {
     }),
   );
 }
+
+export async function disponibilidad(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  const desde = req.query.desde;
+  const hasta = req.query.hasta;
+  if (typeof desde !== 'string' || typeof hasta !== 'string') {
+    throw new AppError(400, 'FECHAS_REQUERIDAS', 'Debe indicar desde y hasta (YYYY-MM-DD).');
+  }
+  res.status(200).json(await vehiculoService.disponibilidad(id, desde, hasta));
+}

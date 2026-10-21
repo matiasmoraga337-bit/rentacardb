@@ -59,28 +59,38 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 ## Reservas
 
-| Método | Ruta | Acceso | SP / Tabla |
-|---|---|---|---|
-| POST | `/reservas` | ROL(CLIENTE) | `u_sp_CrearReserva` (idempotency_key) |
-| GET | `/reservas` | AUTH | `vw_ReservasDetalle` (cliente ve las suyas; proveedor las de sus vehículos) |
-| GET | `/reservas/:id` | AUTH | `vw_ReservasDetalle` |
-| POST | `/reservas/:id/estado` | AUTH | `u_sp_CambiarEstadoReserva` |
-| POST | `/reservas/:id/cancelar` | ROL(CLIENTE) | `u_sp_CancelarReserva` (reembolso opcional) |
-| GET | `/reservas/:id/historial` | AUTH | `HistorialEstadoReserva` |
-| GET | `/reservas/:id/snapshot` | AUTH | `ReservaSnapshot` |
-| GET/POST | `/reservas/:id/cupones` | — | **N/A** (cupones retirados) |
+| Método | Ruta | Acceso | SP / Vista / Tabla | Notas |
+|---|---|---|---|---|
+| GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_VehiculosDisponibles`, `fn_PrecioAplicable`, `ConfiguracionGlobal/Proveedor` | Devuelve `{disponible, motivo, precioDia, dias, subtotal, impuesto, deposito, total}`. |
+| GET | `/vehiculos/:id` | PÚBLICO | `Vehiculo` + `VehiculoSede` | Incluye `sedes[]` con flags de entrega/devolución. |
+| POST | `/reservas` | ROL(CLIENTE) | `u_sp_CrearReserva` | `Idempotency-Key` obligatorio. `ID_usuario_cliente` sale del JWT. |
+| GET | `/reservas?scope=&estado=&page=&pageSize=` | AUTH | `vw_ReservasDetalle` + `Reserva` | `scope=cliente` (propias), `scope=proveedor` (sus vehículos), `todos` (ADMIN). Respuesta `{data,page,pageSize,total}`. |
+| GET | `/reservas/:id` | AUTH | `vw_ReservasDetalle` + `Reserva` | Incluye `reembolsos[]`. Ownership cliente/proveedor/admin. |
+| POST | `/reservas/:id/estado` | ADMIN | `u_sp_CambiarEstadoReserva` | S2: `CONFIRMADA`, `CANCELADA`, `EXPIRADA`. |
+| GET | `/reservas/:id/cancelacion` | AUTH | `PoliticaCancelacion` + `Pago` + `Reembolso` | Previsualiza política, monto pagado y reembolso estimado. |
+| POST | `/reservas/:id/cancelar` | ROL(CLIENTE) dueño | `u_sp_CancelarReserva` | Body `{motivo, solicitar_reembolso, motivo_reembolso?}`. `Idempotency-Key` obligatorio si hay reembolso. |
+| GET | `/reservas/:id/historial` | AUTH | `HistorialEstadoReserva` | Estados anterior/nuevo, evento, motivo y usuario. |
+| GET | `/reservas/:id/snapshot` | AUTH | `ReservaSnapshot` | Versiones congeladas de precios/condiciones. |
+| POST | `/admin/reservas/expirar` | ADMIN | `u_sp_ExpirarReservas` | Ejecución manual del job (cursor). |
 
 ## Pagos
 
-| Método | Ruta | Acceso | SP / Tabla |
-|---|---|---|---|
-| POST | `/pagos` | AUTH | `u_sp_RegistrarPago` |
-| GET | `/pagos?reserva=` | AUTH | `Pago` |
-| POST | `/pagos/webpay/iniciar` | ROL(CLIENTE) | `u_sp_WebPay_IniciarTransaccion` → `{token_ws, url}` |
-| POST | `/pagos/webpay/confirmar` | ROL(CLIENTE) | `u_sp_WebPay_ConfirmarTransaccion` |
-| POST | `/reembolsos` | AUTH | `u_sp_CrearReembolso` |
-| POST | `/reembolsos/:id/completar` | ADMIN | `u_sp_MarcarReembolsoCompletado` |
-| GET | `/reportes/ingresos?anio` | ADMIN | `u_sp_ReporteIngresosMensuales` |
+| Método | Ruta | Acceso | SP / Tabla | Notas |
+|---|---|---|---|---|
+| POST | `/pagos` | ADMIN | `u_sp_RegistrarPago` | Registro manual/operativo. El cliente **no** puede autoaprobar pagos. |
+| GET | `/pagos?reserva=` | AUTH | `Pago` + catálogos | Ownership de la reserva. |
+| POST | `/pagos/webpay/iniciar` | ROL(CLIENTE) dueño | `u_sp_WebPay_IniciarTransaccion` | Body `{ID_reserva}`. El monto se obtiene de la reserva. Devuelve `{token_ws, url, ID_pago, monto}`. |
+| GET | `/pagos/webpay/transaccion/:token` | AUTH dueño | `PagoTransaccionSimulada` | Datos para la confirmación simulada. |
+| POST | `/pagos/webpay/confirmar` | ROL(CLIENTE) dueño | `u_sp_WebPay_ConfirmarTransaccion` | Body `{token_ws, aprobada}`. Solo una confirmación por token. |
+| POST | `/reembolsos` | CLIENTE dueño / ADMIN | `u_sp_CrearReembolso` | `idempotency_key` obligatorio. |
+| POST | `/reembolsos/:id/completar` | CLIENTE dueño / ADMIN | `u_sp_MarcarReembolsoCompletado` | |
+| GET | `/reembolsos?reserva=` | AUTH | `Reembolso` | Ownership de la reserva. |
+| GET | `/reportes/ingresos?anio&ID_proveedor=` | ADMIN | `u_sp_ReporteIngresosMensuales` | Reporte mensual. |
+
+> Los flujos de pago y reembolso se documentan en detalle en
+> [`docs/RESERVAS-PAGOS.md`](../../docs/RESERVAS-PAGOS.md). Los triggers y el
+> cursor se justifican en
+> [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](../../docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 
 ## Arriendos
 
@@ -123,12 +133,13 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET | `/admin/auditoria` | ADMIN | `Auditoria` |
 | GET | `/admin/outbox` | ADMIN | `u_sp_ObtenerOutboxPendiente` |
 | GET | `/admin/integridad` | ADMIN | `u_sp_ValidarIntegridad` |
+| POST | `/admin/reservas/expirar` | ADMIN | `u_sp_ExpirarReservas` |
 | GET | `/health` | PÚBLICO | — (estado API/BD) |
 
 ## Notas de implementación
 
-- **Idempotencia:** `POST /reservas`, `/pagos` y `/reembolsos` aceptan `idempotency_key` en el cuerpo.
-- **Paginación:** `?page=&pageSize=` en listados; respuesta `{ data, page, pageSize, total }`.
+- **Idempotencia:** `POST /reservas` exige `Idempotency-Key` (header) o `idempotency_key`; `POST /reservas/:id/cancelar` la exige cuando hay reembolso; `POST /reembolsos` la exige en el cuerpo. `POST /pagos` (ADMIN) no soporta idempotencia en el SP actual.
+- **Paginación:** `GET /reservas` usa `?page=&pageSize=`; respuesta `{ data, page, pageSize, total }`.
 - **Filtros de vehículos:** comuna, tipo, marca, rango de precio, fechas, características.
 - **Uploads:** `multipart/form-data`; se guardan en storage y se registra la URL en BD.
 - **Swagger:** se publica en `/api/docs` (OpenAPI 3).

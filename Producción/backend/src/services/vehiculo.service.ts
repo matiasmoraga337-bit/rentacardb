@@ -79,15 +79,22 @@ export async function detalle(idVehiculo: number): Promise<unknown> {
   if (!vehiculo) {
     throw new AppError(404, 'VEHICULO_NO_ENCONTRADO', 'Vehiculo no encontrado.');
   }
-  const [fotos, caracteristicas, tarifas] = await Promise.all([
+  const [fotos, caracteristicas, tarifas, sedes] = await Promise.all([
     repo.listarFotos(idVehiculo),
     repo.listarCaracteristicas(idVehiculo),
     repo.listarTarifas(idVehiculo),
+    repo.listarSedesVehiculo(idVehiculo),
   ]);
   const fotosConThumb = (fotos as { id: number; url: string; esPrincipal: boolean }[]).map(
     (foto) => ({ ...foto, thumbUrl: foto.url.replace(/\.webp$/, '-thumb.webp') }),
   );
-  return { ...(vehiculo as object), fotos: fotosConThumb, caracteristicas, tarifas };
+  return {
+    ...(vehiculo as object),
+    fotos: fotosConThumb,
+    caracteristicas,
+    tarifas,
+    sedes,
+  };
 }
 
 export async function subirFotos(
@@ -221,4 +228,70 @@ export async function listarDocumentos(idUsuario: number, idVehiculo: number): P
 
 export async function buscar(params: repo.BusquedaParams): Promise<unknown[]> {
   return repo.buscarVehiculos(params);
+}
+
+export interface DisponibilidadResponse {
+  id: number;
+  patente: string;
+  disponible: boolean;
+  motivo: string | null;
+  precioDia: number;
+  dias: number;
+  ivaPorcentaje: number;
+  requiereDeposito: boolean;
+  deposito: number;
+  subtotal: number;
+  impuesto: number;
+  total: number;
+  minutosExpiracion: number;
+}
+
+const hoyIso = (): string => {
+  const now = new Date();
+  const mes = String(now.getMonth() + 1).padStart(2, '0');
+  const dia = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${mes}-${dia}`;
+};
+
+export async function disponibilidad(
+  idVehiculo: number,
+  desde: string,
+  hasta: string,
+): Promise<DisponibilidadResponse> {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(desde) || !/^\d{4}-\d{2}-\d{2}$/.test(hasta)) {
+    throw new AppError(400, 'FECHAS_INVALIDAS', 'Las fechas deben tener formato YYYY-MM-DD.');
+  }
+  if (hasta <= desde) {
+    throw new AppError(400, 'FECHAS_INVALIDAS', 'La fecha de fin debe ser posterior al inicio.');
+  }
+  if (desde < hoyIso()) {
+    throw new AppError(400, 'FECHAS_INVALIDAS', 'La fecha de inicio no puede ser anterior a hoy.');
+  }
+
+  const row = await repo.consultarDisponibilidad(idVehiculo, { desde, hasta });
+  if (!row) {
+    throw new AppError(404, 'VEHICULO_NO_ENCONTRADO', 'Vehiculo no encontrado.');
+  }
+
+  let motivo: string | null = null;
+  if (!row.publicado) motivo = 'VEHICULO_NO_PUBLICADO';
+  else if (row.reservado) motivo = 'RESERVADO_EN_ESAS_FECHAS';
+  else if (row.bloqueado) motivo = 'BLOQUEO_ACTIVO';
+  else if (row.mantenimiento) motivo = 'MANTENIMIENTO';
+
+  return {
+    id: row.id,
+    patente: row.patente,
+    disponible: Boolean(row.disponible),
+    motivo,
+    precioDia: row.precioDia,
+    dias: row.dias,
+    ivaPorcentaje: row.ivaPorcentaje,
+    requiereDeposito: Boolean(row.requiereDeposito),
+    deposito: row.deposito,
+    subtotal: row.subtotal,
+    impuesto: row.impuesto,
+    total: row.total,
+    minutosExpiracion: row.minutosExpiracion ?? 30,
+  };
 }

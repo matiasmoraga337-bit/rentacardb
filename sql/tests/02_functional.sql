@@ -1,4 +1,6 @@
 USE [RentaCarDB];
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
 SET NOCOUNT ON;
 
 IF OBJECT_ID('tempdb..#R') IS NOT NULL DROP TABLE #R;
@@ -50,6 +52,38 @@ IF NOT EXISTS (SELECT 1 FROM VehiculoFoto WHERE ID_vehiculo_vehiculo_foto=@idVeh
 IF NOT EXISTS (SELECT 1 FROM VehiculoCaracteristica WHERE ID_vehiculo_vehiculo_caracteristica=@idVeh AND ID_caracteristica_vehiculo_caracteristica=1)
     EXEC dbo.u_sp_AgregarCaracteristicaVehiculo @ID_vehiculo=@idVeh, @ID_proveedor=@idProv, @ID_caracteristica=1, @disponible=1;
 EXEC dbo.u_sp_PublicarVehiculo @ID_vehiculo=@idVeh, @ID_usuario_admin=@idAdmin;
+
+-- Fixtures de S2: sedes habilitadas y documentos obligatorios verificados.
+IF NOT EXISTS (SELECT 1 FROM VehiculoSede
+               WHERE ID_vehiculo_vehiculo_sede=@idVeh AND ID_sede_proveedor_vehiculo_sede=@idSede)
+    INSERT INTO VehiculoSede
+        (ID_vehiculo_vehiculo_sede, ID_sede_proveedor_vehiculo_sede,
+         disponible_para_entrega_vehiculo_sede, disponible_para_devolucion_vehiculo_sede)
+    VALUES (@idVeh, @idSede, 1, 1);
+
+DECLARE @vencDoc DATE = DATEADD(YEAR, 5, CAST(GETDATE() AS DATE));
+DECLARE @tipoDoc INT = 1;
+WHILE @tipoDoc <= 3
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM DocumentoVehiculo
+                   WHERE ID_vehiculo_documento_vehiculo=@idVeh
+                     AND ID_tipo_documento_vehiculo_documento_vehiculo=@tipoDoc
+                     AND activo_documento=1)
+        INSERT INTO DocumentoVehiculo
+            (ID_vehiculo_documento_vehiculo, ID_tipo_documento_vehiculo_documento_vehiculo,
+             numero_documento, fecha_emision_documento, fecha_vencimiento_documento,
+             verificado_documento, activo_documento)
+        VALUES (@idVeh, @tipoDoc, CONCAT('QA-S2-', @tipoDoc), CAST(GETDATE() AS DATE),
+                @vencDoc, 1, 1);
+    ELSE
+        UPDATE DocumentoVehiculo
+        SET verificado_documento = 1,
+            fecha_vencimiento_documento = @vencDoc
+        WHERE ID_vehiculo_documento_vehiculo=@idVeh
+          AND ID_tipo_documento_vehiculo_documento_vehiculo=@tipoDoc
+          AND activo_documento=1;
+    SET @tipoDoc += 1;
+END;
 
 -- ===================== AUTH =====================
 BEGIN TRY

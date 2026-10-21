@@ -14,16 +14,38 @@ export function AppLayout() {
             RentaCarDB
           </Link>
           <div className="flex items-center gap-3">
-            <Link to="/proveedor/vehiculos" className="text-sm text-slate-600 hover:text-brand">
-              Vehiculos
+            <Link to="/catalogo" className="text-sm text-slate-600 hover:text-brand">
+              Catalogo
             </Link>
-            <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
-              Proveedor
-            </Link>
-            {usuario?.roles.includes('ADMIN') && (
-              <Link to="/admin/proveedores" className="text-sm text-slate-600 hover:text-brand">
-                Admin
+            {usuario?.roles.includes('CLIENTE') && (
+              <Link to="/reservas" className="text-sm text-slate-600 hover:text-brand">
+                Mis reservas
               </Link>
+            )}
+            {(usuario?.roles.includes('PROVEEDOR') ||
+              usuario?.roles.includes('OPERADOR') ||
+              usuario?.roles.includes('ADMIN')) && (
+              <>
+                <Link to="/proveedor/reservas" className="text-sm text-slate-600 hover:text-brand">
+                  Reservas
+                </Link>
+                <Link to="/proveedor/vehiculos" className="text-sm text-slate-600 hover:text-brand">
+                  Vehiculos
+                </Link>
+                <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
+                  Proveedor
+                </Link>
+              </>
+            )}
+            {usuario?.roles.includes('ADMIN') && (
+              <>
+                <Link to="/admin/proveedores" className="text-sm text-slate-600 hover:text-brand">
+                  Admin
+                </Link>
+                <Link to="/admin/reportes" className="text-sm text-slate-600 hover:text-brand">
+                  Reportes
+                </Link>
+              </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Navigate, useNavigate, Link } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +18,9 @@ type LoginForm = z.infer<typeof loginSchema>;
 export function LoginPage() {
   const { usuario, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const rawFrom = (location.state as { from?: string } | null)?.from;
+  const from = typeof rawFrom === 'string' && rawFrom.startsWith('/') ? rawFrom : undefined;
   const {
     register,
     handleSubmit,
@@ -25,12 +28,12 @@ export function LoginPage() {
     formState: { errors, isSubmitting },
   } = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
-  if (usuario) return <Navigate to="/panel" replace />;
+  if (usuario) return <Navigate to={from ?? '/panel'} replace />;
 
   const onSubmit = async (data: LoginForm): Promise<void> => {
     try {
       await login(data.email, data.password);
-      navigate('/panel');
+      navigate(from ?? '/panel');
     } catch (error) {
       setError('root', {
         message: error instanceof Error ? error.message : 'No se pudo iniciar sesión.',
