@@ -1,4 +1,4 @@
-﻿# SEGURIDAD
+# SEGURIDAD
 
 Buenas prácticas aplicadas a la aplicación web (API + frontend).
 
@@ -9,7 +9,7 @@ Buenas prácticas aplicadas a la aplicación web (API + frontend).
 - **JWT:** firmado con secreto en variable de entorno (`JWT_SECRET`), con expiración corta
   (p. ej. 1 h) y **refresh token** opcional.
 - **Roles:** en el token y **revalidados** contra `UsuarioRol` en operaciones sensibles.
-- **Login:** se usa `sp_Login`; registrar intentos en `LoginHistorial` (ya existe).
+- **Login:** se usa `u_sp_Login`; registrar intentos en `LoginHistorial` (ya existe).
 - **Verificación de correo** (`EmailVerificacion`) y **reset** (`PasswordResetToken`) con tokens
   de un solo uso y expiración.
 

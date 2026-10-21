@@ -1,4 +1,4 @@
-﻿# Documentación — RentaCarDB
+# Documentación — RentaCarDB
 
 Proyecto universitario de Base de Datos: sistema web de reserva/renta de vehículos
 con múltiples sedes y dueños por región de Chile.
@@ -7,7 +7,7 @@ con múltiples sedes y dueños por región de Chile.
 - **Base de datos:** `RentaCarDB`
 - **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
 - Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
-- **Conteo:** 82 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 70 procedimientos almacenados · 3 funciones · 6 vistas.
+- **Conteo:** 82 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 68 procedimientos almacenados · 3 funciones · 6 vistas.
 
 ## Índice
 

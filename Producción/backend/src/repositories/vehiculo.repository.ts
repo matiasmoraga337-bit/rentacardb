@@ -84,7 +84,7 @@ export async function registrarVehiculo(params: RegistrarVehiculoParams): Promis
     .input('kilometraje', sql.Int, params.kilometraje)
     .input('precio_diario_base', sql.Decimal(12, 2), params.precio_diario_base)
     .input('ID_sede_actual', sql.Int, params.ID_sede_actual ?? null)
-    .execute('sp_RegistrarVehiculo');
+    .execute('u_sp_RegistrarVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -107,7 +107,7 @@ export async function actualizarVehiculo(
     .input('anio', sql.SmallInt, params.anio ?? null)
     .input('kilometraje', sql.Int, params.kilometraje ?? null)
     .input('precio_diario_base', sql.Decimal(12, 2), params.precio_diario_base ?? null)
-    .execute('sp_ActualizarVehiculo');
+    .execute('u_sp_ActualizarVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -117,7 +117,7 @@ export async function publicarVehiculo(idVehiculo: number, idUsuario: number): P
     .request()
     .input('ID_vehiculo', sql.Int, idVehiculo)
     .input('ID_usuario_admin', sql.Int, idUsuario)
-    .execute('sp_PublicarVehiculo');
+    .execute('u_sp_PublicarVehiculo');
 }
 
 const VEHICULO_DETALLE = `
@@ -219,7 +219,7 @@ export async function registrarFoto(
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('url_foto', sql.VarChar(500), url)
     .input('es_principal', sql.Bit, esPrincipal)
-    .execute('sp_RegistrarVehiculoFoto');
+    .execute('u_u_sp_RegistrarVehiculoFoto');
   return result.recordset[0] ?? null;
 }
 
@@ -229,7 +229,7 @@ export async function eliminarFoto(idFoto: number, idProveedor: number): Promise
     .request()
     .input('ID_foto', sql.Int, idFoto)
     .input('ID_proveedor', sql.Int, idProveedor)
-    .execute('sp_EliminarVehiculoFoto');
+    .execute('u_sp_EliminarVehiculoFoto');
 }
 
 export async function listarCaracteristicas(idVehiculo: number): Promise<unknown[]> {
@@ -261,7 +261,7 @@ export async function agregarCaracteristica(
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('ID_caracteristica', sql.Int, idCaracteristica)
     .input('disponible', sql.Bit, disponible)
-    .execute('sp_AgregarCaracteristicaVehiculo');
+    .execute('u_sp_AgregarCaracteristicaVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -276,7 +276,7 @@ export async function quitarCaracteristica(
     .input('ID_vehiculo', sql.Int, idVehiculo)
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('ID_caracteristica', sql.Int, idCaracteristica)
-    .execute('sp_QuitarCaracteristicaVehiculo');
+    .execute('u_sp_QuitarCaracteristicaVehiculo');
 }
 
 export async function listarTarifas(idVehiculo: number): Promise<unknown[]> {
@@ -317,7 +317,7 @@ export async function registrarTarifa(
     .input('dias_minimos', sql.Int, data.dias_minimos ?? null)
     .input('dias_maximos', sql.Int, data.dias_maximos ?? null)
     .input('activa', sql.Bit, data.activa ?? true)
-    .execute('sp_RegistrarTarifaVehiculo');
+    .execute('u_sp_RegistrarTarifaVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -342,7 +342,7 @@ export async function actualizarTarifa(
     .input('dias_minimos', sql.Int, data.dias_minimos ?? null)
     .input('dias_maximos', sql.Int, data.dias_maximos ?? null)
     .input('activa', sql.Bit, data.activa ?? null)
-    .execute('sp_ActualizarTarifaVehiculo');
+    .execute('u_sp_ActualizarTarifaVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -352,7 +352,7 @@ export async function eliminarTarifa(idTarifa: number, idProveedor: number): Pro
     .request()
     .input('ID_tarifa', sql.BigInt, idTarifa)
     .input('ID_proveedor', sql.Int, idProveedor)
-    .execute('sp_EliminarTarifaVehiculo');
+    .execute('u_sp_EliminarTarifaVehiculo');
 }
 
 export async function registrarDocumento(
@@ -372,7 +372,7 @@ export async function registrarDocumento(
     .input('fecha_emision', sql.Date, fechaEmision)
     .input('fecha_vencimiento', sql.Date, fechaVencimiento)
     .input('url_archivo', sql.VarChar(500), url)
-    .execute('sp_RegistrarDocumentoVehiculo');
+    .execute('u_sp_RegistrarDocumentoVehiculo');
   return result.recordset[0] ?? null;
 }
 
@@ -416,6 +416,6 @@ export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]
     .input('ID_tipo_vehiculo', sql.Int, params.ID_tipo_vehiculo ?? null)
     .input('precio_maximo', sql.Decimal(14, 2), params.precio_maximo ?? null)
     .input('ID_caracteristica', sql.Int, params.ID_caracteristica ?? null)
-    .execute('sp_V5_BuscarVehiculos');
+    .execute('u_sp_BuscarVehiculos');
   return result.recordset;
 }

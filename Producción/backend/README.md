@@ -34,13 +34,13 @@ npm run dev               # http://localhost:3000/api  ·  docs en /api/docs
 | Método | Ruta | Acceso | SP |
 |---|---|---|---|
 | GET | `/api/health` | Público | — |
-| POST | `/api/auth/login` | Público | `sp_Login` |
-| POST | `/api/auth/registro` | Público | `sp_RegistrarUsuario` |
+| POST | `/api/auth/login` | Público | `u_sp_Login` |
+| POST | `/api/auth/registro` | Público | `u_sp_RegistrarUsuario` |
 | GET | `/api/auth/me` | JWT | `Usuario`/`Persona`/`UsuarioRol` |
 
 ## Notas
 
-- `sp_Login` compara el hash por igualdad; como usamos **bcrypt**, la API compara la
+- `u_sp_Login` compara el hash por igualdad; como usamos **bcrypt**, la API compara la
   contraseña localmente y llama al SP con el hash almacenado para conservar la auditoría
   en `LoginHistorial`.
 - La estructura por capas (`routes → controllers → services → repositories`) está descrita

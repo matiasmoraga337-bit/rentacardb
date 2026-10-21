@@ -66,7 +66,7 @@ export async function login(
     .input('password_hash', sql.VarChar(255), passwordHash)
     .input('ip', sql.VarChar(45), ip ?? null)
     .input('user_agent', sql.NVarChar(300), userAgent ?? null)
-    .execute<LoginRow>('sp_Login');
+    .execute<LoginRow>('u_sp_Login');
   return result.recordset[0] ?? null;
 }
 
@@ -85,7 +85,7 @@ export async function registrarUsuario(
     .input('email', sql.VarChar(150), input.email)
     .input('password_hash', sql.VarChar(255), input.passwordHash)
     .input('rol', sql.VarChar(50), input.rol ?? 'CLIENTE')
-    .execute<RegistrarUsuarioRow>('sp_RegistrarUsuario');
+    .execute<RegistrarUsuarioRow>('u_sp_RegistrarUsuario');
   return result.recordset[0] ?? null;
 }
 
@@ -122,7 +122,7 @@ export async function verificarEmail(
   const result = await pool
     .request()
     .input('token_hash', sql.Char(64), tokenHash)
-    .execute<{ ID_usuario: number; verificado: number }>('sp_VerificarEmail');
+    .execute<{ ID_usuario: number; verificado: number }>('u_sp_VerificarEmail');
   return result.recordset[0] ?? null;
 }
 
@@ -131,7 +131,7 @@ export async function solicitarReset(email: string): Promise<string | null> {
   const result = await pool
     .request()
     .input('email', sql.VarChar(150), email)
-    .execute<{ token_reset: string }>('sp_SolicitarResetPassword');
+    .execute<{ token_reset: string }>('u_sp_SolicitarResetPassword');
   return result.recordset[0]?.token_reset ?? null;
 }
 
@@ -141,7 +141,7 @@ export async function confirmarReset(tokenHash: string, nuevoHash: string): Prom
     .request()
     .input('token_hash', sql.Char(64), tokenHash)
     .input('nuevo_hash', sql.VarChar(255), nuevoHash)
-    .execute('sp_ConfirmarResetPassword');
+    .execute('u_sp_ConfirmarResetPassword');
 }
 
 export interface PerfilRow {
@@ -174,7 +174,7 @@ export async function actualizarPerfil(
     .input('apellido_paterno', sql.NVarChar(50), data.apellidoPaterno ?? null)
     .input('apellido_materno', sql.NVarChar(50), data.apellidoMaterno ?? null)
     .input('telefono', sql.VarChar(20), data.telefono ?? null)
-    .execute<PerfilRow>('sp_ActualizarPerfilUsuario');
+    .execute<PerfilRow>('u_sp_ActualizarPerfilUsuario');
   return result.recordset[0] ?? null;
 }
 

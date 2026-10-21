@@ -1,4 +1,4 @@
-﻿# API — Contratos REST
+# API — Contratos REST
 
 Base: `/api`. Autenticación: `Authorization: Bearer <JWT>`.
 Errores uniformes: `{ "error": { "code": "...", "message": "...", "details": [...] } }`.
@@ -9,13 +9,13 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | Cuerpo / Params | SP / Tabla |
 |---|---|---|---|---|
-| POST | `/auth/registro` | PÚBLICO | `{rut, nombres, apellidos, email, password, telefono?}` | `sp_RegistrarUsuario` |
-| POST | `/auth/login` | PÚBLICO | `{email, password}` | `sp_Login` → JWT |
+| POST | `/auth/registro` | PÚBLICO | `{rut, nombres, apellidos, email, password, telefono?}` | `u_sp_RegistrarUsuario` |
+| POST | `/auth/login` | PÚBLICO | `{email, password}` | `u_sp_Login` → JWT |
 | POST | `/auth/logout` | AUTH | — | — |
 | GET | `/auth/me` | AUTH | — | `Usuario`, `UsuarioRol`, `Persona` |
-| POST | `/auth/verificar-email` | PÚBLICO | `{token}` | `sp_VerificarEmail` |
-| POST | `/auth/recuperar` | PÚBLICO | `{email}` | `sp_SolicitarResetPassword` |
-| POST | `/auth/recuperar/confirmar` | PÚBLICO | `{token, password}` | `sp_ConfirmarResetPassword` |
+| POST | `/auth/verificar-email` | PÚBLICO | `{token}` | `u_sp_VerificarEmail` |
+| POST | `/auth/recuperar` | PÚBLICO | `{email}` | `u_sp_SolicitarResetPassword` |
+| POST | `/auth/recuperar/confirmar` | PÚBLICO | `{token, password}` | `u_sp_ConfirmarResetPassword` |
 | PUT | `/usuarios/perfil` | AUTH | `{nombres, apellidos, telefono}` | `Persona`, `Usuario` |
 | GET | `/usuarios/:id/roles` | ADMIN | — | `UsuarioRol` |
 
@@ -32,13 +32,13 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/proveedores` | AUTH | `sp_RegistrarProveedor` |
+| POST | `/proveedores` | AUTH | `u_sp_RegistrarProveedor` |
 | GET | `/proveedores` | ADMIN | `Proveedor` (filtros por estado/tipo) |
 | GET | `/proveedores/:id` | AUTH | `Proveedor`, `ConfiguracionProveedor` |
-| PATCH | `/proveedores/:id/aprobar` | ADMIN | `sp_AprobarProveedor` |
+| PATCH | `/proveedores/:id/aprobar` | ADMIN | `u_sp_AprobarProveedor` |
 | PUT | `/proveedores/:id/configuracion` | ROL(PROVEEDOR) | `ConfiguracionProveedor` |
 | GET/POST/PUT/DELETE | `/proveedores/:id/sedes[/:sedeId]` | ROL(PROVEEDOR) | `SedeProveedor` |
-| GET | `/reportes/proveedores` | ADMIN | `sp_ReporteProveedores` |
+| GET | `/reportes/proveedores` | ADMIN | `u_sp_ReporteProveedores` |
 
 ## Vehículos
 
@@ -48,24 +48,24 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET | `/vehiculos/:id` | PÚBLICO | `Vehiculo` + características + fotos + tarifas |
 | POST | `/vehiculos` | ROL(PROVEEDOR) | `Vehiculo` |
 | PUT | `/vehiculos/:id` | ROL(PROVEEDOR) | `Vehiculo` |
-| POST | `/vehiculos/:id/publicar` | ROL(PROVEEDOR) | `sp_PublicarVehiculo` |
+| POST | `/vehiculos/:id/publicar` | ROL(PROVEEDOR) | `u_sp_PublicarVehiculo` |
 | POST | `/vehiculos/:id/fotos` | ROL(PROVEEDOR) | `VehiculoFoto` (upload) |
 | GET/POST | `/vehiculos/:id/caracteristicas` | ROL(PROVEEDOR) | `VehiculoCaracteristica` |
 | GET/POST | `/vehiculos/:id/tarifas` | ROL(PROVEEDOR) | `TarifaVehiculo` |
-| GET/POST | `/vehiculos/:id/documentos` | ROL(PROVEEDOR) | `sp_RegistrarDocumentoVehiculo` |
+| GET/POST | `/vehiculos/:id/documentos` | ROL(PROVEEDOR) | `u_sp_RegistrarDocumentoVehiculo` |
 | GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_V5_VehiculosDisponibles` |
-| GET | `/vehiculos/buscar` | PÚBLICO | `sp_V5_BuscarVehiculos` |
+| GET | `/vehiculos/buscar` | PÚBLICO | `u_sp_BuscarVehiculos` |
 | GET/POST/DELETE | `/favoritos[/:vehiculoId]` | AUTH | `FavoritoVehiculo` |
 
 ## Reservas
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/reservas` | ROL(CLIENTE) | `sp_V5_CrearReserva` (idempotency_key) |
+| POST | `/reservas` | ROL(CLIENTE) | `u_sp_CrearReserva` (idempotency_key) |
 | GET | `/reservas` | AUTH | `vw_ReservasDetalle` (cliente ve las suyas; proveedor las de sus vehículos) |
 | GET | `/reservas/:id` | AUTH | `vw_ReservasDetalle` |
-| POST | `/reservas/:id/estado` | AUTH | `sp_V5_CambiarEstadoReserva` |
-| POST | `/reservas/:id/cancelar` | ROL(CLIENTE) | `sp_V5_CancelarReserva` (reembolso opcional) |
+| POST | `/reservas/:id/estado` | AUTH | `u_sp_CambiarEstadoReserva` |
+| POST | `/reservas/:id/cancelar` | ROL(CLIENTE) | `u_sp_CancelarReserva` (reembolso opcional) |
 | GET | `/reservas/:id/historial` | AUTH | `HistorialEstadoReserva` |
 | GET | `/reservas/:id/snapshot` | AUTH | `ReservaSnapshot` |
 | GET/POST | `/reservas/:id/cupones` | — | **N/A** (cupones retirados) |
@@ -74,46 +74,46 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/pagos` | AUTH | `sp_RegistrarPago` |
+| POST | `/pagos` | AUTH | `u_sp_RegistrarPago` |
 | GET | `/pagos?reserva=` | AUTH | `Pago` |
-| POST | `/pagos/webpay/iniciar` | ROL(CLIENTE) | `sp_WP_IniciarTransaccion` → `{token_ws, url}` |
-| POST | `/pagos/webpay/confirmar` | ROL(CLIENTE) | `sp_WP_ConfirmarTransaccion` |
-| POST | `/reembolsos` | AUTH | `sp_V5_CrearReembolso` |
-| POST | `/reembolsos/:id/completar` | ADMIN | `sp_V5_MarcarReembolsoCompletado` |
-| GET | `/reportes/ingresos?anio` | ADMIN | `sp_V5_ReporteIngresosMensuales` |
+| POST | `/pagos/webpay/iniciar` | ROL(CLIENTE) | `u_sp_WebPay_IniciarTransaccion` → `{token_ws, url}` |
+| POST | `/pagos/webpay/confirmar` | ROL(CLIENTE) | `u_sp_WebPay_ConfirmarTransaccion` |
+| POST | `/reembolsos` | AUTH | `u_sp_CrearReembolso` |
+| POST | `/reembolsos/:id/completar` | ADMIN | `u_sp_MarcarReembolsoCompletado` |
+| GET | `/reportes/ingresos?anio` | ADMIN | `u_sp_ReporteIngresosMensuales` |
 
 ## Arriendos
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/arriendos/iniciar` | ROL(OPERADOR/PROVEEDOR) | `sp_IniciarArriendo` |
-| POST | `/arriendos/:id/devolucion` | ROL(OPERADOR/PROVEEDOR) | `sp_RegistrarDevolucion` |
+| POST | `/arriendos/iniciar` | ROL(OPERADOR/PROVEEDOR) | `u_sp_IniciarArriendo` |
+| POST | `/arriendos/:id/devolucion` | ROL(OPERADOR/PROVEEDOR) | `u_sp_RegistrarDevolucion` |
 | GET | `/arriendos/:id` | AUTH | `Arriendo` + inspecciones |
-| POST | `/arriendos/:id/inspecciones` | ROL(OPERADOR) | `InspeccionArriendo`, `sp_RegistrarDanoInspeccion` |
-| POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `sp_RegistrarConductorAdicional` |
-| POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `sp_V5_CrearAceptacionContrato` |
-| POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR) | `sp_CrearCargoExtra` |
-| POST | `/arriendos/:id/multas` | ROL(OPERADOR/ADMIN) | `sp_RegistrarMulta` |
+| POST | `/arriendos/:id/inspecciones` | ROL(OPERADOR) | `InspeccionArriendo`, `u_sp_RegistrarDanoInspeccion` |
+| POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `u_sp_RegistrarConductorAdicional` |
+| POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `u_sp_CrearAceptacionContrato` |
+| POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR) | `u_sp_CrearCargoExtra` |
+| POST | `/arriendos/:id/multas` | ROL(OPERADOR/ADMIN) | `u_sp_RegistrarMulta` |
 
 ## Liquidaciones, disputas, reseñas, chat
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/liquidaciones` | ADMIN | `sp_V5_GenerarLiquidacion` |
+| POST | `/liquidaciones` | ADMIN | `u_sp_GenerarLiquidacion` |
 | GET | `/liquidaciones?proveedor=` | ROL(PROVEEDOR)/ADMIN | `LiquidacionProveedor` |
-| POST | `/liquidaciones/:id/aprobar` | ADMIN | `sp_V5_AprobarLiquidacion` |
-| POST | `/liquidaciones/:id/pagar` | ADMIN | `sp_V5_MarcarLiquidacionPagada` |
-| GET | `/reportes/liquidaciones` | ADMIN | `sp_ReporteLiquidaciones` |
+| POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` |
+| POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` |
+| GET | `/reportes/liquidaciones` | ADMIN | `u_sp_ReporteLiquidaciones` |
 | POST | `/disputas` | AUTH | `Disputa` |
 | GET | `/disputas` | ADMIN | `Disputa` |
-| POST | `/resenas` | AUTH | `sp_CrearResena` |
+| POST | `/resenas` | AUTH | `u_sp_CrearResena` |
 | GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` |
-| POST | `/conversaciones` | AUTH | `sp_CrearConversacion` |
-| GET | `/conversaciones` | AUTH | `sp_ListarConversaciones` |
-| GET | `/conversaciones/:id/mensajes` | AUTH | `sp_ListarMensajes` |
-| POST | `/conversaciones/:id/mensajes` | AUTH | `sp_EnviarMensaje` |
-| POST | `/conversaciones/:id/leidos` | AUTH | `sp_MarcarMensajesLeidos` |
-| POST | `/conversaciones/:id/cerrar` | AUTH | `sp_CerrarConversacion` |
+| POST | `/conversaciones` | AUTH | `u_sp_CrearConversacion` |
+| GET | `/conversaciones` | AUTH | `u_sp_ListarConversaciones` |
+| GET | `/conversaciones/:id/mensajes` | AUTH | `u_sp_ListarMensajes` |
+| POST | `/conversaciones/:id/mensajes` | AUTH | `u_sp_EnviarMensaje` |
+| POST | `/conversaciones/:id/leidos` | AUTH | `u_sp_MarcarMensajesLeidos` |
+| POST | `/conversaciones/:id/cerrar` | AUTH | `u_sp_CerrarConversacion` |
 
 ## Administración y catálogos
 
@@ -121,8 +121,8 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 |---|---|---|---|
 | GET/POST/PUT | `/admin/catalogos/:tabla` | ADMIN | `Tipo*`, `Estado*`, `Marca`, `Modelo`, `PoliticaCancelacion`, `CaracteristicaVehiculo`, `TipoCargoExtra` |
 | GET | `/admin/auditoria` | ADMIN | `Auditoria` |
-| GET | `/admin/outbox` | ADMIN | `sp_V5_ObtenerOutboxPendiente` |
-| GET | `/admin/integridad` | ADMIN | `sp_V5_ValidarIntegridad` |
+| GET | `/admin/outbox` | ADMIN | `u_sp_ObtenerOutboxPendiente` |
+| GET | `/admin/integridad` | ADMIN | `u_sp_ValidarIntegridad` |
 | GET | `/health` | PÚBLICO | — (estado API/BD) |
 
 ## Notas de implementación

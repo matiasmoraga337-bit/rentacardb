@@ -1,4 +1,4 @@
-﻿# BACKLOG — Épicas, historias y tareas
+# BACKLOG — Épicas, historias y tareas
 
 Estimación en **puntos de historia (SP)** (Fibonacci: 1, 2, 3, 5, 8, 13).
 Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
@@ -19,10 +19,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 ## E2 — Autenticación y usuarios `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E2.1 | Registrarme (persona+usuario+cliente) | 8 | `sp_RegistrarUsuario`, validación zod, hash bcrypt, UI registro |
-| E2.2 | Iniciar sesión y obtener JWT | 5 | `sp_Login`, JWT, refresh/expiración, UI login |
-| E2.3 | Verificar correo | 3 | `sp_VerificarEmail`, envío (cola/outbox), UI verificación |
-| E2.4 | Recuperar contraseña | 5 | `sp_SolicitarResetPassword` + `sp_ConfirmarResetPassword`, UI |
+| E2.1 | Registrarme (persona+usuario+cliente) | 8 | `u_sp_RegistrarUsuario`, validación zod, hash bcrypt, UI registro |
+| E2.2 | Iniciar sesión y obtener JWT | 5 | `u_sp_Login`, JWT, refresh/expiración, UI login |
+| E2.3 | Verificar correo | 3 | `u_sp_VerificarEmail`, envío (cola/outbox), UI verificación |
+| E2.4 | Recuperar contraseña | 5 | `u_sp_SolicitarResetPassword` + `u_sp_ConfirmarResetPassword`, UI |
 | E2.5 | Ver mi perfil y editarlo | 3 | `Persona`/`Usuario`, UI perfil |
 | E2.6 | Roles y guards (CLIENTE/PROVEEDOR/OPERADOR/ADMIN) | 5 | `UsuarioRol`, middleware `authorize`, guards de ruta |
 
@@ -35,8 +35,8 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 ## E4 — Proveedores y sedes `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E4.1 | Registrarme como proveedor | 5 | `sp_RegistrarProveedor`, UI |
-| E4.2 | Aprobar/rechazar proveedor (admin) | 3 | `sp_AprobarProveedor`, UI admin |
+| E4.1 | Registrarme como proveedor | 5 | `u_sp_RegistrarProveedor`, UI |
+| E4.2 | Aprobar/rechazar proveedor (admin) | 3 | `u_sp_AprobarProveedor`, UI admin |
 | E4.3 | Configurar mi proveedor | 3 | `ConfiguracionProveedor`, UI |
 | E4.4 | Gestionar mis sedes | 5 | CRUD `SedeProveedor`, UI |
 
@@ -47,13 +47,13 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E5.2 | Subir fotos | 5 | Upload + `VehiculoFoto`, galería |
 | E5.3 | Características (N:M) | 3 | `VehiculoCaracteristica`, UI chips |
 | E5.4 | Tarifas por día | 5 | `TarifaVehiculo`, UI reglas |
-| E5.5 | Documentos legales | 5 | `sp_RegistrarDocumentoVehiculo`, upload, vencimientos |
-| E5.6 | Publicar vehículo | 3 | `sp_PublicarVehiculo`, UI |
+| E5.5 | Documentos legales | 5 | `u_sp_RegistrarDocumentoVehiculo`, upload, vencimientos |
+| E5.6 | Publicar vehículo | 3 | `u_sp_PublicarVehiculo`, UI |
 
 ## E6 — Búsqueda y disponibilidad `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E6.1 | Buscar vehículos con filtros | 8 | `sp_V5_BuscarVehiculos`/`vw_VehiculosPublicados`, UI filtros |
+| E6.1 | Buscar vehículos con filtros | 8 | `u_sp_BuscarVehiculos`/`vw_VehiculosPublicados`, UI filtros |
 | E6.2 | Ver disponibilidad por fechas | 5 | `vw_V5_VehiculosDisponibles` |
 | E6.3 | Favoritos | 3 | `FavoritoVehiculo`, UI |
 | E6.4 | Búsquedas guardadas | 3 | `BusquedaGuardada`, UI |
@@ -61,54 +61,54 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 ## E7 — Reservas `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E7.1 | Crear reserva (fechas, sedes) | 8 | `sp_V5_CrearReserva`, idempotencia, UI checkout |
+| E7.1 | Crear reserva (fechas, sedes) | 8 | `u_sp_CrearReserva`, idempotencia, UI checkout |
 | E7.2 | Ver mis reservas y detalle | 5 | `vw_ReservasDetalle`, UI |
-| E7.3 | Cambiar estado / cancelar | 5 | `sp_V5_CambiarEstadoReserva`, `sp_V5_CancelarReserva` |
+| E7.3 | Cambiar estado / cancelar | 5 | `u_sp_CambiarEstadoReserva`, `u_sp_CancelarReserva` |
 | E7.4 | Ver historial y snapshot | 3 | `HistorialEstadoReserva`, `ReservaSnapshot` |
-| E7.5 | Expiración de reservas | 3 | Job/scheduler que llama `sp_V5_ExpirarReservas` |
+| E7.5 | Expiración de reservas | 3 | Job/scheduler que llama `u_sp_ExpirarReservas` |
 
 ## E8 — Pagos (Webpay simulado) `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E8.1 | Registrar pago | 5 | `sp_RegistrarPago`, UI |
-| E8.2 | Pagar con Webpay simulado | 8 | `sp_WP_IniciarTransaccion`/`sp_WP_ConfirmarTransaccion`, UI flujo |
-| E8.3 | Reembolsos | 5 | `sp_V5_CrearReembolso`, UI |
-| E8.4 | Reporte de ingresos | 3 | `sp_V5_ReporteIngresosMensuales`, gráfico |
+| E8.1 | Registrar pago | 5 | `u_sp_RegistrarPago`, UI |
+| E8.2 | Pagar con Webpay simulado | 8 | `u_sp_WebPay_IniciarTransaccion`/`u_sp_WebPay_ConfirmarTransaccion`, UI flujo |
+| E8.3 | Reembolsos | 5 | `u_sp_CrearReembolso`, UI |
+| E8.4 | Reporte de ingresos | 3 | `u_sp_ReporteIngresosMensuales`, gráfico |
 
 ## E9 — Arriendos e inspecciones `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E9.1 | Iniciar arriendo (retiro) | 5 | `sp_IniciarArriendo`, UI operador |
-| E9.2 | Registrar devolución | 8 | `sp_RegistrarDevolucion`, UI |
-| E9.3 | Inspección entrega/devolución + daños | 8 | `InspeccionArriendo`, `sp_RegistrarDanoInspeccion`, fotos |
-| E9.4 | Conductores adicionales | 3 | `sp_RegistrarConductorAdicional` |
-| E9.5 | Aceptación de contrato | 3 | `sp_V5_CrearAceptacionContrato`, UI firma |
+| E9.1 | Iniciar arriendo (retiro) | 5 | `u_sp_IniciarArriendo`, UI operador |
+| E9.2 | Registrar devolución | 8 | `u_sp_RegistrarDevolucion`, UI |
+| E9.3 | Inspección entrega/devolución + daños | 8 | `InspeccionArriendo`, `u_sp_RegistrarDanoInspeccion`, fotos |
+| E9.4 | Conductores adicionales | 3 | `u_sp_RegistrarConductorAdicional` |
+| E9.5 | Aceptación de contrato | 3 | `u_sp_CrearAceptacionContrato`, UI firma |
 
 ## E10 — Cargos extra, multas, disputas `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E10.1 | Crear cargo extra | 3 | `sp_CrearCargoExtra`, UI |
-| E10.2 | Registrar multa | 3 | `sp_RegistrarMulta`, UI |
+| E10.1 | Crear cargo extra | 3 | `u_sp_CrearCargoExtra`, UI |
+| E10.2 | Registrar multa | 3 | `u_sp_RegistrarMulta`, UI |
 | E10.3 | Abrir/gestionar disputa | 5 | `Disputa`, UI |
 
 ## E11 — Liquidaciones y comisiones `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E11.1 | Generar liquidación por período | 5 | `sp_V5_GenerarLiquidacion`, UI admin |
-| E11.2 | Aprobar/pagar liquidación | 3 | `sp_V5_AprobarLiquidacion`, `sp_V5_MarcarLiquidacionPagada` |
+| E11.1 | Generar liquidación por período | 5 | `u_sp_GenerarLiquidacion`, UI admin |
+| E11.2 | Aprobar/pagar liquidación | 3 | `u_sp_AprobarLiquidacion`, `u_sp_MarcarLiquidacionPagada` |
 | E11.3 | Ver liquidaciones (proveedor) | 3 | `LiquidacionProveedor`, UI |
 
 ## E12 — Chat y notificaciones `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E12.1 | Conversar con proveedor/cliente | 8 | `sp_CrearConversacion`, `sp_EnviarMensaje`, `sp_ListarMensajes`, UI chat |
+| E12.1 | Conversar con proveedor/cliente | 8 | `u_sp_CrearConversacion`, `u_sp_EnviarMensaje`, `u_sp_ListarMensajes`, UI chat |
 | E12.2 | Adjuntos en mensajes | 3 | `MensajeAdjunto`, upload |
 | E12.3 | Notificaciones + worker outbox | 5 | `Notificacion`, `OutboxEvento`, worker, UI campana |
 
 ## E13 — Reseñas `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
-| E13.1 | Crear reseña tras arriendo | 3 | `sp_CrearResena`, UI |
+| E13.1 | Crear reseña tras arriendo | 3 | `u_sp_CrearResena`, UI |
 | E13.2 | Ver reseñas de vehículo/proveedor | 2 | `Resena`, UI |
 
 ## E14 — Paneles `M`
