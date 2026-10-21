@@ -142,7 +142,15 @@ ni `AceptacionContratoArriendo.fecha_generacion`.
 → `_configuracion_proveedor`. Se actualizaron defaults, CHECKs, seed, funcion de comision,
 SPs de reserva/config y el SELECT del backend.
 
-Pendientes: `TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
+**Grupo 6 — `TransicionEstadoReserva` / `HistorialEstadoReserva`** (aplicado):
+`ID_transicion`, `ID_estado_origen`, `ID_estado_destino`, `evento`, `requiere_pago`,
+`requiere_arriendo`, `activo` → `_transicion_estado_reserva`; `ID_estado_anterior`,
+`ID_estado_nuevo`, `evento`, `motivo` → `_historial_estado_reserva`.
+Se actualizaron seed, UQ, índices, FKs, defaults, `u_sp_CambiarEstadoReserva` y los INSERT de historial.
+
+Pendientes: tablas menores (`VehiculoSede`, `Conversacion`, `MovimientoFinanciero`,
+`Reembolso`, `Multa`, `ConductorAdicional`, `AceptacionContratoArriendo`,
+`BloqueoVehiculo`, `TarifaVehiculo`).
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
