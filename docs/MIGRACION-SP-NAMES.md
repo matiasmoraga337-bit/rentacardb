@@ -148,9 +148,15 @@ SPs de reserva/config y el SELECT del backend.
 `ID_estado_nuevo`, `evento`, `motivo` → `_historial_estado_reserva`.
 Se actualizaron seed, UQ, índices, FKs, defaults, `u_sp_CambiarEstadoReserva` y los INSERT de historial.
 
-Pendientes: tablas menores (`VehiculoSede`, `Conversacion`, `MovimientoFinanciero`,
-`Reembolso`, `Multa`, `ConductorAdicional`, `AceptacionContratoArriendo`,
-`BloqueoVehiculo`, `TarifaVehiculo`).
+**Grupo 7 — tablas menores** (aplicado): `VehiculoSede.disponible_para_*` → `_vehiculo_sede`;
+`Reembolso.referencia_externa` → `_reembolso`; `MovimientoFinanciero.referencia_externa`/`descripcion`
+→ `_movimiento_financiero`; `AceptacionContratoArriendo.es_vigente`/`fecha_generacion`
+→ `_aceptacion_contrato_arriendo`; `Conversacion.fecha_ultimo_mensaje`/`vehiculo_conversacion_calc`
+→ `_conversacion`; `ConductorAdicional.fecha_registro` → `_conductor_adicional`;
+`MigracionLog.fecha_ejecucion`/`detalles` → `_migracion_log`; `BloqueoVehiculo.ID_usuario_creacion`
+→ `_bloqueo_vehiculo`; `Multa.numero_parte` → `_multa`; `TarifaVehiculo.dia_semana_aplica`,
+`anticipacion_*`, `dias_*`, `ID_usuario_creacion` → `_tarifa_vehiculo`.
+Se actualizaron índices (incluido el computed column y el índice filtrado de conversación) y SPs.
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
