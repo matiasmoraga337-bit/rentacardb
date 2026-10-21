@@ -22,7 +22,17 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1).default('dev-secret-change-me'),
   JWT_EXPIRES_IN: z.string().default('1h'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  APP_URL: z.string().default('http://localhost:5173'),
   UPLOAD_DIR: z.string().default('./uploads'),
+  MAX_IMAGE_MB: z.coerce.number().int().positive().default(10),
+  MAX_DOC_MB: z.coerce.number().int().positive().default(10),
+
+  SMTP_HOST: z.string().default('localhost'),
+  SMTP_PORT: z.coerce.number().int().positive().default(1025),
+  SMTP_SECURE: boolFromString(false),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().default('RentaCarDB <no-reply@rentacar.cl>'),
 });
 
 const parsed = envSchema.safeParse(process.env);

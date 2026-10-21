@@ -1,4 +1,4 @@
-﻿# PROMPT MAESTRO — Proyecto RentaCarDB (aplicación web)
+# PROMPT MAESTRO — Proyecto RentaCarDB (aplicación web)
 
 > Copia este documento (o su contenido) en una nueva sesión del agente para que continúe el
 > desarrollo desde donde quedó.
@@ -35,8 +35,8 @@ con Docker, lista para la presentación del **17 de noviembre**.
 - **Stack:** Node.js + Express + TypeScript (API) · React + Vite + TypeScript + Tailwind CSS
   + shadcn/ui (web) · SQL Server.
 - **Acceso a datos:** driver **`mssql` (node-mssql) llamando a los SPs** existentes (NO ORM).
-- **Auth:** JWT + bcrypt; roles desde `UsuarioRol`; login/registro vía SPs (`sp_Login`,
-  `sp_RegistrarUsuario`, `sp_VerificarEmail`, `sp_SolicitarResetPassword`, `sp_ConfirmarResetPassword`).
+- **Auth:** JWT + bcrypt; roles desde `UsuarioRol`; login/registro vía SPs (`u_sp_Login`,
+  `u_sp_RegistrarUsuario`, `u_sp_VerificarEmail`, `u_sp_SolicitarResetPassword`, `u_sp_ConfirmarResetPassword`).
 - **Validación:** `zod`. **Docs API:** Swagger/OpenAPI.
 - **Despliegue:** Docker local (`docker-compose`); Render opcional solo para la demo.
 - **Equipo:** 3 personas. **Entrega:** 17‑nov. **Hoy:** 18‑oct.
@@ -74,7 +74,7 @@ S3 arriendos/paneles/chat, S4 extensiones + QA + demo).
 - **Endpoints y su SP:** `Producción/docs/API.md`.
 - **Tablas/columnas/reglas:** `docs/01-ModeloRelacional.md` y `docs/06-ERD.md`.
 - **Reglas de negocio que YA están en la BD (no reimplementar):** precio
-  (`fn_V5_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`),
+  (`fn_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`),
   solapamiento (trigger + SP), transiciones de estado, reembolsos, liquidaciones, auditoría.
 - **Backlog y estimaciones:** `Producción/docs/BACKLOG.md`.
 - **Seguridad:** `Producción/docs/SEGURIDAD.md` (OWASP, secretos, Ley 19.628).

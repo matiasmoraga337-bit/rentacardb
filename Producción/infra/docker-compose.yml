@@ -36,9 +36,19 @@ services:
     environment:
       MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
     volumes:
-      - ../database:/scripts:ro
+      - ../../RentacarFinal.sql:/scripts/RentacarFinal.sql:ro
+      - ../database/init.sh:/scripts/init.sh:ro
     entrypoint: ['/bin/bash', '/scripts/init.sh']
     restart: 'no'
+
+  # Bandeja de correo de desarrollo (verificacion de email / reset de password).
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '${MAILPIT_WEB_PORT:-8026}:8025'
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: '1'
+      MP_SMTP_AUTH_ALLOW_INSECURE: '1'
 
   api:
     build:
@@ -56,7 +66,14 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en el .env}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:5173}
+      APP_URL: ${APP_URL:-http://localhost:5173}
       UPLOAD_DIR: /app/uploads
+      MAX_IMAGE_MB: ${MAX_IMAGE_MB:-10}
+      MAX_DOC_MB: ${MAX_DOC_MB:-10}
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+      SMTP_SECURE: 'false'
+      SMTP_FROM: ${SMTP_FROM:-RentaCarDB <no-reply@rentacar.cl>}
     ports:
       - '3000:3000'
     volumes:
@@ -66,6 +83,8 @@ services:
         condition: service_healthy
       db-init:
         condition: service_completed_successfully
+      mailpit:
+        condition: service_started
 
   web:
     build:

@@ -1,4 +1,4 @@
-﻿# ARQUITECTURA
+# ARQUITECTURA
 
 ## 1) Visión general
 
@@ -39,8 +39,8 @@ src/
 ## 3) Acceso a datos (mssql)
 
 - Pool único de conexiones (`mssql.ConnectionPool`) reutilizado por request.
-- **Repositorios** encapsulan cada SP: `sp_V5_CrearReserva`, `sp_RegistrarPago`,
-  `sp_IniciarArriendo`, `sp_RegistrarDevolucion`, `sp_V5_CancelarReserva`, `sp_WP_*`, etc.
+- **Repositorios** encapsulan cada SP: `u_sp_CrearReserva`, `u_sp_RegistrarPago`,
+  `u_sp_IniciarArriendo`, `u_sp_RegistrarDevolucion`, `u_sp_CancelarReserva`, `u_sp_WP_*`, etc.
 - Para catálogos y lecturas simples se usan **queries parametrizadas** (nunca SQL concatenado).
 - **Transacciones**: se respetan las que abren los SPs (`@gestionar_transaccion`).
 
@@ -66,7 +66,7 @@ src/
 
 | # | Decisión | Motivo |
 |---|---|---|
-| 1 | **mssql + SPs** en vez de ORM | La lógica ya está en 54 SPs; evita duplicar reglas y mantiene integridad |
+| 1 | **mssql + SPs** en vez de ORM | La lógica ya está en 69 SPs; evita duplicar reglas y mantiene integridad |
 | 2 | **Express** (no NestJS) | Curva de aprendizaje menor; suficiente para el alcance |
 | 3 | **JWT stateless** | Simple para SPA; roles en el token + verificación en BD |
 | 4 | **TanStack Query** | Manejo de cache/estados de carga sin boilerplate |
