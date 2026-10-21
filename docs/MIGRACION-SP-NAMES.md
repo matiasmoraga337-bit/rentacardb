@@ -126,8 +126,14 @@ ni literales como `'PENDIENTE'`).
 Se actualizaron tabla, defaults, `CK_reserva_snapshot_*`, `INSERT` de `u_sp_CrearSnapshotReserva`
 y `u_sp_ValidarIntegridad`. Se conservaron alias del `FOR JSON` y variables.
 
-Pendientes: `LiquidacionProveedor`, `Configuracion*`, `TransicionEstadoReserva`,
-`HistorialEstadoReserva` y el resto.
+**Grupo 4 — `LiquidacionProveedor`** (aplicado): `periodo_inicio`, `periodo_fin`,
+`total_bruto`, `total_comision`, `total_reembolsos`, `total_ajustes`, `total_neto`,
+`fecha_generacion`, `fecha_pago` → mismo nombre + `_liquidacion_proveedor`.
+Se actualizaron tabla, defaults, `CK_liquidacion_proveedor_periodo`, `u_sp_GenerarLiquidacion`,
+`u_sp_MarcarLiquidacionPagada` y `u_sp_ReporteLiquidaciones`. No se tocaron `Pago.fecha_pago`
+ni `AceptacionContratoArriendo.fecha_generacion`.
+
+Pendientes: `Configuracion*`, `TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
