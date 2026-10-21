@@ -419,3 +419,216 @@ export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]
     .execute('u_sp_BuscarVehiculos');
   return result.recordset;
 }
+
+export interface SedeVehiculoItem {
+  id: number;
+  nombre: string;
+  direccion: string;
+  comuna: string;
+  permiteEntrega: boolean;
+  permiteDevolucion: boolean;
+}
+
+export async function listarSedesVehiculo(idVehiculo: number): Promise<SedeVehiculoItem[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .query<SedeVehiculoItem>(
+      `SELECT s.ID_sede_proveedor AS id,
+              s.nombre_sede_proveedor AS nombre,
+              s.direccion_sede_proveedor AS direccion,
+              c.nombre_comuna AS comuna,
+              vs.disponible_para_entrega_vehiculo_sede AS permiteEntrega,
+              vs.disponible_para_devolucion_vehiculo_sede AS permiteDevolucion
+       FROM dbo.VehiculoSede vs
+       INNER JOIN dbo.SedeProveedor s
+         ON s.ID_sede_proveedor = vs.ID_sede_proveedor_vehiculo_sede
+       INNER JOIN dbo.Comuna c ON c.ID_comuna = s.ID_comuna_sede_proveedor
+       WHERE vs.ID_vehiculo_vehiculo_sede = @id
+         AND s.activo_sede_proveedor = 1
+       ORDER BY s.nombre_sede_proveedor`,
+    );
+  return result.recordset;
+}
+
+export interface DisponibilidadParams {
+  desde: string;
+  hasta: string;
+}
+
+export interface DisponibilidadRow {
+  id: number;
+  patente: string;
+  disponible: boolean;
+  publicado: boolean;
+  reservado: boolean;
+  bloqueado: boolean;
+  mantenimiento: boolean;
+  documentosOk: boolean;
+  sedesOk: boolean;
+  duracionOk: boolean;
+  precioDia: number;
+  dias: number;
+  ivaPorcentaje: number;
+  requiereDeposito: boolean;
+  deposito: number;
+  subtotal: number;
+  impuesto: number;
+  total: number;
+  minutosExpiracion: number | null;
+}
+
+export async function consultarDisponibilidad(
+  idVehiculo: number,
+  params: DisponibilidadParams,
+): Promise<DisponibilidadRow | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .input('desde', sql.Date, params.desde)
+    .input('hasta', sql.Date, params.hasta)
+    .query<DisponibilidadRow>(
+      `SELECT v.ID_vehiculo AS id,
+              v.patente_vehiculo AS patente,
+              pub.publicado,
+              res.reservado,
+              blq.bloqueado,
+              man.mantenimiento,
+              doc.documentosOk,
+              sed.sedesOk,
+              dur.duracionOk,
+              CAST(CASE WHEN pub.publicado = 1 AND res.reservado = 0
+                         AND blq.bloqueado = 0 AND man.mantenimiento = 0
+                         AND doc.documentosOk = 1 AND sed.sedesOk = 1
+                         AND dur.duracionOk = 1
+                        THEN 1 ELSE 0 END AS BIT) AS disponible,
+              pr.precio AS precioDia,
+              d.dias,
+              ISNULL(cg.iva_porcentaje_configuracion_global, 19.00) AS ivaPorcentaje,
+              CAST(CASE WHEN ISNULL(cp.requiere_deposito_configuracion_proveedor, 0) = 1
+                        THEN 1 ELSE 0 END AS BIT) AS requiereDeposito,
+              CAST(CASE WHEN ISNULL(cp.requiere_deposito_configuracion_proveedor, 0) = 1
+                        THEN ISNULL(cp.monto_deposito_configuracion_proveedor, 0)
+                        ELSE 0 END AS DECIMAL(14,2)) AS deposito,
+              st.subtotal,
+              im.impuesto,
+              tot.total,
+              cp.minutos_expiracion_reserva_configuracion_proveedor AS minutosExpiracion
+       FROM dbo.Vehiculo v
+       LEFT JOIN dbo.ConfiguracionProveedor cp
+         ON cp.ID_proveedor_configuracion_proveedor = v.ID_proveedor_vehiculo
+       LEFT JOIN dbo.ConfiguracionGlobal cg ON cg.ID_configuracion = 1
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1 FROM dbo.vw_VehiculosDisponibles vd WHERE vd.ID_vehiculo = v.ID_vehiculo
+         ) THEN 1 ELSE 0 END AS BIT) AS publicado
+       ) pub
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1
+           FROM dbo.Reserva r
+           INNER JOIN dbo.EstadoReserva er ON er.ID_estado_reserva = r.ID_estado_reserva_reserva
+           WHERE r.ID_vehiculo_reserva = v.ID_vehiculo
+             AND er.nombre_estado_reserva IN ('PENDIENTE','CONFIRMADA','EN_CURSO')
+             AND CAST(@desde AS DATE) < r.fecha_fin_reserva
+             AND CAST(@hasta AS DATE) > r.fecha_inicio_reserva
+         ) THEN 1 ELSE 0 END AS BIT) AS reservado
+       ) res
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1 FROM dbo.BloqueoVehiculo b
+           WHERE b.ID_vehiculo_bloqueo = v.ID_vehiculo
+             AND b.activo_bloqueo = 1
+             AND CAST(@desde AS DATETIME2) < b.fecha_fin_bloqueo
+             AND CAST(@hasta AS DATETIME2) > b.fecha_inicio_bloqueo
+         ) THEN 1 ELSE 0 END AS BIT) AS bloqueado
+       ) blq
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1 FROM dbo.Mantenimiento m
+           WHERE m.ID_vehiculo_mantenimiento = v.ID_vehiculo
+             AND m.activo_mantenimiento = 1
+             AND (m.fecha_fin_mantenimiento IS NULL
+                  OR m.fecha_fin_mantenimiento > CAST(@desde AS DATETIME2))
+             AND m.fecha_inicio_mantenimiento < CAST(@hasta AS DATETIME2)
+         ) THEN 1 ELSE 0 END AS BIT) AS mantenimiento
+       ) man
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1
+           FROM dbo.TipoDocumentoVehiculo td
+           WHERE td.obligatorio_tipo_documento = 1
+             AND td.activo_tipo_documento = 1
+             AND NOT EXISTS (
+               SELECT 1
+               FROM dbo.DocumentoVehiculo dv
+               WHERE dv.ID_vehiculo_documento_vehiculo = v.ID_vehiculo
+                 AND dv.ID_tipo_documento_vehiculo_documento_vehiculo = td.ID_tipo_documento_vehiculo
+                 AND dv.activo_documento = 1
+                 AND dv.verificado_documento = 1
+                 AND dv.fecha_vencimiento_documento >= @hasta
+             )
+         ) THEN 0 ELSE 1 END AS BIT) AS documentosOk
+       ) doc
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1
+           FROM dbo.VehiculoSede vs
+           INNER JOIN dbo.SedeProveedor s
+             ON s.ID_sede_proveedor = vs.ID_sede_proveedor_vehiculo_sede
+           WHERE vs.ID_vehiculo_vehiculo_sede = v.ID_vehiculo
+             AND s.activo_sede_proveedor = 1
+             AND s.ID_proveedor_sede_proveedor = v.ID_proveedor_vehiculo
+             AND vs.disponible_para_entrega_vehiculo_sede = 1
+             AND (vs.fecha_inicio_vehiculo_sede IS NULL
+                  OR vs.fecha_inicio_vehiculo_sede <= @hasta)
+             AND (vs.fecha_fin_vehiculo_sede IS NULL
+                  OR vs.fecha_fin_vehiculo_sede >= @desde)
+         ) AND EXISTS (
+           SELECT 1
+           FROM dbo.VehiculoSede vs
+           INNER JOIN dbo.SedeProveedor s
+             ON s.ID_sede_proveedor = vs.ID_sede_proveedor_vehiculo_sede
+           WHERE vs.ID_vehiculo_vehiculo_sede = v.ID_vehiculo
+             AND s.activo_sede_proveedor = 1
+             AND s.ID_proveedor_sede_proveedor = v.ID_proveedor_vehiculo
+             AND vs.disponible_para_devolucion_vehiculo_sede = 1
+             AND (vs.fecha_inicio_vehiculo_sede IS NULL
+                  OR vs.fecha_inicio_vehiculo_sede <= @hasta)
+             AND (vs.fecha_fin_vehiculo_sede IS NULL
+                  OR vs.fecha_fin_vehiculo_sede >= @desde)
+         ) THEN 1 ELSE 0 END AS BIT) AS sedesOk
+       ) sed
+       CROSS APPLY (
+         SELECT dbo.fn_PrecioAplicable(v.ID_vehiculo, @desde, @hasta) AS precio
+       ) pr
+       CROSS APPLY (SELECT DATEDIFF(DAY, @desde, @hasta) AS dias) d
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN (cp.dias_minimos_arriendo_configuracion_proveedor IS NULL
+                               OR d.dias >= cp.dias_minimos_arriendo_configuracion_proveedor)
+                           AND (cp.dias_maximos_arriendo_configuracion_proveedor IS NULL
+                               OR d.dias <= cp.dias_maximos_arriendo_configuracion_proveedor)
+                          THEN 1 ELSE 0 END AS BIT) AS duracionOk
+       ) dur
+       CROSS APPLY (
+         SELECT CONVERT(DECIMAL(14,2), ROUND(d.dias * pr.precio, 2)) AS subtotal
+       ) st
+       CROSS APPLY (
+         SELECT CONVERT(DECIMAL(14,2),
+                ROUND(d.dias * pr.precio
+                      * ISNULL(cg.iva_porcentaje_configuracion_global, 19.00) / 100.0, 2)) AS impuesto
+       ) im
+       CROSS APPLY (
+         SELECT CONVERT(DECIMAL(14,2),
+                st.subtotal + im.impuesto
+                + CASE WHEN ISNULL(cp.requiere_deposito_configuracion_proveedor, 0) = 1
+                       THEN ISNULL(cp.monto_deposito_configuracion_proveedor, 0)
+                       ELSE 0 END) AS total
+       ) tot
+       WHERE v.ID_vehiculo = @id
+         AND v.fecha_baja_vehiculo IS NULL`,
+    );
+  return result.recordset[0] ?? null;
+}

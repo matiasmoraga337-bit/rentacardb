@@ -1,6 +1,10 @@
 import { z } from 'zod';
+import { esFechaValida } from '../utils/dates';
 
-const fecha = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha invalido (YYYY-MM-DD).');
+const fecha = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, 'Formato de fecha invalido (YYYY-MM-DD).')
+  .refine(esFechaValida, 'La fecha no existe en el calendario.');
 
 export const registrarVehiculoSchema = z.object({
   ID_modelo: z.number().int().positive(),

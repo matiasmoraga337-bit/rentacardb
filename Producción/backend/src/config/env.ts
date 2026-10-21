@@ -27,6 +27,9 @@ const envSchema = z.object({
   MAX_IMAGE_MB: z.coerce.number().int().positive().default(10),
   MAX_DOC_MB: z.coerce.number().int().positive().default(10),
 
+  RESERVAS_JOB_ENABLED: boolFromString(false),
+  RESERVAS_JOB_INTERVAL_MS: z.coerce.number().int().positive().default(300000),
+
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   SMTP_SECURE: boolFromString(false),

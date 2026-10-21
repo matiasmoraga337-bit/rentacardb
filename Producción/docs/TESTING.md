@@ -38,3 +38,33 @@ Estrategia de pruebas de la aplicación web (pirámide de tests).
 
 Una historia está testeada cuando: sus endpoints/componentes tienen tests que pasan en CI y
 el flujo crítico asociado está cubierto por al menos un test de integración o API.
+
+## 6) Sprint S2 — Reservas y pagos
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/05_reservas_pagos.sql` | Crear reserva, snapshot, bloqueo, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración con cursor y `vw_ReservasDetalle` (30 casos). |
+| Backend (API) | `Producción/backend/tests/reservas.test.ts` | Autenticación, validación de fechas, autorización y cancelación ADMIN. |
+| Backend (API) | `Producción/backend/tests/pagos.test.ts` | `/pagos` solo ADMIN, validación WebPay, reembolsos solo ADMIN y reportes. |
+| Backend (unitario) | `Producción/backend/tests/reembolso-policy.test.ts` | Cálculo de reembolso: 100%, 50%, 0%, anticipación y saldo. |
+| Frontend | `Producción/frontend/src/features/reservas/__tests__/` | Formatos, badges y tabla de reservas. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s2.ts` | Login → buscar → reservar → pagar → cancelar + doble confirmación concurrente contra API + BD. |
+
+Comandos:
+
+```powershell
+# BD (contenedor rentacardb-db-test)
+powershell -ExecutionPolicy Bypass -File sql/tests/run_tests.ps1
+
+# Backend
+cd Producción/backend
+npm run lint; npm run typecheck; npm test; npm run build
+
+# Frontend
+cd Producción/frontend
+npm run lint; npm run typecheck; npm test; npm run build
+
+# Smoke S2 (API + BD levantadas)
+cd Producción/backend
+npm run smoke:s2
+```

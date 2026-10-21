@@ -3,7 +3,7 @@
 Proyecto universitario de Base de Datos: sistema web de reserva/renta de vehículos
 con múltiples sedes y dueños por región de Chile.
 
-- **Motor:** Microsoft SQL Server 2025 (`COMPATIBILITY_LEVEL = 170`)
+- **Motor:** Microsoft SQL Server 2022 (`COMPATIBILITY_LEVEL = 160`)
 - **Base de datos:** `RentaCarDB`
 - **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
 - Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
@@ -20,6 +20,10 @@ con múltiples sedes y dueños por región de Chile.
 | 4 | [`04-Clasificacion-Tablas.md`](04-Clasificacion-Tablas.md) | Maestras / Transaccionales / Asociativas / Técnicas. |
 | 5 | [`05-Alcance.md`](05-Alcance.md) | Alcance, supuestos y límites del proyecto. |
 | 6 | [`06-ERD.md`](06-ERD.md) | Diagramas entidad‑relación por módulo (Mermaid) + pasos para SSMS. |
+| — | [`RESERVAS-PAGOS.md`](RESERVAS-PAGOS.md) | S2: flujo, endpoints, SQL, idempotencia y seguridad de reservas/pagos. |
+| — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
+| — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (99 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres

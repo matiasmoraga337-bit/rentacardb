@@ -37,20 +37,32 @@ rentacardb/
 
 ```bash
 cp .env.example .env
-docker compose -f Producción/infra/docker-compose.yml up --build
+docker compose --env-file .env -f Producción/infra/docker-compose.yml up --build
 # API:  http://localhost:3000/api
 # Web:  http://localhost:5173
-# BD:   localhost:1433 (SQL Server)
+# BD:   localhost:14330 (SQL Server en Docker)
 ```
 
 > `Producción/infra/` y los esqueletos de `backend/` y `frontend/` se generan en las
 > fases S0–S4 (ver [`Producción/PLAN.md`](Producción/PLAN.md)).
+
+## Estado actual
+
+- **S0/H0:** proyecto levanta + login.
+- **S1/H1:** auth, catálogos, proveedores/sedes y vehículos.
+- **S2/H2:** búsqueda con fechas, reservas, pago WebPay simulado, cancelación con
+  reembolso, panel de proveedor y reporte de ingresos.
+
+Guion de demo y datos de ejemplo: [`docs/DEMO-S2.md`](docs/DEMO-S2.md).
 
 ## Documentación
 
 - Modelo de datos: [`docs/README.md`](docs/README.md) · ERD: [`docs/06-ERD.md`](docs/06-ERD.md).
 - Planificación de la app: [`Producción/README.md`](Producción/README.md).
 - Contratos de la API: [`Producción/docs/API.md`](Producción/docs/API.md).
+- S2 (reservas/pagos, SQL y seguridad): [`docs/RESERVAS-PAGOS.md`](docs/RESERVAS-PAGOS.md).
+- Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
+- Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 
 ## Contribuir
 

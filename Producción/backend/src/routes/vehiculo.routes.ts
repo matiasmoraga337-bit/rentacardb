@@ -15,6 +15,7 @@ const router = Router();
 
 router.get('/mios', authenticate, asyncHandler(vehiculoController.listarMios));
 router.get('/buscar', asyncHandler(vehiculoController.buscar));
+router.get('/:id/disponibilidad', asyncHandler(vehiculoController.disponibilidad));
 router.post(
   '/',
   authenticate,

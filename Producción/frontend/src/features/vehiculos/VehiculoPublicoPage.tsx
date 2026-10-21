@@ -1,16 +1,39 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { fetchVehiculo } from './api';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/features/auth/AuthContext';
+import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
+import { fetchDisponibilidad, fetchVehiculo } from './api';
 
 export function VehiculoPublicoPage() {
   const { id } = useParams();
   const vehiculoId = Number(id);
+  const [searchParams] = useSearchParams();
+  const { usuario } = useAuth();
+  const [fechaInicio, setFechaInicio] = useState(
+    searchParams.get('desde') || fechaFutura(7),
+  );
+  const [fechaFin, setFechaFin] = useState(searchParams.get('hasta') || fechaFutura(11));
+
   const query = useQuery({
     queryKey: ['vehiculo-publico', vehiculoId],
     queryFn: () => fetchVehiculo(vehiculoId),
     enabled: Number.isInteger(vehiculoId),
   });
+
+  const fechasValidas = Boolean(fechaInicio && fechaFin && fechaFin > fechaInicio);
+  const disponibilidad = useQuery({
+    queryKey: ['disponibilidad', vehiculoId, fechaInicio, fechaFin],
+    queryFn: () => fetchDisponibilidad(vehiculoId, fechaInicio, fechaFin),
+    enabled: Boolean(query.data) && fechasValidas,
+    retry: false,
+  });
+
+  const checkoutUrl = `/checkout/${vehiculoId}?desde=${fechaInicio}&hasta=${fechaFin}`;
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -19,8 +42,8 @@ export function VehiculoPublicoPage() {
           <Link to="/catalogo" className="text-lg font-semibold text-brand">
             RentaCarDB
           </Link>
-          <Link to="/login" className="text-sm text-slate-600 hover:text-brand">
-            Iniciar sesion
+          <Link to={usuario ? '/panel' : '/login'} className="text-sm text-slate-600 hover:text-brand">
+            {usuario ? 'Mi panel' : 'Iniciar sesion'}
           </Link>
         </div>
       </header>
@@ -63,6 +86,88 @@ export function VehiculoPublicoPage() {
 
             <Card>
               <CardHeader>
+                <CardTitle>Reservar</CardTitle>
+                <CardDescription>Elige las fechas para cotizar y continuar al checkout.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="detalleDesde">Desde</Label>
+                    <Input
+                      id="detalleDesde"
+                      type="date"
+                      value={fechaInicio}
+                      onChange={(event) => setFechaInicio(event.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="detalleHasta">Hasta</Label>
+                    <Input
+                      id="detalleHasta"
+                      type="date"
+                      value={fechaFin}
+                      onChange={(event) => setFechaFin(event.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {!fechasValidas && (
+                  <p className="text-sm text-amber-700">Revisa el rango de fechas.</p>
+                )}
+                {disponibilidad.isLoading && (
+                  <p className="text-sm text-slate-500">Calculando disponibilidad…</p>
+                )}
+                {disponibilidad.isError && (
+                  <p className="text-sm text-red-600">
+                    {disponibilidad.error instanceof Error
+                      ? disponibilidad.error.message
+                      : 'No se pudo calcular la disponibilidad.'}
+                  </p>
+                )}
+                {disponibilidad.data && (
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
+                    <p>
+                      {disponibilidad.data.disponible
+                        ? 'Disponible en las fechas seleccionadas.'
+                        : `No disponible${disponibilidad.data.motivo ? ` (${disponibilidad.data.motivo})` : ''}.`}
+                    </p>
+                    {disponibilidad.data.disponible && (
+                      <p className="mt-1">
+                        {disponibilidad.data.dias} dias · Total{' '}
+                        <strong>{formatearCLP(disponibilidad.data.total)}</strong> (incluye
+                        impuestos)
+                      </p>
+                    )}
+                    <p className="text-xs text-slate-500">
+                      {formatearFecha(fechaInicio)} → {formatearFecha(fechaFin)}
+                    </p>
+                  </div>
+                )}
+
+                {!usuario && (
+                  <Link to="/login" state={{ from: checkoutUrl }}>
+                    <Button disabled={!fechasValidas || !disponibilidad.data?.disponible}>
+                      Inicia sesion para reservar
+                    </Button>
+                  </Link>
+                )}
+                {usuario && usuario.roles.includes('CLIENTE') && (
+                  <Link to={checkoutUrl}>
+                    <Button disabled={!fechasValidas || !disponibilidad.data?.disponible}>
+                      Continuar al checkout
+                    </Button>
+                  </Link>
+                )}
+                {usuario && !usuario.roles.includes('CLIENTE') && (
+                  <p className="text-sm text-slate-600">
+                    Tu cuenta no tiene rol CLIENTE; no puedes crear reservas.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>Caracteristicas</CardTitle>
               </CardHeader>
               <CardContent>
@@ -87,10 +192,13 @@ export function VehiculoPublicoPage() {
                 <ul className="space-y-1 text-sm">
                   {query.data.tarifas.map((t) => (
                     <li key={t.id}>
-                      {t.nombre}: ${t.precioDia.toLocaleString('es-CL')} / dia ({t.fechaInicio} → {t.fechaFin})
+                      {t.nombre}: ${t.precioDia.toLocaleString('es-CL')} / dia ({t.fechaInicio} →{' '}
+                      {t.fechaFin})
                     </li>
                   ))}
-                  {query.data.tarifas.length === 0 && <li className="text-slate-500">Sin tarifas.</li>}
+                  {query.data.tarifas.length === 0 && (
+                    <li className="text-slate-500">Sin tarifas.</li>
+                  )}
                 </ul>
               </CardContent>
             </Card>

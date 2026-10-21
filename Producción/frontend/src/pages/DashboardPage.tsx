@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/AuthContext';
 
@@ -27,8 +29,37 @@ export function DashboardPage() {
           </p>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Accesos rápidos</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-2">
+          <Link to="/catalogo">
+            <Button variant="outline">Buscar vehículos</Button>
+          </Link>
+          {usuario?.roles.includes('CLIENTE') && (
+            <Link to="/reservas">
+              <Button variant="outline">Mis reservas</Button>
+            </Link>
+          )}
+          {(usuario?.roles.includes('PROVEEDOR') ||
+            usuario?.roles.includes('OPERADOR') ||
+            usuario?.roles.includes('ADMIN')) && (
+            <Link to="/proveedor/reservas">
+              <Button variant="outline">Reservas de mis vehículos</Button>
+            </Link>
+          )}
+          {usuario?.roles.includes('ADMIN') && (
+            <Link to="/admin/reportes">
+              <Button variant="outline">Reporte de ingresos</Button>
+            </Link>
+          )}
+        </CardContent>
+      </Card>
+
       <p className="text-sm text-slate-500">
-        Sprint S0: autenticación base. Los módulos (vehículos, reservas, pagos…) llegan en S1–S4.
+        Sprint S2: reservas, disponibilidad, pagos WebPay simulado y reembolsos.
       </p>
     </div>
   );

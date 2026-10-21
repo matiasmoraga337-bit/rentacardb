@@ -70,6 +70,8 @@ services:
       UPLOAD_DIR: /app/uploads
       MAX_IMAGE_MB: ${MAX_IMAGE_MB:-10}
       MAX_DOC_MB: ${MAX_DOC_MB:-10}
+      RESERVAS_JOB_ENABLED: ${RESERVAS_JOB_ENABLED:-false}
+      RESERVAS_JOB_INTERVAL_MS: ${RESERVAS_JOB_INTERVAL_MS:-300000}
       SMTP_HOST: mailpit
       SMTP_PORT: 1025
       SMTP_SECURE: 'false'

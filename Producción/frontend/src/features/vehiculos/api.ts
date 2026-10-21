@@ -45,6 +45,30 @@ export interface VehiculoDetalle {
     prioridad: number;
     activa: boolean;
   }[];
+  sedes: {
+    id: number;
+    nombre: string;
+    direccion: string;
+    comuna: string;
+    permiteEntrega: boolean;
+    permiteDevolucion: boolean;
+  }[];
+}
+
+export interface Disponibilidad {
+  id: number;
+  patente: string;
+  disponible: boolean;
+  motivo: string | null;
+  precioDia: number;
+  dias: number;
+  ivaPorcentaje: number;
+  requiereDeposito: boolean;
+  deposito: number;
+  subtotal: number;
+  impuesto: number;
+  total: number;
+  minutosExpiracion: number;
 }
 
 export interface CrearVehiculoData {
@@ -72,6 +96,15 @@ export const fetchMisVehiculos = (): Promise<VehiculoResumen[]> =>
 
 export const fetchVehiculo = (id: number): Promise<VehiculoDetalle> =>
   apiFetch<VehiculoDetalle>(`/vehiculos/${id}`);
+
+export const fetchDisponibilidad = (
+  id: number,
+  desde: string,
+  hasta: string,
+): Promise<Disponibilidad> => {
+  const qs = new URLSearchParams({ desde, hasta });
+  return apiFetch<Disponibilidad>(`/vehiculos/${id}/disponibilidad?${qs.toString()}`);
+};
 
 export const crearVehiculo = (data: CrearVehiculoData): Promise<{ ID_vehiculo: number }> =>
   apiFetch<{ ID_vehiculo: number }>('/vehiculos', {
