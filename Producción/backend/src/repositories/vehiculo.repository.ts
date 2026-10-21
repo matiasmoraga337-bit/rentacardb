@@ -219,7 +219,7 @@ export async function registrarFoto(
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('url_foto', sql.VarChar(500), url)
     .input('es_principal', sql.Bit, esPrincipal)
-    .execute('u_u_sp_RegistrarVehiculoFoto');
+    .execute('u_sp_RegistrarVehiculoFoto');
   return result.recordset[0] ?? null;
 }
 
