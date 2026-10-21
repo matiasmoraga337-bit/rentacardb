@@ -133,7 +133,16 @@ Se actualizaron tabla, defaults, `CK_liquidacion_proveedor_periodo`, `u_sp_Gener
 `u_sp_MarcarLiquidacionPagada` y `u_sp_ReporteLiquidaciones`. No se tocaron `Pago.fecha_pago`
 ni `AceptacionContratoArriendo.fecha_generacion`.
 
-Pendientes: `Configuracion*`, `TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
+**Grupo 5 — `ConfiguracionGlobal` y `ConfiguracionProveedor`** (aplicado):
+`iva_porcentaje`, `comision_porcentaje`, `minutos_expiracion_reserva`, `moneda`,
+`dias_minimos_publicacion`, `fecha_actualizacion` → `_configuracion_global`;
+`permite_devolucion_otra_sede`, `permite_entrega_domicilio`, `permite_retiro_domicilio`,
+`radio_maximo_km`, `minutos_expiracion_reserva`, `edad_minima_arriendo`, `requiere_deposito`,
+`monto_deposito`, `dias_minimos_arriendo`, `dias_maximos_arriendo`, `moneda_operacion`
+→ `_configuracion_proveedor`. Se actualizaron defaults, CHECKs, seed, funcion de comision,
+SPs de reserva/config y el SELECT del backend.
+
+Pendientes: `TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
