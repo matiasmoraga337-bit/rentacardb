@@ -119,8 +119,15 @@ reservas/pagos y los SPs `u_sp_PublicarEvento`, `u_sp_ObtenerOutboxPendiente`,
 `u_sp_MarcarEventoProcesado`, `u_sp_ReintentarOutboxError` (sin tocar `@payload`, `@lock_id`
 ni literales como `'PENDIENTE'`).
 
-Pendientes: `ReservaSnapshot`, `LiquidacionProveedor`, `Configuracion*`,
-`TransicionEstadoReserva`, `HistorialEstadoReserva` y el resto.
+**Grupo 3 — `ReservaSnapshot`** (aplicado): `precio_dia`, `cantidad_dias`, `subtotal`,
+`descuento`, `impuesto`, `total`, `porcentaje_impuesto`, `porcentaje_comision`,
+`km_incluidos_dia`, `cargo_km_excedido`, `nombre_tarifa`, `politica_cancelacion`,
+`condiciones_comerciales`, `snapshot_json` → mismo nombre + `_reserva_snapshot`.
+Se actualizaron tabla, defaults, `CK_reserva_snapshot_*`, `INSERT` de `u_sp_CrearSnapshotReserva`
+y `u_sp_ValidarIntegridad`. Se conservaron alias del `FOR JSON` y variables.
+
+Pendientes: `LiquidacionProveedor`, `Configuracion*`, `TransicionEstadoReserva`,
+`HistorialEstadoReserva` y el resto.
 
 ## 5) Comentarios
 - Se eliminaron banners decorativos, etiquetas de módulo/sección, changelogs y comentarios obvios (331 líneas).
