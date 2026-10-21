@@ -1,6 +1,7 @@
 import { app } from './app';
 import { closePool, getPool } from './config/db';
 import { env } from './config/env';
+import { startReservasJob, stopReservasJob } from './jobs/reservas.job';
 
 async function bootstrap(): Promise<void> {
   try {
@@ -18,7 +19,10 @@ async function bootstrap(): Promise<void> {
     console.log(`Documentacion en http://localhost:${env.API_PORT}/api/docs`);
   });
 
+  startReservasJob();
+
   const shutdown = async (): Promise<void> => {
+    stopReservasJob();
     server.close();
     await closePool();
     process.exit(0);

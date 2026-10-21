@@ -103,7 +103,14 @@ export function CatalogoPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {query.data?.map((item) => (
-            <Link key={item.ID_vehiculo} to={`/catalogo/${item.ID_vehiculo}`}>
+            <Link
+              key={item.ID_vehiculo}
+              to={`/catalogo/${item.ID_vehiculo}${
+                fechaInicio && fechaFin
+                  ? `?desde=${encodeURIComponent(fechaInicio)}&hasta=${encodeURIComponent(fechaFin)}`
+                  : ''
+              }`}
+            >
               <Card className="h-full transition-shadow hover:shadow-md">
                 <CardContent className="space-y-1 p-4">
                   <p className="font-semibold">

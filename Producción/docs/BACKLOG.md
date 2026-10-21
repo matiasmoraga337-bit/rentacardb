@@ -75,6 +75,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E8.3 | Reembolsos | 5 | `u_sp_CrearReembolso`, UI |
 | E8.4 | Reporte de ingresos | 3 | `u_sp_ReporteIngresosMensuales`, gráfico |
 
+> **Estado S2:** E7.1–E7.5 y E8.1–E8.4 implementadas y verificadas. Ver
+> [`../../docs/RESERVAS-PAGOS.md`](../../docs/RESERVAS-PAGOS.md),
+> [`../../docs/DEMO-S2.md`](../../docs/DEMO-S2.md) y `sql/tests/05_reservas_pagos.sql`.
+
 ## E9 — Arriendos e inspecciones `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

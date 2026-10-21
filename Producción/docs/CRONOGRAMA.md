@@ -33,6 +33,8 @@ review/retro (viernes).
 - **P2:** flujo de búsqueda → detalle → checkout → pago.
 - **P3:** validaciones, tests de API de reserva/pago, datos de ejemplo.
 - **Meta (H2):** un cliente reserva y paga de punta a punta.
+- **Estado:** completado y verificado con Docker (`rentacardb-s2`), seed, smoke
+  S2 y suite SQL de 99 casos. Ver `../../docs/DEMO-S2.md`.
 
 ## S3 — 4–10 nov
 - **P1:** arriendos (`u_sp_IniciarArriendo`, `u_sp_RegistrarDevolucion`), inspecciones, cargos.
