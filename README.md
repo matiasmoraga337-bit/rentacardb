@@ -37,7 +37,7 @@ rentacardb/
 
 ```bash
 cp .env.example .env
-docker compose -f Producción/infra/docker-compose.yml up --build
+docker compose --env-file .env -f Producción/infra/docker-compose.yml up --build
 # API:  http://localhost:3000/api
 # Web:  http://localhost:5173
 # BD:   localhost:14330 (SQL Server en Docker)

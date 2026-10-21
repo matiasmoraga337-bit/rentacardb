@@ -278,6 +278,20 @@ export async function obtenerCancelacionInfo(idReserva: number): Promise<Cancela
   return result.recordset[0] ?? null;
 }
 
+export async function existePagoAprobadoReserva(idReserva: number): Promise<boolean> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idReserva)
+    .query<{ ok: number }>(
+      `SELECT TOP 1 1 AS ok
+       FROM dbo.Pago p
+       INNER JOIN dbo.EstadoPago ep ON ep.ID_estado_pago = p.ID_estado_pago_pago
+       WHERE p.ID_reserva_pago = @id AND ep.nombre_estado_pago = 'APROBADO'`,
+    );
+  return result.recordset.length > 0;
+}
+
 export async function esProveedorDeUsuario(idUsuario: number): Promise<boolean> {
   const pool = await getPool();
   const result = await pool
@@ -309,7 +323,7 @@ export async function esProveedorDelVehiculo(
 
 export async function cancelarReserva(
   params: CancelarReservaParams,
-): Promise<ReservaViewRow | null> {
+): Promise<{ row: ReservaViewRow | null; fueIdempotente: boolean }> {
   const pool = await getPool();
   const request = pool
     .request()
@@ -322,7 +336,10 @@ export async function cancelarReserva(
     .input('referencia_externa', sql.VarChar(150), params.referencia_externa)
     .output('fue_idempotente', sql.Bit);
   const result = await request.execute<ReservaViewRow>('u_sp_CancelarReserva');
-  return extraerReservaView(result.recordsets as unknown[][]);
+  return {
+    row: extraerReservaView(result.recordsets as unknown[][]),
+    fueIdempotente: Boolean(result.output.fue_idempotente),
+  };
 }
 
 export async function cambiarEstadoReserva(

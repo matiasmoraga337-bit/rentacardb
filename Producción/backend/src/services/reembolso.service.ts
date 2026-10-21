@@ -11,23 +11,17 @@ export async function crearReembolso(
   idUsuario: number,
   roles: string[],
 ): Promise<reembolsoRepo.ReembolsoCompleto | null> {
-  let usuarioPropietario = idUsuario;
-  if (esAdmin(roles)) {
-    const acceso = await assertAccesoReserva(input.ID_reserva, idUsuario, roles);
-    usuarioPropietario = acceso.idCliente;
-  } else {
-    const acceso = await assertAccesoReserva(input.ID_reserva, idUsuario, roles);
-    if (acceso.idCliente !== idUsuario) {
-      throw new AppError(403, 'FORBIDDEN', 'Solo el cliente propietario puede crear un reembolso.');
-    }
+  if (!esAdmin(roles)) {
+    throw new AppError(403, 'FORBIDDEN', 'Solo un ADMIN puede crear reembolsos manuales.');
   }
 
+  const acceso = await assertAccesoReserva(input.ID_reserva, idUsuario, roles);
   return reembolsoRepo.crearReembolso({
     ID_reserva: input.ID_reserva,
     monto: input.monto,
     motivo: input.motivo,
     idempotency_key: input.idempotency_key,
-    ID_usuario: usuarioPropietario,
+    ID_usuario: acceso.idCliente,
   });
 }
 
@@ -37,21 +31,18 @@ export async function completarReembolso(
   roles: string[],
   referenciaExterna?: string | null,
 ): Promise<reembolsoRepo.ReembolsoCompleto | null> {
+  if (!esAdmin(roles)) {
+    throw new AppError(403, 'FORBIDDEN', 'Solo un ADMIN puede completar reembolsos manuales.');
+  }
+
   const acceso = await reembolsoRepo.obtenerAccesoReembolso(idReembolso);
   if (!acceso) {
     throw new AppError(404, 'REEMBOLSO_NO_ENCONTRADO', 'Reembolso no encontrado.');
   }
 
-  let usuarioPropietario = idUsuario;
-  if (esAdmin(roles)) {
-    usuarioPropietario = acceso.idCliente;
-  } else if (acceso.idCliente !== idUsuario) {
-    throw new AppError(403, 'FORBIDDEN', 'No tiene acceso a este reembolso.');
-  }
-
   return reembolsoRepo.completarReembolso(
     idReembolso,
-    usuarioPropietario,
+    acceso.idCliente,
     referenciaExterna ?? null,
   );
 }

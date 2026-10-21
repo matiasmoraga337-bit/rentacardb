@@ -8,7 +8,7 @@ Desde la **raíz del repo**:
 
 ```bash
 cp .env.example .env          # completar DB_PASSWORD y JWT_SECRET
-docker compose -f Producción/infra/docker-compose.yml up --build
+docker compose --env-file .env -f Producción/infra/docker-compose.yml up --build
 ```
 
 | Servicio | URL |
@@ -41,4 +41,4 @@ DB_HOST=localhost DB_PORT=14330 npm run seed
 - **Credenciales SA:** el usuario `api_user` de la BD es `WITHOUT LOGIN`; en el entorno
   Docker la API se conecta como `sa` (solo para desarrollo/demo).
 - **Volúmenes:** `mssql-data` (datos de la BD) y `uploads` (fotos de vehículos y documentos).
-- Para reiniciar la BD desde cero: `docker compose -f Producción/infra/docker-compose.yml down -v`.
+- Para reiniciar la BD desde cero: `docker compose --env-file .env -f Producción/infra/docker-compose.yml down -v`.

@@ -22,7 +22,7 @@ router.get(
 router.post(
   '/',
   authenticate,
-  authorize('CLIENTE', 'ADMIN'),
+  authorize('ADMIN'),
   validate(crearReembolsoSchema),
   asyncHandler(reembolsoController.crear),
 );
@@ -30,7 +30,7 @@ router.post(
 router.post(
   '/:id/completar',
   authenticate,
-  authorize('CLIENTE', 'ADMIN'),
+  authorize('ADMIN'),
   validate(completarReembolsoSchema),
   asyncHandler(reembolsoController.completar),
 );

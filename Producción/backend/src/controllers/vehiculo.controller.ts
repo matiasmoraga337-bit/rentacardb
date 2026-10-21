@@ -9,6 +9,7 @@ import {
 } from '../schemas/vehiculo.schema';
 import * as vehiculoService from '../services/vehiculo.service';
 import { AppError } from '../utils/AppError';
+import { esFechaValida } from '../utils/dates';
 
 const parseId = (value: string, name: string): number => {
   const id = Number(value);
@@ -134,15 +135,27 @@ const parseOptionalNumber = (value: unknown): number | undefined => {
 };
 
 const parseOptionalDate = (value: unknown): string | undefined => {
-  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return undefined;
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value !== 'string' || !esFechaValida(value)) {
+    throw new AppError(400, 'FECHA_INVALIDA', 'El parametro de fecha no es valido (YYYY-MM-DD).');
+  }
   return value;
 };
 
 export async function buscar(req: Request, res: Response): Promise<void> {
+  const fechaInicio = parseOptionalDate(req.query.fecha_inicio);
+  const fechaFin = parseOptionalDate(req.query.fecha_fin);
+  if (fechaInicio && fechaFin && fechaFin <= fechaInicio) {
+    throw new AppError(
+      400,
+      'FECHAS_INVALIDAS',
+      'La fecha de fin debe ser posterior a la fecha de inicio.',
+    );
+  }
   res.status(200).json(
     await vehiculoService.buscar({
-      fecha_inicio: parseOptionalDate(req.query.fecha_inicio),
-      fecha_fin: parseOptionalDate(req.query.fecha_fin),
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin,
       ID_comuna: parseOptionalNumber(req.query.ID_comuna),
       ID_tipo_vehiculo: parseOptionalNumber(req.query.ID_tipo_vehiculo),
       precio_maximo: parseOptionalNumber(req.query.precio_maximo),

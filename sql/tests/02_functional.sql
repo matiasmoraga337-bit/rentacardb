@@ -54,8 +54,13 @@ IF NOT EXISTS (SELECT 1 FROM VehiculoCaracteristica WHERE ID_vehiculo_vehiculo_c
 EXEC dbo.u_sp_PublicarVehiculo @ID_vehiculo=@idVeh, @ID_usuario_admin=@idAdmin;
 
 -- Fixtures de S2: sedes habilitadas y documentos obligatorios verificados.
-IF NOT EXISTS (SELECT 1 FROM VehiculoSede
-               WHERE ID_vehiculo_vehiculo_sede=@idVeh AND ID_sede_proveedor_vehiculo_sede=@idSede)
+IF EXISTS (SELECT 1 FROM VehiculoSede
+           WHERE ID_vehiculo_vehiculo_sede=@idVeh AND ID_sede_proveedor_vehiculo_sede=@idSede)
+    UPDATE VehiculoSede
+    SET disponible_para_entrega_vehiculo_sede=1,
+        disponible_para_devolucion_vehiculo_sede=1
+    WHERE ID_vehiculo_vehiculo_sede=@idVeh AND ID_sede_proveedor_vehiculo_sede=@idSede;
+ELSE
     INSERT INTO VehiculoSede
         (ID_vehiculo_vehiculo_sede, ID_sede_proveedor_vehiculo_sede,
          disponible_para_entrega_vehiculo_sede, disponible_para_devolucion_vehiculo_sede)

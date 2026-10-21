@@ -41,7 +41,7 @@ router.get('/:id/snapshot', authenticate, asyncHandler(reservaController.snapsho
 router.post(
   '/:id/cancelar',
   authenticate,
-  authorize('CLIENTE'),
+  authorize('CLIENTE', 'ADMIN'),
   validate(cancelarReservaSchema),
   asyncHandler(reservaController.cancelar),
 );

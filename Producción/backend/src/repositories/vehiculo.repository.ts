@@ -465,6 +465,9 @@ export interface DisponibilidadRow {
   reservado: boolean;
   bloqueado: boolean;
   mantenimiento: boolean;
+  documentosOk: boolean;
+  sedesOk: boolean;
+  duracionOk: boolean;
   precioDia: number;
   dias: number;
   ivaPorcentaje: number;
@@ -493,8 +496,13 @@ export async function consultarDisponibilidad(
               res.reservado,
               blq.bloqueado,
               man.mantenimiento,
+              doc.documentosOk,
+              sed.sedesOk,
+              dur.duracionOk,
               CAST(CASE WHEN pub.publicado = 1 AND res.reservado = 0
                          AND blq.bloqueado = 0 AND man.mantenimiento = 0
+                         AND doc.documentosOk = 1 AND sed.sedesOk = 1
+                         AND dur.duracionOk = 1
                         THEN 1 ELSE 0 END AS BIT) AS disponible,
               pr.precio AS precioDia,
               d.dias,
@@ -548,9 +556,62 @@ export async function consultarDisponibilidad(
          ) THEN 1 ELSE 0 END AS BIT) AS mantenimiento
        ) man
        CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1
+           FROM dbo.TipoDocumentoVehiculo td
+           WHERE td.obligatorio_tipo_documento = 1
+             AND td.activo_tipo_documento = 1
+             AND NOT EXISTS (
+               SELECT 1
+               FROM dbo.DocumentoVehiculo dv
+               WHERE dv.ID_vehiculo_documento_vehiculo = v.ID_vehiculo
+                 AND dv.ID_tipo_documento_vehiculo_documento_vehiculo = td.ID_tipo_documento_vehiculo
+                 AND dv.activo_documento = 1
+                 AND dv.verificado_documento = 1
+                 AND dv.fecha_vencimiento_documento >= @hasta
+             )
+         ) THEN 0 ELSE 1 END AS BIT) AS documentosOk
+       ) doc
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN EXISTS (
+           SELECT 1
+           FROM dbo.VehiculoSede vs
+           INNER JOIN dbo.SedeProveedor s
+             ON s.ID_sede_proveedor = vs.ID_sede_proveedor_vehiculo_sede
+           WHERE vs.ID_vehiculo_vehiculo_sede = v.ID_vehiculo
+             AND s.activo_sede_proveedor = 1
+             AND s.ID_proveedor_sede_proveedor = v.ID_proveedor_vehiculo
+             AND vs.disponible_para_entrega_vehiculo_sede = 1
+             AND (vs.fecha_inicio_vehiculo_sede IS NULL
+                  OR vs.fecha_inicio_vehiculo_sede <= @hasta)
+             AND (vs.fecha_fin_vehiculo_sede IS NULL
+                  OR vs.fecha_fin_vehiculo_sede >= @desde)
+         ) AND EXISTS (
+           SELECT 1
+           FROM dbo.VehiculoSede vs
+           INNER JOIN dbo.SedeProveedor s
+             ON s.ID_sede_proveedor = vs.ID_sede_proveedor_vehiculo_sede
+           WHERE vs.ID_vehiculo_vehiculo_sede = v.ID_vehiculo
+             AND s.activo_sede_proveedor = 1
+             AND s.ID_proveedor_sede_proveedor = v.ID_proveedor_vehiculo
+             AND vs.disponible_para_devolucion_vehiculo_sede = 1
+             AND (vs.fecha_inicio_vehiculo_sede IS NULL
+                  OR vs.fecha_inicio_vehiculo_sede <= @hasta)
+             AND (vs.fecha_fin_vehiculo_sede IS NULL
+                  OR vs.fecha_fin_vehiculo_sede >= @desde)
+         ) THEN 1 ELSE 0 END AS BIT) AS sedesOk
+       ) sed
+       CROSS APPLY (
          SELECT dbo.fn_PrecioAplicable(v.ID_vehiculo, @desde, @hasta) AS precio
        ) pr
        CROSS APPLY (SELECT DATEDIFF(DAY, @desde, @hasta) AS dias) d
+       CROSS APPLY (
+         SELECT CAST(CASE WHEN (cp.dias_minimos_arriendo_configuracion_proveedor IS NULL
+                               OR d.dias >= cp.dias_minimos_arriendo_configuracion_proveedor)
+                           AND (cp.dias_maximos_arriendo_configuracion_proveedor IS NULL
+                               OR d.dias <= cp.dias_maximos_arriendo_configuracion_proveedor)
+                          THEN 1 ELSE 0 END AS BIT) AS duracionOk
+       ) dur
        CROSS APPLY (
          SELECT CONVERT(DECIMAL(14,2), ROUND(d.dias * pr.precio, 2)) AS subtotal
        ) st

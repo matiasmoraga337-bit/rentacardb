@@ -7,6 +7,7 @@ import {
   type TarifaUpdateInput,
 } from '../schemas/vehiculo.schema';
 import { AppError } from '../utils/AppError';
+import { esFechaValida, hoyIsoLocal } from '../utils/dates';
 import { isPdf } from '../utils/images';
 import { guardarDocumento, guardarFotoVehiculo } from '../utils/uploads';
 
@@ -246,25 +247,18 @@ export interface DisponibilidadResponse {
   minutosExpiracion: number;
 }
 
-const hoyIso = (): string => {
-  const now = new Date();
-  const mes = String(now.getMonth() + 1).padStart(2, '0');
-  const dia = String(now.getDate()).padStart(2, '0');
-  return `${now.getFullYear()}-${mes}-${dia}`;
-};
-
 export async function disponibilidad(
   idVehiculo: number,
   desde: string,
   hasta: string,
 ): Promise<DisponibilidadResponse> {
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(desde) || !/^\d{4}-\d{2}-\d{2}$/.test(hasta)) {
-    throw new AppError(400, 'FECHAS_INVALIDAS', 'Las fechas deben tener formato YYYY-MM-DD.');
+  if (!esFechaValida(desde) || !esFechaValida(hasta)) {
+    throw new AppError(400, 'FECHA_INVALIDA', 'Las fechas no existen en el calendario.');
   }
   if (hasta <= desde) {
     throw new AppError(400, 'FECHAS_INVALIDAS', 'La fecha de fin debe ser posterior al inicio.');
   }
-  if (desde < hoyIso()) {
+  if (desde < hoyIsoLocal()) {
     throw new AppError(400, 'FECHAS_INVALIDAS', 'La fecha de inicio no puede ser anterior a hoy.');
   }
 
@@ -278,6 +272,9 @@ export async function disponibilidad(
   else if (row.reservado) motivo = 'RESERVADO_EN_ESAS_FECHAS';
   else if (row.bloqueado) motivo = 'BLOQUEO_ACTIVO';
   else if (row.mantenimiento) motivo = 'MANTENIMIENTO';
+  else if (!row.documentosOk) motivo = 'DOCUMENTOS_VEHICULO_INVALIDOS';
+  else if (!row.sedesOk) motivo = 'SEDES_NO_HABILITADAS';
+  else if (!row.duracionOk) motivo = 'DURACION_FUERA_DE_RANGO';
 
   return {
     id: row.id,

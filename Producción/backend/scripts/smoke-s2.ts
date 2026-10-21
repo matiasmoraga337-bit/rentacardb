@@ -22,10 +22,18 @@ async function api<T>(
   if (token) headers.set('Authorization', `Bearer ${token}`);
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
   const text = await res.text();
-  const data = text ? (JSON.parse(text) as T & ApiError) : null;
+  let data: unknown = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = text;
+    }
+  }
   if (!res.ok) {
     const err = (data as ApiError | null)?.error;
-    const error = new Error(err?.message ?? `HTTP ${res.status}`) as Error & {
+    const fallback = typeof data === 'string' ? data.slice(0, 200) : `HTTP ${res.status}`;
+    const error = new Error(err?.message ?? fallback) as Error & {
       status?: number;
       code?: string;
     };
@@ -40,6 +48,14 @@ function formatear(date: Date): string {
   const mes = String(date.getMonth() + 1).padStart(2, '0');
   const dia = String(date.getDate()).padStart(2, '0');
   return `${date.getFullYear()}-${mes}-${dia}`;
+}
+
+function rango(offsetDias: number): { inicio: string; fin: string } {
+  const inicioDate = new Date();
+  inicioDate.setDate(inicioDate.getDate() + offsetDias);
+  const finDate = new Date(inicioDate);
+  finDate.setDate(finDate.getDate() + 4);
+  return { inicio: formatear(inicioDate), fin: formatear(finDate) };
 }
 
 async function main(): Promise<void> {
@@ -165,6 +181,113 @@ async function main(): Promise<void> {
   assert.equal(cancelada.reserva.estado, 'CANCELADA');
   assert.equal(cancelada.reembolso?.estado, 'COMPLETADO');
   console.log('PASS cancelacion con reembolso');
+
+  const raceRange = rango(300 + Math.floor(Math.random() * 100));
+  const raceKey = `smoke-race-${crypto.randomUUID()}`;
+  const raceBody = JSON.stringify({
+    ID_vehiculo: vehiculo.ID_vehiculo,
+    ID_sede_retiro: retiro,
+    ID_sede_devolucion: devolucion,
+    fecha_inicio: raceRange.inicio,
+    fecha_fin: raceRange.fin,
+    politica_combustible: 'MISMO_NIVEL',
+  });
+  const raceReserva = await api<{ id: number; total: number }>(
+    '/reservas',
+    { method: 'POST', headers: { 'Idempotency-Key': raceKey }, body: raceBody },
+    login.token,
+  );
+  const racePago = await api<{ token_ws: string }>(
+    '/pagos/webpay/iniciar',
+    { method: 'POST', body: JSON.stringify({ ID_reserva: raceReserva.id }) },
+    login.token,
+  );
+  const confirmar = (): Promise<unknown> =>
+    api(
+      '/pagos/webpay/confirmar',
+      { method: 'POST', body: JSON.stringify({ token_ws: racePago.token_ws, aprobada: true }) },
+      login.token,
+    );
+  const resultados = await Promise.allSettled([confirmar(), confirmar()]);
+  const exitos = resultados.filter((r) => r.status === 'fulfilled').length;
+  const fallos = resultados.filter((r) => r.status === 'rejected') as PromiseRejectedResult[];
+  assert.equal(exitos, 1, `Se esperaba una confirmacion exitosa y hubo ${exitos}.`);
+  assert.equal(fallos.length, 1);
+  assert.equal((fallos[0].reason as { status?: number }).status, 409);
+  const pagosRace = await api<{ estado: string }[]>(
+    `/pagos?reserva=${raceReserva.id}`,
+    {},
+    login.token,
+  );
+  assert.equal(
+    pagosRace.filter((p) => p.estado === 'APROBADO').length,
+    1,
+    'La carrera genero mas de un pago aprobado.',
+  );
+  console.log('PASS WebPay concurrencia (1 pago aprobado)');
+
+  const cancelRaceKey = `smoke-race-cancel-${crypto.randomUUID()}`;
+  await api(
+    `/reservas/${raceReserva.id}/cancelar`,
+    {
+      method: 'POST',
+      headers: { 'Idempotency-Key': cancelRaceKey },
+      body: JSON.stringify({
+        motivo: 'Smoke S2 race',
+        solicitar_reembolso: true,
+        motivo_reembolso: 'Smoke S2 race refund',
+      }),
+    },
+    login.token,
+  );
+
+  const cancelRange = rango(450 + Math.floor(Math.random() * 100));
+  const cancelKeyPend = `smoke-cancel-pend-${crypto.randomUUID()}`;
+  const cancelBody = JSON.stringify({
+    ID_vehiculo: vehiculo.ID_vehiculo,
+    ID_sede_retiro: retiro,
+    ID_sede_devolucion: devolucion,
+    fecha_inicio: cancelRange.inicio,
+    fecha_fin: cancelRange.fin,
+    politica_combustible: 'MISMO_NIVEL',
+  });
+  const pendiente = await api<{ id: number }>(
+    '/reservas',
+    { method: 'POST', headers: { 'Idempotency-Key': cancelKeyPend }, body: cancelBody },
+    login.token,
+  );
+  const pagoPendiente = await api<{ token_ws: string }>(
+    '/pagos/webpay/iniciar',
+    { method: 'POST', body: JSON.stringify({ ID_reserva: pendiente.id }) },
+    login.token,
+  );
+  await api(
+    `/reservas/${pendiente.id}/cancelar`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ motivo: 'Smoke S2 cancel pending', solicitar_reembolso: false }),
+    },
+    login.token,
+  );
+  try {
+    await api(
+      '/pagos/webpay/confirmar',
+      {
+        method: 'POST',
+        body: JSON.stringify({ token_ws: pagoPendiente.token_ws, aprobada: true }),
+      },
+      login.token,
+    );
+    throw new Error('La confirmacion tras cancelar no fue rechazada.');
+  } catch (err) {
+    const e = err as Error & { status?: number; code?: string };
+    assert.equal(e.status, 409);
+    assert.ok(
+      e.code === 'RESERVA_NO_PENDIENTE' || e.code === 'TRANSACCION_YA_RESUELTA',
+      `Codigo inesperado: ${e.code}`,
+    );
+    console.log('PASS WebPay rechaza confirmacion tras cancelar');
+  }
 
   console.log('SMOKE S2 OK');
 }

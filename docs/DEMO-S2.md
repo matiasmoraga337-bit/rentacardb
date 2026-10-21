@@ -18,18 +18,26 @@ Guion reproducible para demostrar el flujo completo del Sprint S2.
 ## 2. Levantar el entorno
 
 ```powershell
-docker compose -f "Producción/infra/docker-compose.yml" up -d --build
+docker compose --env-file .env -p rentacardb-s2 -f "Producción/infra/docker-compose.yml" up -d --build
 # API:     http://localhost:3000/api
 # Web:     http://localhost:5173
 # Mailpit: http://localhost:8026
 # SQL:     localhost:14330
 ```
 
+> Se usa el proyecto `rentacardb-s2` para partir de volúmenes nuevos
+> (`rentacardb-s2_mssql-data` y `rentacardb-s2_uploads`) sin tocar el volumen
+> anterior `rentacardb_mssql-data`. Si el stack ya está arriba, no repitas el
+> comando. Para detenerlo: `docker compose --env-file .env -p rentacardb-s2 -f "Producción/infra/docker-compose.yml" down`.
+
 Verificar:
 
 ```powershell
 Invoke-RestMethod http://localhost:3000/api/health
 ```
+
+La verificación de S2 se hizo con este proyecto: `db-init` salió con código 0,
+la API respondió `db: up`, la web respondió 200 y el smoke S2 terminó OK.
 
 ## 3. Cargar datos demo
 
@@ -79,7 +87,10 @@ Datos: proveedor `AutoDemo`, sedes `Sede Santiago Centro` y
 - Admin: iniciar sesión con `admin@rentacar.cl`:
   - **Reportes** → ingresos mensuales del año.
   - `POST /api/admin/reservas/expirar` para ejecutar la expiración manual.
-  - `POST /api/reservas/:id/estado` para cancelar/expirar una reserva.
+  - `POST /api/reservas/:id/cancelar` para cancelar con reembolso; el backend
+    resuelve el cliente dueño y aplica la política.
+  - `POST /api/reservas/:id/estado` para expirar o cancelar sin pago; si hay
+    pago aprobado, deriva al flujo de cancelación con reembolso.
 
 ## 6. Casos límite para demostrar
 
@@ -89,9 +100,11 @@ Datos: proveedor `AutoDemo`, sedes `Sede Santiago Centro` y
 | Idempotencia | Repetir `POST /reservas` con la misma `Idempotency-Key` | Misma reserva, sin duplicado |
 | Pago rechazado | En WebPay simulado pulsar **Rechazar pago** | Pago `RECHAZADO`; reserva sigue `PENDIENTE` |
 | Pago duplicado | Confirmar el mismo token dos veces | `409 TRANSACCION_YA_RESUELTA` |
+| WebPay concurrente | Confirmar el mismo token en dos peticiones simultáneas | Un solo pago aprobado; la otra recibe `409` |
+| Confirmar tras cancelar | Cancelar una reserva con pago pendiente y confirmar el token viejo | `409 RESERVA_NO_PENDIENTE` |
 | Cancelación sin pago | Reserva `PENDIENTE` → cancelar | `CANCELADA`, sin reembolso |
 | Cancelación con reembolso | Reserva `CONFIRMADA` → cancelar | `CANCELADA`, reembolso `COMPLETADO` |
-| Expiración | Forzar fecha de expiración o esperar el job | `EXPIRADA`, bloqueo liberado |
+| Expiración | Forzar fecha de expiración y ejecutar `POST /api/admin/reservas/expirar` | `EXPIRADA`, bloqueo liberado |
 | Acceso ajeno | Cliente intenta abrir una reserva de otro | `403 FORBIDDEN` |
 | Documentos | Vehículo sin documentos verificados | `409 DOCUMENTOS_VEHICULO_INVALIDOS` |
 
@@ -106,8 +119,8 @@ npm run smoke:s2
 ```
 
 El script hace login, busca, cotiza, reserva, prueba idempotencia y
-solapamiento, inicia/confirma WebPay, previsualiza y ejecuta la cancelación
-con reembolso. Termina con `SMOKE S2 OK`.
+solapamiento, inicia/confirma WebPay, prueba doble confirmación concurrente,
+previsualiza y ejecuta la cancelación con reembolso. Termina con `SMOKE S2 OK`.
 
 ## 8. Evidencia para la rúbrica
 
@@ -117,5 +130,5 @@ con reembolso. Termina con `SMOKE S2 OK`.
   `u_sp_WebPay_IniciarTransaccion`, `u_sp_WebPay_ConfirmarTransaccion`,
   `u_sp_RegistrarPago`, `u_sp_ExpirarReservas`.
 - **Trigger y cursor:** ver `docs/JUSTIFICACION-TRIGGERS-CURSOR.md`.
-- **Pruebas:** `sql/tests/05_reservas_pagos.sql` (19 casos),
+- **Pruebas:** `sql/tests/05_reservas_pagos.sql` (30 casos),
   tests backend/frontend y smoke S2.

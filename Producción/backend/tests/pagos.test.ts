@@ -73,6 +73,36 @@ describe('Reembolsos y reportes', () => {
     expect(res.status).toBe(400);
   });
 
+  it('un cliente no puede crear reembolsos manuales', async () => {
+    const res = await request(app)
+      .post('/api/reembolsos')
+      .set('Authorization', `Bearer ${clienteToken}`)
+      .send({
+        ID_reserva: 1,
+        monto: 1000,
+        motivo: 'Prueba',
+        idempotency_key: 'reembolso-test-1',
+      });
+    expect(res.status).toBe(403);
+  });
+
+  it('un cliente no puede completar reembolsos manuales', async () => {
+    const res = await request(app)
+      .post('/api/reembolsos/1/completar')
+      .set('Authorization', `Bearer ${clienteToken}`)
+      .send({});
+    expect(res.status).toBe(403);
+  });
+
+  it('un admin si accede a la validacion de reembolsos', async () => {
+    const res = await request(app)
+      .post('/api/reembolsos')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({ ID_reserva: 1 });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
   it('el reporte de ingresos es solo ADMIN', async () => {
     const res = await request(app)
       .get('/api/reportes/ingresos?anio=2026')

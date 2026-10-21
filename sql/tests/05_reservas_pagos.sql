@@ -123,6 +123,37 @@ BEGIN CATCH
     INSERT #R VALUES ('WebPay iniciar', 'token 64', 'FAIL', ERROR_MESSAGE());
 END CATCH;
 
+DECLARE @token2 CHAR(64), @url2 VARCHAR(200);
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idRes, @monto=@montoTotal,
+        @token_ws=@token2 OUTPUT, @url_redireccion=@url2 OUTPUT;
+    DECLARE @pagosPendientes INT;
+    SELECT @pagosPendientes = COUNT(*)
+        FROM Pago p INNER JOIN EstadoPago ep ON ep.ID_estado_pago=p.ID_estado_pago_pago
+        WHERE p.ID_reserva_pago=@idRes AND ep.nombre_estado_pago='PENDIENTE';
+    IF @token2 = @token AND @pagosPendientes = 1
+        INSERT #R VALUES ('WebPay reutiliza transaccion pendiente', '1 pago', 'PASS', '');
+    ELSE
+        INSERT #R VALUES ('WebPay reutiliza transaccion pendiente', '1 pago', 'FAIL',
+            CONCAT('tokens=', CASE WHEN @token2=@token THEN 'iguales' ELSE 'distintos' END,
+                   ' pagos=', @pagosPendientes));
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay reutiliza transaccion pendiente', '1 pago', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+DECLARE @montoMalo DECIMAL(12,2) = @montoTotal + 1;
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idRes, @monto=@montoMalo,
+        @token_ws=@token2 OUTPUT, @url_redireccion=@url2 OUTPUT;
+    INSERT #R VALUES ('WebPay monto distinto rechazado', 'ERROR 52007', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay monto distinto rechazado', 'ERROR 52007',
+        CASE WHEN ERROR_NUMBER()=52007 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
 BEGIN TRY
     EXEC dbo.u_sp_WebPay_ConfirmarTransaccion @token_ws=@token, @aprobada=1;
     IF EXISTS (SELECT 1 FROM Reserva r INNER JOIN EstadoReserva er ON er.ID_estado_reserva=r.ID_estado_reserva_reserva
@@ -134,6 +165,12 @@ END TRY
 BEGIN CATCH
     INSERT #R VALUES ('WebPay confirmar reserva', 'CONFIRMADA', 'FAIL', ERROR_MESSAGE());
 END CATCH;
+
+IF EXISTS (SELECT 1 FROM HistorialEstadoReserva
+           WHERE ID_reserva_historial=@idRes AND evento_historial_estado_reserva='CONFIRMAR')
+    INSERT #R VALUES ('Historial CONFIRMAR por WebPay', 'existe', 'PASS', '');
+ELSE
+    INSERT #R VALUES ('Historial CONFIRMAR por WebPay', 'existe', 'FAIL', 'no existe');
 
 IF EXISTS (SELECT 1 FROM Pago p INNER JOIN EstadoPago ep ON ep.ID_estado_pago=p.ID_estado_pago_pago
            WHERE p.ID_reserva_pago=@idRes AND ep.nombre_estado_pago='APROBADO')
@@ -150,10 +187,10 @@ ELSE
 BEGIN TRY
     EXEC dbo.u_sp_RegistrarPago @ID_reserva=@idRes, @ID_tipo_operacion_pago=1,
         @ID_metodo_pago=1, @monto_pago=@montoTotal, @aprobado=1;
-    INSERT #R VALUES ('Pago duplicado rechazado', 'ERROR 52005', 'FAIL', 'no lanzo error');
+    INSERT #R VALUES ('Pago sobre reserva ya confirmada', 'ERROR 52005', 'FAIL', 'no lanzo error');
 END TRY
 BEGIN CATCH
-    INSERT #R VALUES ('Pago duplicado rechazado', 'ERROR 52005',
+    INSERT #R VALUES ('Pago sobre reserva ya confirmada', 'ERROR 52005',
         CASE WHEN ERROR_NUMBER()=52005 THEN 'PASS' ELSE 'FAIL' END,
         CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
 END CATCH;
@@ -239,6 +276,158 @@ BEGIN TRY
 END TRY
 BEGIN CATCH
     INSERT #R VALUES ('Expiracion de reserva (cursor)', 'EXPIRADA', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+-- ===================== HARDENING WEBPAY =====================
+DECLARE @inicio3 DATE = DATEADD(DAY, 60, @hoy);
+DECLARE @fin3 DATE = DATEADD(DAY, 4, @inicio3);
+DECLARE @inicio4 DATE = DATEADD(DAY, 80, @hoy);
+DECLARE @fin4 DATE = DATEADD(DAY, 4, @inicio4);
+DECLARE @inicio5 DATE = DATEADD(DAY, 100, @hoy);
+DECLARE @fin5 DATE = DATEADD(DAY, 4, @inicio5);
+
+DECLARE @keyPay VARCHAR(100) = CONCAT('QA-S2-PAY-', CONVERT(VARCHAR(36), NEWID()));
+DECLARE @idPay INT, @montoPay DECIMAL(14,2), @tokenPay CHAR(64), @urlPay VARCHAR(200);
+BEGIN TRY
+    EXEC dbo.u_sp_CrearReserva @ID_usuario_cliente=@idCliente, @ID_vehiculo=@idVeh,
+        @ID_sede_retiro=@idSede, @ID_sede_devolucion=@idSede,
+        @fecha_inicio=@inicio3, @fecha_fin=@fin3, @idempotency_key=@keyPay;
+    SET @idPay = (SELECT ID_reserva FROM Reserva WHERE idempotency_key_reserva=@keyPay);
+    SELECT @montoPay = monto_total_reserva FROM Reserva WHERE ID_reserva=@idPay;
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idPay, @monto=@montoPay,
+        @token_ws=@tokenPay OUTPUT, @url_redireccion=@urlPay OUTPUT;
+    EXEC dbo.u_sp_WebPay_ConfirmarTransaccion @token_ws=@tokenPay, @aprobada=1;
+    INSERT #R VALUES ('WebPay reserva para hardening', 'CONFIRMADA', 'PASS', CONCAT('ID=', @idPay));
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay reserva para hardening', 'CONFIRMADA', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_ConfirmarTransaccion @token_ws=@tokenPay, @aprobada=1;
+    INSERT #R VALUES ('WebPay doble confirmacion rechazada', 'ERROR 52034', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay doble confirmacion rechazada', 'ERROR 52034',
+        CASE WHEN ERROR_NUMBER()=52034 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idPay, @monto=@montoPay,
+        @token_ws=@tokenPay OUTPUT, @url_redireccion=@urlPay OUTPUT;
+    INSERT #R VALUES ('WebPay iniciar sobre reserva confirmada', 'ERROR 52032', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay iniciar sobre reserva confirmada', 'ERROR 52032',
+        CASE WHEN ERROR_NUMBER()=52032 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+DECLARE @keyRef VARCHAR(100) = CONCAT('QA-S2-REF-', CONVERT(VARCHAR(36), NEWID()));
+DECLARE @montoExcesivo DECIMAL(14,2) = @montoPay + 1;
+BEGIN TRY
+    DECLARE @reembolsoId BIGINT;
+    EXEC dbo.u_sp_CrearReembolso @ID_reserva=@idPay, @monto=@montoExcesivo,
+        @motivo=N'Reembolso excesivo', @idempotency_key=@keyRef,
+        @ID_usuario=@idCliente, @ID_reembolso_creado=@reembolsoId OUTPUT;
+    INSERT #R VALUES ('Reembolso excesivo rechazado', 'ERROR 70301', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Reembolso excesivo rechazado', 'ERROR 70301',
+        CASE WHEN ERROR_NUMBER()=70301 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+DECLARE @keyPend VARCHAR(100) = CONCAT('QA-S2-PEND-', CONVERT(VARCHAR(36), NEWID()));
+DECLARE @idPend INT, @tokenPend CHAR(64), @urlPend VARCHAR(200);
+BEGIN TRY
+    EXEC dbo.u_sp_CrearReserva @ID_usuario_cliente=@idCliente, @ID_vehiculo=@idVeh,
+        @ID_sede_retiro=@idSede, @ID_sede_devolucion=@idSede,
+        @fecha_inicio=@inicio4, @fecha_fin=@fin4, @idempotency_key=@keyPend;
+    SET @idPend = (SELECT ID_reserva FROM Reserva WHERE idempotency_key_reserva=@keyPend);
+    DECLARE @montoPend DECIMAL(14,2);
+    SELECT @montoPend = monto_total_reserva FROM Reserva WHERE ID_reserva=@idPend;
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idPend, @monto=@montoPend,
+        @token_ws=@tokenPend OUTPUT, @url_redireccion=@urlPend OUTPUT;
+    EXEC dbo.u_sp_CancelarReserva @ID_reserva=@idPend, @ID_usuario=@idCliente,
+        @motivo=N'Cancelacion con pago pendiente', @monto_reembolso=NULL;
+    INSERT #R VALUES ('Reserva cancelada con transaccion pendiente', 'CANCELADA', 'PASS', '');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Reserva cancelada con transaccion pendiente', 'CANCELADA', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_ConfirmarTransaccion @token_ws=@tokenPend, @aprobada=1;
+    INSERT #R VALUES ('WebPay confirmar tras cancelar', 'ERROR 52035', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay confirmar tras cancelar', 'ERROR 52035',
+        CASE WHEN ERROR_NUMBER()=52035 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+DECLARE @inicio6 DATE = DATEADD(DAY, 120, @hoy);
+DECLARE @fin6 DATE = DATEADD(DAY, 4, @inicio6);
+DECLARE @keyExp VARCHAR(100) = CONCAT('QA-S2-EXP2-', CONVERT(VARCHAR(36), NEWID()));
+DECLARE @idExp INT, @tokenExp CHAR(64), @urlExp VARCHAR(200), @montoExp DECIMAL(14,2);
+BEGIN TRY
+    EXEC dbo.u_sp_CrearReserva @ID_usuario_cliente=@idCliente, @ID_vehiculo=@idVeh,
+        @ID_sede_retiro=@idSede, @ID_sede_devolucion=@idSede,
+        @fecha_inicio=@inicio6, @fecha_fin=@fin6, @idempotency_key=@keyExp;
+    SET @idExp = (SELECT ID_reserva FROM Reserva WHERE idempotency_key_reserva=@keyExp);
+    SELECT @montoExp = monto_total_reserva FROM Reserva WHERE ID_reserva=@idExp;
+    EXEC dbo.u_sp_WebPay_IniciarTransaccion @ID_reserva=@idExp, @monto=@montoExp,
+        @token_ws=@tokenExp OUTPUT, @url_redireccion=@urlExp OUTPUT;
+    UPDATE Reserva SET fecha_expiracion_reserva = DATEADD(MINUTE, -1, SYSDATETIME())
+    WHERE ID_reserva=@idExp;
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Reserva para expiracion WebPay', 'OK', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_WebPay_ConfirmarTransaccion @token_ws=@tokenExp, @aprobada=1;
+    INSERT #R VALUES ('WebPay confirmar reserva expirada', 'ERROR 52037', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('WebPay confirmar reserva expirada', 'ERROR 52037',
+        CASE WHEN ERROR_NUMBER()=52037 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_CancelarReserva @ID_reserva=@idExp, @ID_usuario=@idCliente,
+        @motivo=N'Limpieza expirada QA', @monto_reembolso=NULL;
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Limpieza reserva expirada', 'OK', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+DECLARE @keyOwn VARCHAR(100) = CONCAT('QA-S2-OWN-', CONVERT(VARCHAR(36), NEWID()));
+DECLARE @idOwn INT;
+BEGIN TRY
+    EXEC dbo.u_sp_CrearReserva @ID_usuario_cliente=@idCliente, @ID_vehiculo=@idVeh,
+        @ID_sede_retiro=@idSede, @ID_sede_devolucion=@idSede,
+        @fecha_inicio=@inicio5, @fecha_fin=@fin5, @idempotency_key=@keyOwn;
+    SET @idOwn = (SELECT ID_reserva FROM Reserva WHERE idempotency_key_reserva=@keyOwn);
+    EXEC dbo.u_sp_CancelarReserva @ID_reserva=@idOwn, @ID_usuario=@idAdmin,
+        @motivo=N'Intento de admin sin ownership', @monto_reembolso=NULL;
+    INSERT #R VALUES ('Cancelacion por usuario ajeno rechazada', 'ERROR 70305', 'FAIL', 'no lanzo error');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Cancelacion por usuario ajeno rechazada', 'ERROR 70305',
+        CASE WHEN ERROR_NUMBER()=70305 THEN 'PASS' ELSE 'FAIL' END,
+        CONCAT(ERROR_NUMBER(), ': ', ERROR_MESSAGE()));
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_CancelarReserva @ID_reserva=@idOwn, @ID_usuario=@idCliente,
+        @motivo=N'Limpieza QA', @monto_reembolso=NULL;
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Limpieza reserva ownership', 'OK', 'FAIL', ERROR_MESSAGE());
 END CATCH;
 
 -- ===================== VISTA =====================

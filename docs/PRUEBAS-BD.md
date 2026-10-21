@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **88 PASS / 0 FAIL**
+- **Resultado global:** **99 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -18,7 +18,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/02_functional.sql` | 22 | Auth, proveedores/sedes, vehículos, tarifas, publicación, búsqueda, outbox |
 | `sql/tests/03_triggers_security_errorlog.sql` | 13 | Triggers de solapamiento/auditoría, permisos (`api_user`/`report_user`), ErrorLog, inyección |
 | `sql/tests/04_flows.sql` | 12 | Pagos, WebPay, arriendos, multas, chat (Unicode), liquidaciones/outbox |
-| `sql/tests/05_reservas_pagos.sql` | 19 | Reserva, idempotencia, solapamiento, WebPay, reembolso, expiración (cursor) y vista |
+| `sql/tests/05_reservas_pagos.sql` | 30 | Reserva, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración (cursor) y vista |
 
 ## 2. Resultados por categoría
 
@@ -61,18 +61,27 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Conversación: crear, enviar mensaje con **Unicode (Ñ, áéíóú)** y cerrar.
 - Liquidaciones y outbox: aprobar/pagar/reintentar inexistentes → errores esperados.
 
-### S2 — Reservas y pagos (19/19)
+### S2 — Reservas y pagos (30/30)
 - Crear reserva `PENDIENTE` con total, snapshot, historial `CREAR` y bloqueo activo.
 - Idempotencia: misma `idempotency_key` → una sola fila.
 - Solapamiento rechazado (`70209`/`70900`); reserva adyacente permitida.
 - WebPay iniciar → token de 64 caracteres; confirmar → reserva `CONFIRMADA`.
 - Pago `APROBADO` y trigger de auditoría `FINANCIAL`.
-- Pago duplicado sobre reserva confirmada → `52005`.
+- Pago sobre reserva confirmada → `52005`.
 - Cancelar con reembolso → reserva `CANCELADA`, reembolso `COMPLETADO` y movimiento `REEMBOLSO` negativo.
 - Reintento de cancelación con la misma clave → idempotente y un solo reembolso.
 - Cancelar sin pago → `CANCELADA` sin reembolso.
 - Expiración: reserva vencida → `EXPIRADA`, bloqueo liberado (cursor `u_sp_ExpirarReservas`).
 - `vw_ReservasDetalle` devuelve la reserva integrada.
+- Hardening: doble confirmación WebPay rechazada (`52034`).
+- Hardening: iniciar WebPay sobre reserva confirmada rechazado (`52032`).
+- Hardening: reembolso que excede el saldo rechazado (`70301`).
+- Hardening: confirmación tras cancelar rechazada (`52035`).
+- Hardening: cancelación por usuario que no es dueño rechazada (`70305`).
+- Hardening: `u_sp_WebPay_IniciarTransaccion` reutiliza la transacción pendiente.
+- Hardening: monto distinto al total de la reserva rechazado (`52007`).
+- Hardening: confirmación de reserva expirada rechazada (`52037`).
+- Hardening: historial `CONFIRMAR` creado por WebPay.
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).
@@ -81,10 +90,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 4. **`REPLICATE()` inline en `EXEC`** no es válido; se asigna a variables antes de llamar al SP.
 5. **Formato de patente** en el seed demo (`CK_vehiculo_patente_formato`). Se corrigió a 4 letras + 2 dígitos (`DEMA01`, `DEMB02`).
 6. **Recordsets múltiples** en `u_sp_CrearReserva`/`u_sp_CancelarReserva` (snapshot/reembolso/reserva/vista). El repositorio selecciona explícitamente la fila de `vw_ReservasDetalle`.
+7. **Doble confirmación WebPay** y reanimación de reservas canceladas/expiradas. Se endureció `u_sp_WebPay_ConfirmarTransaccion` con `UPDLOCK/HOLDLOCK`, validación de estado y `UPDATE` condicional; migración en `sql/migrations/2026-10-21_s2_webpay_hardening.sql`.
+8. **Fechas imposibles** (`2026-02-31`) llegaban a SQL como error 241. Se agregó validación de calendario en zod/servicios y mapeo a 400.
+9. **Reembolsos manuales de CLIENTE**. Las rutas `/reembolsos` y `/reembolsos/:id/completar` quedaron solo para ADMIN; el cliente usa `POST /reservas/:id/cancelar`.
 
 ## 4. Cobertura no incluida (pendiente / futura)
 - Flujo feliz de arriendo → devolución → liquidación (S3/S4).
-- Concurrencia real con dos sesiones simultáneas.
+- Concurrencia real con dos sesiones SQL (la carrera WebPay se prueba vía smoke API con `Promise.all`).
 - Rendimiento (`SET STATISTICS IO/TIME`) en búsqueda y reportes.
 - Cobertura exhaustiva de los 94 CHECK (se probaron los representativos).
 

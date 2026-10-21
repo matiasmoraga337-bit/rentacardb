@@ -44,6 +44,9 @@ export function CancelarReservaPanel({ reserva }: { reserva: Reserva }) {
       queryClient.invalidateQueries({ queryKey: ['reserva', reserva.id] });
       queryClient.invalidateQueries({ queryKey: ['reservas'] });
       queryClient.invalidateQueries({ queryKey: ['cancelacion-preview', reserva.id] });
+      queryClient.invalidateQueries({ queryKey: ['reserva-historial', reserva.id] });
+      queryClient.invalidateQueries({ queryKey: ['pagos', reserva.id] });
+      queryClient.invalidateQueries({ queryKey: ['reserva-snapshot', reserva.id] });
     },
   });
 

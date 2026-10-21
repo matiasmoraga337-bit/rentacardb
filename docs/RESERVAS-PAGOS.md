@@ -47,8 +47,8 @@ Estados soportados en S2: `PENDIENTE`, `CONFIRMADA`, `CANCELADA`, `EXPIRADA`.
 | POST | `/pagos/webpay/iniciar` | CLIENTE dueño | `u_sp_WebPay_IniciarTransaccion` |
 | GET | `/pagos/webpay/transaccion/:token` | AUTH dueño | `PagoTransaccionSimulada` + `Pago` + `Reserva` |
 | POST | `/pagos/webpay/confirmar` | CLIENTE dueño | `u_sp_WebPay_ConfirmarTransaccion` |
-| POST | `/reembolsos` | CLIENTE dueño / ADMIN | `u_sp_CrearReembolso` |
-| POST | `/reembolsos/:id/completar` | CLIENTE dueño / ADMIN | `u_sp_MarcarReembolsoCompletado` |
+| POST | `/reembolsos` | ADMIN | `u_sp_CrearReembolso` |
+| POST | `/reembolsos/:id/completar` | ADMIN | `u_sp_MarcarReembolsoCompletado` |
 | GET | `/reembolsos?reserva=` | AUTH | `Reembolso` |
 | GET | `/reportes/ingresos?anio=` | ADMIN | `u_sp_ReporteIngresosMensuales` |
 
@@ -83,10 +83,12 @@ Estados soportados en S2: `PENDIENTE`, `CONFIRMADA`, `CANCELADA`, `EXPIRADA`.
 - `POST /reservas`: exige `Idempotency-Key` (header) o `idempotency_key`
   (body). El SP devuelve la reserva existente si la clave se repite.
 - `POST /reservas/:id/cancelar`: exige clave cuando se solicita reembolso.
-  El reintento con la misma clave devuelve el mismo reembolso.
-- `POST /pagos/webpay/confirmar`: la transacción solo puede resolverse una vez
-  (`PagoTransaccionSimulada.estado = CREADA`).
-- `POST /reembolsos`: el SP exige `idempotency_key`.
+  El reintento devuelve el reembolso existente y su monto real.
+- `POST /pagos/webpay/iniciar`: reutiliza la transacción `CREADA` pendiente de
+  la reserva; no crea una nueva si ya existe una.
+- `POST /pagos/webpay/confirmar`: la transacción solo puede resolverse una vez.
+  El SP usa `UPDLOCK/HOLDLOCK` y `UPDATE ... WHERE estado='CREADA'`.
+- `POST /reembolsos`: ADMIN y el SP exige `idempotency_key`.
 
 ### Regla de reembolso
 
@@ -110,6 +112,19 @@ La función pura está en `src/services/reembolso-policy.ts` y tiene tests.
   reserva y `SESSION_CONTEXT`.
 - `u_sp_WebPay_ConfirmarTransaccion` confirma la reserva directamente. No se
   llama después a `u_sp_CambiarEstadoReserva`.
+- **Hardening WebPay S2:** el SP toma la transacción con `UPDLOCK/HOLDLOCK`,
+  exige reserva y pago `PENDIENTE`, valida expiración, rechaza si ya hay un
+  pago aprobado y actualiza con `WHERE estado='CREADA'` + `@@ROWCOUNT`. También
+  inserta `HistorialEstadoReserva` al confirmar. La migración está en
+  `sql/migrations/2026-10-21_s2_webpay_hardening.sql`.
+- **Iniciar WebPay:** el SP bloquea la reserva con `UPDLOCK/HOLDLOCK`, valida
+  el monto contra `monto_total_reserva` y reutiliza una transacción `CREADA`
+  pendiente en vez de crear otra.
+- La cancelación administrativa usa `POST /reservas/:id/cancelar` y pasa el
+  `idCliente` al SP; `POST /reservas/:id/estado` no permite cancelar una
+  reserva con pago aprobado (deriva al flujo con reembolso).
+- `POST /reembolsos` y `/reembolsos/:id/completar` son solo ADMIN. El cliente
+  no puede crear ni completar reembolsos manuales.
 - `u_sp_RegistrarPago` también confirma la reserva al aprobar un pago
   `RESERVA`; se usa solo desde ADMIN para registros manuales.
 - Los SPs de reembolso validan que el `ID_usuario` sea el dueño. Para el
@@ -127,10 +142,16 @@ La función pura está en `src/services/reembolso-policy.ts` y tiene tests.
 | `VEHICULO_EN_MANTENIMIENTO` | 409 | Mantenimiento activo |
 | `DOCUMENTOS_VEHICULO_INVALIDOS` | 409 | Documentos obligatorios no verificados |
 | `SIN_PRECIO_DISPONIBLE` | 409 | No hay tarifa aplicable |
-| `RESERVA_NO_PENDIENTE` | 409 | Pago sobre reserva no pendiente |
-| `RESERVA_EXPIRADA` | 409 | Intento de pago sobre reserva vencida |
+| `RESERVA_NO_PENDIENTE` | 409 | Pago o confirmación sobre reserva no pendiente |
+| `RESERVA_EXPIRADA` | 409 | Intento de pago o confirmación sobre reserva vencida |
 | `TRANSACCION_YA_RESUELTA` | 409 | Confirmación repetida de WebPay |
+| `PAGO_NO_PENDIENTE` | 409 | Confirmar transacción sobre pago no pendiente |
+| `PAGO_PENDIENTE_INCONSISTENTE` | 409 | Transacción pendiente con otro monto |
+| `PAGO_YA_APROBADO` | 409 | La reserva ya tiene pago aprobado |
 | `REEMBOLSO_EXCEDE_SALDO` | 409 | Monto mayor al disponible |
+| `FECHA_INVALIDA` | 400 | Fecha inexistente (`2026-02-31`) |
+| `OPERACION_DUPLICADA` | 409 | Violación de unicidad (p. ej. `buy_order`) |
+| `DEADLOCK_REINTENTAR` | 503 | Deadlock de SQL Server; reintentar |
 | `IDEMPOTENCY_KEY_REQUIRED` | 400 | Falta clave de idempotencia |
 | `FORBIDDEN` | 403 | Sin ownership o rol |
 
@@ -138,9 +159,27 @@ El mapeo está en `src/middlewares/errorHandler.ts`.
 
 ## 7. Pruebas
 
-- `sql/tests/05_reservas_pagos.sql`: 19 casos de reserva, solapamiento,
-  idempotencia, WebPay, reembolso, expiración y vista.
+- `sql/tests/05_reservas_pagos.sql`: 30 casos de reserva, solapamiento,
+  idempotencia, WebPay, reutilización/doble confirmación, reembolso,
+  expiración y vista.
 - `tests/reservas.test.ts`, `tests/pagos.test.ts`: validación, autenticación
   y autorización sin dependencia de BD.
 - `tests/reembolso-policy.test.ts`: cálculo puro de reembolsos.
-- `scripts/smoke-s2.ts`: flujo real contra API + BD (`npm run smoke:s2`).
+- `scripts/smoke-s2.ts`: flujo real contra API + BD, incluyendo carrera de
+  confirmación WebPay (`npm run smoke:s2`).
+
+## 8. Limitaciones conocidas de S2
+
+- `POST /reservas/:id/estado` valida el pago aprobado en el servicio; una
+  aprobación concurrente entre la consulta y el SP podría permitir una
+  cancelación sin reembolso. El flujo recomendado para ADMIN es
+  `/reservas/:id/cancelar`.
+- `u_sp_BuscarVehiculos` no aplica los mismos checks de documentos/sedes/
+  duración que la cotización de checkout; un vehículo puede aparecer en la
+  búsqueda y luego no estar disponible en el detalle.
+- Las acciones ADMIN de cancelación/reembolso usan el `ID_usuario` del cliente
+  dueño porque los SP validan ownership; la auditoría las atribuye al cliente.
+- La fecha “hoy” se calcula con la zona horaria del servidor; el contenedor SQL
+  puede estar en UTC. Las reservas de la demo usan fechas futuras.
+- La suite SQL se ejecuta manualmente; CI corre lint/typecheck/tests/build de
+  backend y frontend, pero no levanta SQL Server.

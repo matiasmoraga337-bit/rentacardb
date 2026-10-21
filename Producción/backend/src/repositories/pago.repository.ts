@@ -1,4 +1,5 @@
 import sql from 'mssql';
+import { randomUUID } from 'node:crypto';
 import { getPool } from '../config/db';
 
 export interface RegistrarPagoParams {
@@ -44,6 +45,12 @@ export interface IniciarWebPayResult {
   ID_pago: number;
   token_ws: string;
   url: string;
+}
+
+export interface TransaccionPendiente {
+  ID_pago: number;
+  token_ws: string;
+  monto: number;
 }
 
 export async function registrarPago(params: RegistrarPagoParams): Promise<PagoRow | null> {
@@ -126,10 +133,12 @@ export async function iniciarWebPay(
   monto: number,
 ): Promise<IniciarWebPayResult | null> {
   const pool = await getPool();
+  const buyOrder = `BO-${idReserva}-${randomUUID()}`;
   const request = pool
     .request()
     .input('ID_reserva', sql.Int, idReserva)
     .input('monto', sql.Decimal(12, 2), monto)
+    .input('buy_order', sql.VarChar(100), buyOrder)
     .output('token_ws', sql.Char(64))
     .output('url_redireccion', sql.VarChar(200));
   const result = await request.execute('u_sp_WebPay_IniciarTransaccion');
@@ -138,6 +147,28 @@ export async function iniciarWebPay(
   const url = result.output.url_redireccion as string | undefined;
   if (!row || !token || !url) return null;
   return { ID_pago: row.ID_pago, token_ws: token.trim(), url };
+}
+
+export async function obtenerTransaccionPendiente(
+  idReserva: number,
+): Promise<TransaccionPendiente | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idReserva)
+    .query<TransaccionPendiente>(
+      `SELECT TOP 1 p.ID_pago AS ID_pago,
+              LTRIM(RTRIM(t.token_ws_transaccion_simulada)) AS token_ws,
+              p.monto_pago AS monto
+       FROM dbo.PagoTransaccionSimulada t
+       INNER JOIN dbo.Pago p ON p.ID_pago = t.ID_pago_transaccion_simulada
+       INNER JOIN dbo.EstadoPago ep ON ep.ID_estado_pago = p.ID_estado_pago_pago
+       WHERE p.ID_reserva_pago = @id
+         AND t.estado_transaccion_simulada = 'CREADA'
+         AND ep.nombre_estado_pago = 'PENDIENTE'
+       ORDER BY t.ID_transaccion_simulada DESC`,
+    );
+  return result.recordset[0] ?? null;
 }
 
 export async function confirmarWebPay(

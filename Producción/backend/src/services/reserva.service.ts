@@ -133,7 +133,8 @@ export async function crearReserva(
   if (!row) {
     throw new AppError(500, 'RESERVA_NO_CREADA', 'No se pudo crear la reserva.');
   }
-  return mapReserva(row);
+  const view = await repo.obtenerReservaView(row.ID_reserva);
+  return mapReserva(view ?? row);
 }
 
 export async function listarReservas(
@@ -279,9 +280,21 @@ export async function cancelarReserva(
 
   let montoReembolso: number | null = null;
   if (input.solicitar_reembolso) {
-    const prevision = await calcularPrevision(idReserva);
-    if (prevision.montoReembolso > 0) {
-      montoReembolso = prevision.montoReembolso;
+    if (acceso.estado === 'CANCELADA') {
+      const reembolsos = await repo.listarReembolsosReserva(idReserva);
+      if (!reembolsos[0]) {
+        throw new AppError(
+          409,
+          'REEMBOLSO_NO_EXISTE',
+          'La reserva ya estaba cancelada y no tiene un reembolso asociado.',
+        );
+      }
+      montoReembolso = reembolsos[0].monto;
+    } else {
+      const prevision = await calcularPrevision(idReserva);
+      if (prevision.montoReembolso > 0) {
+        montoReembolso = prevision.montoReembolso;
+      }
     }
   }
 
@@ -293,9 +306,10 @@ export async function cancelarReserva(
     );
   }
 
-  const row = await repo.cancelarReserva({
+  const usuarioPropietario = esAdmin(roles) ? acceso.idCliente : idUsuario;
+  const { row, fueIdempotente } = await repo.cancelarReserva({
     ID_reserva: idReserva,
-    ID_usuario: idUsuario,
+    ID_usuario: usuarioPropietario,
     motivo: input.motivo,
     monto_reembolso: montoReembolso,
     motivo_reembolso: input.motivo_reembolso ?? input.motivo,
@@ -305,12 +319,16 @@ export async function cancelarReserva(
   if (!row) {
     throw new AppError(500, 'CANCELACION_FALLIDA', 'No se pudo cancelar la reserva.');
   }
+  const view = await repo.obtenerReservaView(idReserva);
+  if (!view) {
+    throw new AppError(404, 'RESERVA_NO_ENCONTRADA', 'Reserva no encontrada.');
+  }
   const reembolsos = await repo.listarReembolsosReserva(idReserva);
   return {
-    reserva: mapReserva(row),
+    reserva: mapReserva(view),
     reembolso: reembolsos[0] ?? null,
-    montoReembolsado: montoReembolso ?? 0,
-    fueIdempotente: acceso.estado === 'CANCELADA',
+    montoReembolsado: reembolsos[0]?.monto ?? 0,
+    fueIdempotente,
   };
 }
 
@@ -325,6 +343,13 @@ export async function cambiarEstadoReserva(
   idUsuario: number,
   input: CambiarEstadoReservaInput,
 ): Promise<ReservaDto> {
+  if (input.estado === 'CANCELADA' && (await repo.existePagoAprobadoReserva(idReserva))) {
+    throw new AppError(
+      409,
+      'USE_CANCELAR_CON_REEMBOLSO',
+      'La reserva tiene pago aprobado; usa /reservas/:id/cancelar para gestionar el reembolso.',
+    );
+  }
   const evento = EVENTO_POR_ESTADO[input.estado];
   await repo.cambiarEstadoReserva(
     idReserva,

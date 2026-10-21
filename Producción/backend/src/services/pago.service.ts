@@ -1,4 +1,5 @@
 import * as pagoRepo from '../repositories/pago.repository';
+import { existePagoAprobadoReserva } from '../repositories/reserva.repository';
 import { type ConfirmarWebPayInput, type RegistrarPagoInput } from '../schemas/pago.schema';
 import { AppError } from '../utils/AppError';
 import { assertAccesoReserva } from './reserva.service';
@@ -65,6 +66,27 @@ export async function iniciarWebPay(
   if (!(acceso.total > 0)) {
     throw new AppError(409, 'MONTO_INVALIDO', 'La reserva no tiene un monto valido.');
   }
+  if (await existePagoAprobadoReserva(idReserva)) {
+    throw new AppError(409, 'PAGO_YA_APROBADO', 'La reserva ya tiene un pago aprobado.');
+  }
+
+  const pendiente = await pagoRepo.obtenerTransaccionPendiente(idReserva);
+  if (pendiente) {
+    if (pendiente.monto !== acceso.total) {
+      throw new AppError(
+        409,
+        'PAGO_PENDIENTE_INCONSISTENTE',
+        'Existe una transaccion pendiente con un monto distinto al total de la reserva.',
+      );
+    }
+    return {
+      ID_pago: pendiente.ID_pago,
+      token_ws: pendiente.token_ws,
+      url: `/webpay/confirmar?token_ws=${pendiente.token_ws}`,
+      monto: pendiente.monto,
+      ID_reserva: idReserva,
+    };
+  }
 
   const result = await pagoRepo.iniciarWebPay(idReserva, acceso.total);
   if (!result) {
@@ -103,6 +125,16 @@ export async function confirmarWebPay(
   assertClientePropietario(tx.idCliente, idUsuario, roles);
   if (tx.estadoTransaccion !== 'CREADA') {
     throw new AppError(409, 'TRANSACCION_YA_RESUELTA', 'La transaccion ya fue resuelta.');
+  }
+  if (tx.estadoReserva !== 'PENDIENTE') {
+    throw new AppError(
+      409,
+      'RESERVA_NO_PENDIENTE',
+      `La reserva esta en estado ${tx.estadoReserva}; no se puede confirmar el pago.`,
+    );
+  }
+  if (await existePagoAprobadoReserva(tx.idReserva)) {
+    throw new AppError(409, 'PAGO_YA_APROBADO', 'La reserva ya tiene un pago aprobado.');
   }
 
   const result = await pagoRepo.confirmarWebPay(input.token_ws, input.aprobada);

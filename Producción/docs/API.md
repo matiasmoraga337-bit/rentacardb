@@ -66,9 +66,9 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/reservas` | ROL(CLIENTE) | `u_sp_CrearReserva` | `Idempotency-Key` obligatorio. `ID_usuario_cliente` sale del JWT. |
 | GET | `/reservas?scope=&estado=&page=&pageSize=` | AUTH | `vw_ReservasDetalle` + `Reserva` | `scope=cliente` (propias), `scope=proveedor` (sus vehículos), `todos` (ADMIN). Respuesta `{data,page,pageSize,total}`. |
 | GET | `/reservas/:id` | AUTH | `vw_ReservasDetalle` + `Reserva` | Incluye `reembolsos[]`. Ownership cliente/proveedor/admin. |
-| POST | `/reservas/:id/estado` | ADMIN | `u_sp_CambiarEstadoReserva` | S2: `CONFIRMADA`, `CANCELADA`, `EXPIRADA`. |
+| POST | `/reservas/:id/estado` | ADMIN | `u_sp_CambiarEstadoReserva` | S2: `CONFIRMADA`, `CANCELADA`, `EXPIRADA`. Si hay pago aprobado, `CANCELADA` se rechaza y debe usarse `/cancelar`. |
 | GET | `/reservas/:id/cancelacion` | AUTH | `PoliticaCancelacion` + `Pago` + `Reembolso` | Previsualiza política, monto pagado y reembolso estimado. |
-| POST | `/reservas/:id/cancelar` | ROL(CLIENTE) dueño | `u_sp_CancelarReserva` | Body `{motivo, solicitar_reembolso, motivo_reembolso?}`. `Idempotency-Key` obligatorio si hay reembolso. |
+| POST | `/reservas/:id/cancelar` | ROL(CLIENTE/ADMIN) dueño | `u_sp_CancelarReserva` | Body `{motivo, solicitar_reembolso, motivo_reembolso?}`. `Idempotency-Key` obligatorio si hay reembolso. ADMIN también puede cancelar con reembolso. |
 | GET | `/reservas/:id/historial` | AUTH | `HistorialEstadoReserva` | Estados anterior/nuevo, evento, motivo y usuario. |
 | GET | `/reservas/:id/snapshot` | AUTH | `ReservaSnapshot` | Versiones congeladas de precios/condiciones. |
 | POST | `/admin/reservas/expirar` | ADMIN | `u_sp_ExpirarReservas` | Ejecución manual del job (cursor). |
@@ -82,8 +82,8 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/pagos/webpay/iniciar` | ROL(CLIENTE) dueño | `u_sp_WebPay_IniciarTransaccion` | Body `{ID_reserva}`. El monto se obtiene de la reserva. Devuelve `{token_ws, url, ID_pago, monto}`. |
 | GET | `/pagos/webpay/transaccion/:token` | AUTH dueño | `PagoTransaccionSimulada` | Datos para la confirmación simulada. |
 | POST | `/pagos/webpay/confirmar` | ROL(CLIENTE) dueño | `u_sp_WebPay_ConfirmarTransaccion` | Body `{token_ws, aprobada}`. Solo una confirmación por token. |
-| POST | `/reembolsos` | CLIENTE dueño / ADMIN | `u_sp_CrearReembolso` | `idempotency_key` obligatorio. |
-| POST | `/reembolsos/:id/completar` | CLIENTE dueño / ADMIN | `u_sp_MarcarReembolsoCompletado` | |
+| POST | `/reembolsos` | ADMIN | `u_sp_CrearReembolso` | `idempotency_key` obligatorio. |
+| POST | `/reembolsos/:id/completar` | ADMIN | `u_sp_MarcarReembolsoCompletado` | |
 | GET | `/reembolsos?reserva=` | AUTH | `Reembolso` | Ownership de la reserva. |
 | GET | `/reportes/ingresos?anio&ID_proveedor=` | ADMIN | `u_sp_ReporteIngresosMensuales` | Reporte mensual. |
 
@@ -139,6 +139,7 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 ## Notas de implementación
 
 - **Idempotencia:** `POST /reservas` exige `Idempotency-Key` (header) o `idempotency_key`; `POST /reservas/:id/cancelar` la exige cuando hay reembolso; `POST /reembolsos` la exige en el cuerpo. `POST /pagos` (ADMIN) no soporta idempotencia en el SP actual.
+- **WebPay:** `iniciar` reutiliza una transacción `CREADA` pendiente; `confirmar` solo acepta reservas `PENDIENTE`, sin pago aprobado y con token `CREADA`. El SP usa `UPDLOCK/HOLDLOCK` (migración `sql/migrations/2026-10-21_s2_webpay_hardening.sql`).
 - **Paginación:** `GET /reservas` usa `?page=&pageSize=`; respuesta `{ data, page, pageSize, total }`.
 - **Filtros de vehículos:** comuna, tipo, marca, rango de precio, fechas, características.
 - **Uploads:** `multipart/form-data`; se guardan en storage y se registra la URL en BD.

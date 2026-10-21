@@ -20,7 +20,7 @@ services:
 
 - **Volúmenes:** datos de la BD y carpeta `uploads/`.
 - **`.env`** en la raíz (copiado de `.env.example`).
-- **Arranque:** `docker compose -f infra/docker-compose.yml up --build`.
+- **Arranque:** `docker compose --env-file .env -f Producción/infra/docker-compose.yml up --build`.
 - Al iniciar la BD por primera vez, se ejecuta `database/RentacarFinal.sql` (init) para crear el esquema.
 
 > **Compatibilidad SQL Server:** el script fija `COMPATIBILITY_LEVEL = 170` (SQL 2025). La imagen

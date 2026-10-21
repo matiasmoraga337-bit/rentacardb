@@ -80,7 +80,7 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   52005: { status: 409, code: 'RESERVA_NO_PENDIENTE' },
   52006: { status: 400, code: 'PAGO_RESERVA_PARAMETROS' },
   52007: { status: 409, code: 'MONTO_NO_COINCIDE' },
-  52008: { status: 409, code: 'PAGO_RESERVA_DUPLICADO' },
+  52008: { status: 409, code: 'PAGO_YA_APROBADO' },
   52009: { status: 400, code: 'ARRIENDO_REQUERIDO' },
   52010: { status: 400, code: 'PAGO_ARRIENDO_PARAMETROS' },
   52011: { status: 400, code: 'ARRIENDO_NO_CORRESPONDE' },
@@ -94,6 +94,16 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   52032: { status: 409, code: 'RESERVA_NO_PENDIENTE' },
   52033: { status: 404, code: 'TRANSACCION_NO_ENCONTRADA' },
   52034: { status: 409, code: 'TRANSACCION_YA_RESUELTA' },
+  52035: { status: 409, code: 'RESERVA_NO_PENDIENTE' },
+  52036: { status: 409, code: 'PAGO_NO_PENDIENTE' },
+  52037: { status: 409, code: 'RESERVA_EXPIRADA' },
+  52038: { status: 409, code: 'PAGO_PENDIENTE_INCONSISTENTE' },
+
+  241: { status: 400, code: 'FECHA_INVALIDA' },
+  2627: { status: 409, code: 'OPERACION_DUPLICADA' },
+  2601: { status: 409, code: 'OPERACION_DUPLICADA' },
+  1205: { status: 503, code: 'DEADLOCK_REINTENTAR' },
+  8115: { status: 400, code: 'VALOR_FUERA_DE_RANGO' },
 };
 
 export function errorHandler(

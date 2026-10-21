@@ -43,12 +43,12 @@ el flujo crítico asociado está cubierto por al menos un test de integración o
 
 | Capa | Archivo | Qué cubre |
 |---|---|---|
-| BD | `sql/tests/05_reservas_pagos.sql` | Crear reserva, snapshot, bloqueo, idempotencia, solapamiento, WebPay, reembolso, expiración con cursor y `vw_ReservasDetalle`. |
-| Backend (API) | `Producción/backend/tests/reservas.test.ts` | Autenticación, validación y autorización de reservas. |
-| Backend (API) | `Producción/backend/tests/pagos.test.ts` | `/pagos` solo ADMIN, validación WebPay, reembolsos y reportes. |
+| BD | `sql/tests/05_reservas_pagos.sql` | Crear reserva, snapshot, bloqueo, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración con cursor y `vw_ReservasDetalle` (30 casos). |
+| Backend (API) | `Producción/backend/tests/reservas.test.ts` | Autenticación, validación de fechas, autorización y cancelación ADMIN. |
+| Backend (API) | `Producción/backend/tests/pagos.test.ts` | `/pagos` solo ADMIN, validación WebPay, reembolsos solo ADMIN y reportes. |
 | Backend (unitario) | `Producción/backend/tests/reembolso-policy.test.ts` | Cálculo de reembolso: 100%, 50%, 0%, anticipación y saldo. |
 | Frontend | `Producción/frontend/src/features/reservas/__tests__/` | Formatos, badges y tabla de reservas. |
-| Smoke e2e | `Producción/backend/scripts/smoke-s2.ts` | Login → buscar → reservar → pagar → cancelar contra API + BD. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s2.ts` | Login → buscar → reservar → pagar → cancelar + doble confirmación concurrente contra API + BD. |
 
 Comandos:
 

@@ -252,7 +252,29 @@ export const swaggerSpec = {
         summary: 'Registrar un pago manual (ADMIN)',
         tags: ['Pagos'],
         security: [{ bearerAuth: [] }],
-        responses: { '201': { description: 'Pago registrado' } },
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_reserva', 'ID_tipo_operacion_pago', 'ID_metodo_pago', 'monto_pago', 'aprobado'],
+                properties: {
+                  ID_reserva: { type: 'integer' },
+                  ID_tipo_operacion_pago: { type: 'integer' },
+                  ID_metodo_pago: { type: 'integer' },
+                  monto_pago: { type: 'number', exclusiveMinimum: 0 },
+                  aprobado: { type: 'boolean' },
+                  referencia: { type: 'string', maxLength: 100 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Pago registrado' },
+          '403': { description: 'Solo ADMIN' },
+        },
       },
     },
     '/pagos/webpay/iniciar': {
@@ -289,7 +311,25 @@ export const swaggerSpec = {
         summary: 'Confirmar o rechazar una transaccion WebPay simulada (CLIENTE)',
         tags: ['Pagos'],
         security: [{ bearerAuth: [] }],
-        responses: { '200': { description: 'Transaccion resuelta' }, '409': { description: 'Transaccion ya resuelta' } },
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['token_ws'],
+                properties: {
+                  token_ws: { type: 'string', minLength: 64, maxLength: 64 },
+                  aprobada: { type: 'boolean', default: true },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Transaccion resuelta' },
+          '409': { description: 'Transaccion ya resuelta o reserva no pendiente' },
+        },
       },
     },
     '/reembolsos': {
@@ -301,19 +341,42 @@ export const swaggerSpec = {
         responses: { '200': { description: 'Reembolsos' } },
       },
       post: {
-        summary: 'Crear un reembolso manual',
+        summary: 'Crear un reembolso manual (ADMIN)',
         tags: ['Reembolsos'],
         security: [{ bearerAuth: [] }],
-        responses: { '201': { description: 'Reembolso creado' } },
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_reserva', 'monto', 'motivo', 'idempotency_key'],
+                properties: {
+                  ID_reserva: { type: 'integer' },
+                  monto: { type: 'number', exclusiveMinimum: 0 },
+                  motivo: { type: 'string', maxLength: 500 },
+                  idempotency_key: { type: 'string', maxLength: 100 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Reembolso creado' },
+          '403': { description: 'Solo ADMIN' },
+        },
       },
     },
     '/reembolsos/{id}/completar': {
       post: {
-        summary: 'Completar un reembolso pendiente',
+        summary: 'Completar un reembolso pendiente (ADMIN)',
         tags: ['Reembolsos'],
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
-        responses: { '200': { description: 'Reembolso completado' } },
+        responses: {
+          '200': { description: 'Reembolso completado' },
+          '403': { description: 'Solo ADMIN' },
+        },
       },
     },
     '/reportes/ingresos': {
