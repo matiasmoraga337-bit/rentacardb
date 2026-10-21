@@ -1,4 +1,4 @@
-﻿# CRONOGRAMA
+# CRONOGRAMA
 
 **Inicio:** 18 de octubre · **Entrega:** 17 de noviembre (≈ 4 semanas, 3 personas).
 Cada sprint dura **1 semana** (lunes a domingo). Ceremonias: planning (lunes), daily (15 min),
@@ -23,19 +23,19 @@ review/retro (viernes).
 - **Meta:** `docker compose up` levanta todo; login mínimo funcional.
 
 ## S1 — 21–27 oct
-- **P1:** auth completo (`sp_Login`, registro, JWT, roles), geografía.
+- **P1:** auth completo (`u_sp_Login`, registro, JWT, roles), geografía.
 - **P2:** UI de login/registro/perfil, catálogo de vehículos (lectura).
 - **P3:** CRUD proveedores/sedes + endpoints de catálogos + CI.
 - **Meta (H1):** un proveedor crea y publica un vehículo con fotos y tarifa.
 
 ## S2 — 28 oct–3 nov
-- **P1:** búsqueda/disponibilidad, reservas (`sp_V5_CrearReserva`), pagos + Webpay simulado.
+- **P1:** búsqueda/disponibilidad, reservas (`u_sp_CrearReserva`), pagos + Webpay simulado.
 - **P2:** flujo de búsqueda → detalle → checkout → pago.
 - **P3:** validaciones, tests de API de reserva/pago, datos de ejemplo.
 - **Meta (H2):** un cliente reserva y paga de punta a punta.
 
 ## S3 — 4–10 nov
-- **P1:** arriendos (`sp_IniciarArriendo`, `sp_RegistrarDevolucion`), inspecciones, cargos.
+- **P1:** arriendos (`u_sp_IniciarArriendo`, `u_sp_RegistrarDevolucion`), inspecciones, cargos.
 - **P2:** paneles cliente/proveedor, chat, reseñas.
 - **P3:** panel admin, notificaciones/worker outbox, tests de UI.
 - **Meta (H3):** ciclo completo retiro → devolución → reseña; chat funcionando.

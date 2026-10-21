@@ -36,7 +36,8 @@ services:
     environment:
       MSSQL_SA_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en el .env}
     volumes:
-      - ../database:/scripts:ro
+      - ../../RentacarFinal.sql:/scripts/RentacarFinal.sql:ro
+      - ../database/init.sh:/scripts/init.sh:ro
     entrypoint: ['/bin/bash', '/scripts/init.sh']
     restart: 'no'
 

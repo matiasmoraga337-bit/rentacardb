@@ -1,4 +1,4 @@
-﻿# Informe consolidado — Base de Datos RentaCarDB
+# Informe consolidado — Base de Datos RentaCarDB
 
 Documento único que reúne toda la documentación del modelo relacional de `RentaCarDB`.
 Generado a partir de los documentos de `docs/`.
@@ -366,7 +366,7 @@ Propósito: reglas de precio por día.
 | fecha_creacion_tarifa | datetime2(0) | NO | |
 | ID_usuario_creacion | int | SÍ | |
 
-> Función `fn_V5_PrecioAplicable(@ID_vehiculo,@inicio,@fin)` elige la tarifa vigente.
+> Función `fn_PrecioAplicable(@ID_vehiculo,@inicio,@fin)` elige la tarifa vigente.
 
 ### `DocumentoVehiculo` + `TipoDocumentoVehiculo` (catálogo)
 `TipoDocumentoVehiculo`: `ID_tipo_documento_vehiculo` PK · `nombre_tipo_documento` UQ · `obligatorio_tipo_documento` · `activo_tipo_documento`.

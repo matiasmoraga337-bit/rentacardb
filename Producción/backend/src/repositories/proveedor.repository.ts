@@ -83,7 +83,7 @@ export async function registrarProveedor(
     .input('rut_proveedor', sql.VarChar(12), params.rut_proveedor ?? null)
     .input('telefono', sql.VarChar(20), params.telefono ?? null)
     .input('email', sql.VarChar(150), params.email ?? null)
-    .execute<ProveedorRow>('sp_RegistrarProveedor');
+    .execute<ProveedorRow>('u_sp_RegistrarProveedor');
   const row = result.recordset[0];
   if (!row) {
     throw new AppError(500, 'PROVEEDOR_NO_CREADO', 'No se pudo crear el proveedor.');
@@ -102,7 +102,7 @@ export async function asignarRol(
     .input('ID_usuario', sql.Int, idUsuario)
     .input('rol', sql.VarChar(50), rol)
     .input('ID_usuario_ejecutor', sql.Int, idEjecutor)
-    .execute('sp_AsignarRolUsuario');
+    .execute('u_sp_AsignarRolUsuario');
 }
 
 export async function vincularUsuario(
@@ -116,7 +116,7 @@ export async function vincularUsuario(
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('ID_usuario', sql.Int, idUsuario)
     .input('es_administrador', sql.Bit, esAdministrador)
-    .execute('sp_VincularUsuarioProveedor');
+    .execute('u_sp_VincularUsuarioProveedor');
 }
 
 export async function aprobarProveedor(idProveedor: number, idAdmin: number): Promise<void> {
@@ -125,7 +125,7 @@ export async function aprobarProveedor(idProveedor: number, idAdmin: number): Pr
     .request()
     .input('ID_proveedor', sql.Int, idProveedor)
     .input('ID_usuario_admin', sql.Int, idAdmin)
-    .execute('sp_AprobarProveedor');
+    .execute('u_sp_AprobarProveedor');
 }
 
 export async function listarProveedores(estado?: string): Promise<unknown[]> {
@@ -250,7 +250,7 @@ export async function actualizarConfiguracion(
     .input('dias_minimos_arriendo', sql.Int, data.dias_minimos_arriendo ?? null)
     .input('dias_maximos_arriendo', sql.Int, data.dias_maximos_arriendo ?? null)
     .input('moneda_operacion', sql.Char(3), data.moneda_operacion ?? null)
-    .execute('sp_ActualizarConfiguracionProveedor');
+    .execute('u_sp_ActualizarConfiguracionProveedor');
   return result.recordset[0] ?? null;
 }
 
@@ -290,7 +290,7 @@ export async function registrarSede(
     .input('telefono', sql.VarChar(20), data.telefono ?? null)
     .input('email', sql.VarChar(150), data.email ?? null)
     .input('activo', sql.Bit, data.activo ?? true)
-    .execute('sp_RegistrarSedeProveedor');
+    .execute('u_sp_RegistrarSedeProveedor');
   return result.recordset[0] ?? null;
 }
 
@@ -310,7 +310,7 @@ export async function actualizarSede(
     .input('telefono', sql.VarChar(20), data.telefono ?? null)
     .input('email', sql.VarChar(150), data.email ?? null)
     .input('activo', sql.Bit, data.activo ?? null)
-    .execute('sp_ActualizarSedeProveedor');
+    .execute('u_sp_ActualizarSedeProveedor');
   return result.recordset[0] ?? null;
 }
 
@@ -320,5 +320,5 @@ export async function eliminarSede(idProveedor: number, idSede: number): Promise
     .request()
     .input('ID_sede', sql.Int, idSede)
     .input('ID_proveedor', sql.Int, idProveedor)
-    .execute('sp_EliminarSedeProveedor');
+    .execute('u_sp_EliminarSedeProveedor');
 }

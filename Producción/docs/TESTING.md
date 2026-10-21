@@ -1,4 +1,4 @@
-﻿# TESTING
+# TESTING
 
 Estrategia de pruebas de la aplicación web (pirámide de tests).
 
@@ -30,7 +30,7 @@ Estrategia de pruebas de la aplicación web (pirámide de tests).
 
 ## 4) Convenciones
 
-- Nombres: `describe('sp_V5_CrearReserva')`, `it('rechaza solapamiento')`.
+- Nombres: `describe('u_sp_CrearReserva')`, `it('rechaza solapamiento')`.
 - Mocks de BD solo cuando sea imprescindible; preferir BD real de test.
 - No probar los SPs (ya están validados en la BD); probar **cómo los usa la API**.
 

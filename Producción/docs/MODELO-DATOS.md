@@ -1,4 +1,4 @@
-﻿# MODELO DE DATOS
+# MODELO DE DATOS
 
 La aplicación web consume la base de datos **`RentaCarDB`**, documentada en la carpeta
 hermana [`../../docs/`](../../docs/).
@@ -26,12 +26,12 @@ hermana [`../../docs/`](../../docs/).
 - La escritura se hace **por SPs** (ver [`API.md`](API.md) para el mapeo endpoint → SP).
 - **Idempotencia** y **correlación** se propagan a los SPs que las soportan.
 - Vistas de lectura ya disponibles: `vw_VehiculosPublicados`, `vw_ReservasDetalle`,
-  `vw_V5_VehiculosDisponibles`, `vw_PagosPendientes`, `vw_DocumentosVencidos`,
+  `vw_VehiculosDisponibles`, `vw_PagosPendientes`, `vw_DocumentosVencidos`,
   `vw_MantenimientosActivos`.
 
 ## Reglas de negocio que ya viven en la BD (no reimplementar en la API)
 
-- Cálculo de precio (`fn_V5_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`).
+- Cálculo de precio (`fn_PrecioAplicable`), comisión (`fn_ComisionAplicable`), IVA (`ConfiguracionGlobal`).
 - Validación de solapamiento de reservas (trigger + SP).
 - Transiciones de estado de reserva (`TransicionEstadoReserva`).
 - Reembolsos, liquidaciones, comisiones y movimientos financieros.
