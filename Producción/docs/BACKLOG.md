@@ -112,6 +112,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E11.2 | Aprobar/pagar liquidación | 3 | `u_sp_AprobarLiquidacion`, `u_sp_MarcarLiquidacionPagada` |
 | E11.3 | Ver liquidaciones (proveedor) | 3 | `LiquidacionProveedor`, UI |
 
+> **Estado S4-E11:** implementadas. Admin genera por proveedor/periodo y
+> aprueba/paga; el proveedor ve sus liquidaciones. Ver
+> [`../../docs/LIQUIDACIONES.md`](../../docs/LIQUIDACIONES.md).
+
 ## E12 — Chat y notificaciones `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

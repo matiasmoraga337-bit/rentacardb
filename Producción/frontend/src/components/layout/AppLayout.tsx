@@ -43,6 +43,9 @@ export function AppLayout() {
                 <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
                   Proveedor
                 </Link>
+                <Link to="/proveedor/liquidaciones" className="text-sm text-slate-600 hover:text-brand">
+                  Liquidaciones
+                </Link>
               </>
             )}
             {usuario?.roles.includes('ADMIN') && (
@@ -61,6 +64,9 @@ export function AppLayout() {
                 </Link>
                 <Link to="/admin/disputas" className="text-sm text-slate-600 hover:text-brand">
                   Disputas
+                </Link>
+                <Link to="/admin/liquidaciones" className="text-sm text-slate-600 hover:text-brand">
+                  Liquidaciones
                 </Link>
               </>
             )}

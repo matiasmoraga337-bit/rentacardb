@@ -171,10 +171,12 @@ export function PanelProveedor() {
         <Card>
           <CardHeader>
             <CardTitle>Liquidaciones</CardTitle>
-            <CardDescription>Disponible en S4.</CardDescription>
+            <CardDescription>Consulta tus liquidaciones calculadas, aprobadas y pagadas.</CardDescription>
           </CardHeader>
-          <CardContent className="text-sm text-slate-500">
-            La generacion y pago de liquidaciones se habilitara en el siguiente sprint.
+          <CardContent>
+            <Link to="/proveedor/liquidaciones">
+              <Button variant="outline">Ver liquidaciones</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

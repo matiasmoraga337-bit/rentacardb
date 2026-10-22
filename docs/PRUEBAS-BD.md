@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **144 PASS / 0 FAIL**
+- **Resultado global:** **151 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -23,6 +23,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/07_chat.sql` | 10 | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre |
 | `sql/tests/08_cargos_multas.sql` | 7 | Cargo extra/multa sobre arriendo finalizado, movimiento financiero y errores de monto/arriendo |
 | `sql/tests/09_disputas.sql` | 6 | Apertura, duplicado, autor ajeno, EN_REVISION, resolucion y cierre |
+| `sql/tests/10_liquidaciones.sql` | 7 | Generacion, idempotencia, solapamiento, aprobacion y pago |
 
 ## 2. Resultados por categoría
 
@@ -123,6 +124,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Usuario ajeno rechazado (`60112`).
 - Admin pasa a `EN_REVISION` y resuelve con fecha de cierre.
 - Resolver una disputa ya cerrada rechazado (`60116`).
+
+### S4 — Liquidaciones (7/7)
+- Generar liquidacion por proveedor y periodo → `CALCULADA`.
+- Segunda generacion con el mismo periodo es idempotente (una fila).
+- Periodo solapado rechazado (`70504`).
+- Aprobar → `APROBADA`; aprobar dos veces rechazado (`70502`).
+- Pagar → `PAGADA` con fecha; pagar dos veces rechazado (`70503`).
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).

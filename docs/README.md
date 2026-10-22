@@ -27,10 +27,11 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`PANELES.md`](PANELES.md) | S3: paneles por rol, catálogos y auditoría. |
 | — | [`CARGOS-MULTAS.md`](CARGOS-MULTAS.md) | S4: cargos extra y multas sobre arriendos finalizados. |
 | — | [`DISPUTAS.md`](DISPUTAS.md) | S4: apertura, listado y resolución de disputas. |
+| — | [`LIQUIDACIONES.md`](LIQUIDACIONES.md) | S4: generación, aprobación, pago y consulta de liquidaciones. |
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (144 PASS). |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (151 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres
