@@ -150,6 +150,20 @@ describe('Cargos extra y multas', () => {
   });
 });
 
+describe('Fotos de inspeccion', () => {
+  it('exige autenticacion', async () => {
+    const res = await request(app).post('/api/arriendos/1/inspecciones/1/fotos');
+    expect(res.status).toBe(401);
+  });
+
+  it('no permite CLIENTE', async () => {
+    const res = await request(app)
+      .post('/api/arriendos/1/inspecciones/1/fotos')
+      .set('Authorization', `Bearer ${clienteToken}`);
+    expect(res.status).toBe(403);
+  });
+});
+
 describe('GET /api/arriendos/:id/contrato', () => {
   it('exige autenticacion', async () => {
     const res = await request(app).get('/api/arriendos/1/contrato');
