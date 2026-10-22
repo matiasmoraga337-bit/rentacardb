@@ -58,6 +58,7 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
   worker outbox, fotos de inspección y adjuntos de chat.
 
 Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md) · [`docs/DEMO-S4.md`](docs/DEMO-S4.md).
+Manual de usuario: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md).
 
 ## Documentación
 
