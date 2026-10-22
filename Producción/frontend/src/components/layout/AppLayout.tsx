@@ -53,6 +53,12 @@ export function AppLayout() {
                 <Link to="/admin/reportes" className="text-sm text-slate-600 hover:text-brand">
                   Reportes
                 </Link>
+                <Link to="/admin/catalogos" className="text-sm text-slate-600 hover:text-brand">
+                  Catalogos
+                </Link>
+                <Link to="/admin/auditoria" className="text-sm text-slate-600 hover:text-brand">
+                  Auditoria
+                </Link>
               </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">

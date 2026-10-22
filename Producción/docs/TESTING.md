@@ -109,3 +109,11 @@ npm run smoke:chat
 cd Producción/backend
 npm run smoke:s3
 ```
+
+## 10) Sprint S3 — Paneles
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| Backend (API) | `Producción/backend/tests/admin.test.ts` | Autenticacion y rol ADMIN en `GET /admin/auditoria`. |
+| Frontend | `Producción/frontend/src/features/paneles/__tests__/MetricCard.test.tsx` | Tarjeta de metrica reutilizable. |
+| UI | `/panel`, `/admin/catalogos`, `/admin/auditoria` | Widgets por rol, consulta de catalogos y auditoria paginada. |

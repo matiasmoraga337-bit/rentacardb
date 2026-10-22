@@ -1,5 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AdminAuditoriaPage } from '@/features/admin/AdminAuditoriaPage';
+import { AdminCatalogosPage } from '@/features/admin/AdminCatalogosPage';
 import { ReporteIngresosPage } from '@/features/admin/ReporteIngresosPage';
 import { ArriendoDetallePage } from '@/features/arriendos/ArriendoDetallePage';
 import { ArriendosProveedorPage, MisArriendosPage } from '@/features/arriendos/ArriendosPage';
@@ -159,6 +161,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['ADMIN']}>
             <ReporteIngresosPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/catalogos',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminCatalogosPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/auditoria',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminAuditoriaPage />
           </RequireRole>
         ),
       },

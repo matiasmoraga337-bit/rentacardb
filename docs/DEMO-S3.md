@@ -75,7 +75,14 @@ npm run smoke:chat
 > Cada autor puede registrar una reseña por tipo y arriendo. Si intenta repetirla,
 > la API responde `409 RESENA_DUPLICADA`.
 
-## 5. Casos límite
+## 5. Paneles
+
+1. Iniciar sesión como cliente y abrir `/panel`: métricas de reservas/alquileres, últimos pagos y chat.
+2. Como proveedor: vehículos, reservas confirmadas, arriendos activos, configuración y sedes.
+3. Como admin: proveedores pendientes, reservas, comisiones, catálogos y auditoría.
+4. Admin puede revisar `/admin/catalogos` y filtrar `/admin/auditoria` por entidad.
+
+## 6. Casos límite
 
 | Caso | Resultado |
 |---|---|
@@ -88,7 +95,7 @@ npm run smoke:chat
 | Conductor con RUT inexistente | `404 PERSONA_NO_ENCONTRADA` |
 | Contrato sin `aceptado: true` | `400 VALIDATION_ERROR` |
 
-## 6. Smoke automático
+## 7. Smoke automático
 
 Con la API y la BD levantadas:
 
@@ -100,9 +107,9 @@ npm run smoke:s3
 
 El script hace login cliente/proveedor, crea reserva con política de km, paga, inicia arriendo, acepta contrato, agrega conductor, registra devolución, valida cargo por km, registra un daño y crea las reseñas cliente/proveedor. Termina con `SMOKE S3/E9+E13 OK`.
 
-## 7. Pendiente para cerrar H3
+## 8. Pendiente para cerrar H3
 
 - Chat (E12): implementado en `/chat` y botón **Contactar proveedor**.
 - Reseñas (E13): implementadas en el detalle del arriendo y ficha pública.
-- Paneles con widgets de alquileres (E14).
+- Paneles (E14): implementados en `/panel`, `/admin/catalogos` y `/admin/auditoria`.
 - Fotos de inspección y cargos extra manuales (S4).
