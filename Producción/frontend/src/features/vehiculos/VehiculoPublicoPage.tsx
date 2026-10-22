@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/AuthContext';
 import { crearConversacion } from '@/features/chat/api';
 import { fechaFutura, formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
+import { FavoritoButton } from '@/features/favoritos/FavoritoButton';
 import { fetchResenasProveedor, fetchResenasVehiculo } from '@/features/resenas/api';
 import { fetchDisponibilidad, fetchVehiculo } from './api';
 
@@ -66,9 +67,15 @@ export function VehiculoPublicoPage() {
           <Link to="/catalogo" className="text-lg font-semibold text-brand">
             RentaCarDB
           </Link>
-          <Link to={usuario ? '/panel' : '/login'} className="text-sm text-slate-600 hover:text-brand">
-            {usuario ? 'Mi panel' : 'Iniciar sesion'}
-          </Link>
+          <div className="flex items-center gap-3">
+            <FavoritoButton vehiculoId={vehiculoId} />
+            <Link
+              to={usuario ? '/panel' : '/login'}
+              className="text-sm text-slate-600 hover:text-brand"
+            >
+              {usuario ? 'Mi panel' : 'Iniciar sesion'}
+            </Link>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-4xl space-y-6 px-4 py-8">

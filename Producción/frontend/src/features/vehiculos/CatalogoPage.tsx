@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { UbicacionSelect } from '@/components/forms/UbicacionSelect';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,16 +8,36 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { useCatalogo } from '@/features/catalogos/hooks';
+import { FavoritoButton } from '@/features/favoritos/FavoritoButton';
+import { GuardarBusqueda } from '@/features/favoritos/GuardarBusqueda';
 import { buscarVehiculos, type BusquedaParams } from './api';
 
 export function CatalogoPage() {
   const tipos = useCatalogo('tipos-vehiculo');
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
-  const [idComuna, setIdComuna] = useState<number | undefined>();
-  const [idTipo, setIdTipo] = useState<number | undefined>();
-  const [precioMax, setPrecioMax] = useState<number | undefined>();
-  const [filtros, setFiltros] = useState<BusquedaParams>({});
+  const [searchParams] = useSearchParams();
+  const desdeParam = searchParams.get('desde') ?? '';
+  const hastaParam = searchParams.get('hasta') ?? '';
+  const comunaParam = searchParams.get('comuna');
+  const tipoParam = searchParams.get('tipo');
+  const precioParam = searchParams.get('precio');
+  const [fechaInicio, setFechaInicio] = useState(desdeParam);
+  const [fechaFin, setFechaFin] = useState(hastaParam);
+  const [idComuna, setIdComuna] = useState<number | undefined>(
+    comunaParam ? Number(comunaParam) : undefined,
+  );
+  const [idTipo, setIdTipo] = useState<number | undefined>(
+    tipoParam ? Number(tipoParam) : undefined,
+  );
+  const [precioMax, setPrecioMax] = useState<number | undefined>(
+    precioParam ? Number(precioParam) : undefined,
+  );
+  const [filtros, setFiltros] = useState<BusquedaParams>({
+    fecha_inicio: desdeParam || undefined,
+    fecha_fin: hastaParam || undefined,
+    ID_comuna: comunaParam ? Number(comunaParam) : undefined,
+    ID_tipo_vehiculo: tipoParam ? Number(tipoParam) : undefined,
+    precio_maximo: precioParam ? Number(precioParam) : undefined,
+  });
 
   const query = useQuery({
     queryKey: ['busqueda', filtros],
@@ -98,6 +118,8 @@ export function CatalogoPage() {
           </CardContent>
         </Card>
 
+        <GuardarBusqueda filtros={filtros} />
+
         {query.isLoading && <p className="text-slate-500">Buscando…</p>}
         {query.isError && <p className="text-sm text-red-600">No se pudo realizar la busqueda.</p>}
 
@@ -111,7 +133,10 @@ export function CatalogoPage() {
                   : ''
               }`}
             >
-              <Card className="h-full transition-shadow hover:shadow-md">
+              <Card className="relative h-full transition-shadow hover:shadow-md">
+                <div className="absolute right-2 top-2 z-10">
+                  <FavoritoButton vehiculoId={item.ID_vehiculo} />
+                </div>
                 <CardContent className="space-y-1 p-4">
                   <p className="font-semibold">
                     {item.nombre_marca} {item.nombre_modelo}

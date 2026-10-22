@@ -144,6 +144,12 @@ export function PanelCliente() {
           <Link to="/disputas">
             <Button variant="outline">Disputas</Button>
           </Link>
+          <Link to="/favoritos">
+            <Button variant="outline">Favoritos</Button>
+          </Link>
+          <Link to="/busquedas">
+            <Button variant="outline">Busquedas guardadas</Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

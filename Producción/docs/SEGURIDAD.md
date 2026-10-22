@@ -63,3 +63,13 @@ Buenas prácticas aplicadas a la aplicación web (API + frontend).
 
 - No exponer trazas ni detalles internos en respuestas (mensajes genéricos + código).
 - Logs internos con `correlation_id` para trazabilidad sin filtrar datos sensibles.
+
+## 9) Riesgos residuales (demo local)
+
+- **Dependencias:** `npm audit` mantiene 3 moderadas en `mssql/tedious` (`sprintf-js`) y 2 moderadas en `react-router` 6. Actualizar a `mssql@12`/`react-router@7` es un cambio mayor y queda fuera del cierre; no se explotan desde entradas de usuario en el flujo actual.
+- **Docker demo:** la API usa `sa` para simplificar la puesta en marcha. Para producción real debe crearse un login de aplicación con `db_rentacar_rw` (hoy `api_user` es `WITHOUT LOGIN`).
+- **Uploads:** fotos/adjuntos se sirven por URL aleatoria. No hay descarga autenticada; no subir documentos sensibles en la demo.
+- **SMTP:** Mailpit es local y sin TLS; no usar credenciales reales.
+- **Rate limiting:** aplicado a `/auth/*`. Endpoints autenticados de escritura no tienen límite específico.
+
+Estas deudas están aceptadas para la entrega universitaria y documentadas para un despliegue real.
