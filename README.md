@@ -3,7 +3,7 @@
 Sistema web de reserva y arriendo de vehículos con múltiples proveedores y sedes por
 región de Chile. Proyecto universitario de Base de Datos + aplicación web full‑stack.
 
-- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 113 FK, 69 SP, 3 funciones, 6 vistas).
+- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 113 FK, 74 SP, 3 funciones, 6 vistas).
 - **API:** Node.js + Express + TypeScript · acceso a datos con `mssql` (llamando a los SPs).
 - **Web:** React + Vite + TypeScript + Tailwind CSS + shadcn/ui.
 - **Despliegue:** Docker Compose (local). Render opcional para la demo.
@@ -52,10 +52,12 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
 - **S1/H1:** auth, catálogos, proveedores/sedes y vehículos.
 - **S2/H2:** búsqueda con fechas, reservas, pago WebPay simulado, cancelación con
   reembolso, panel de proveedor y reporte de ingresos.
-- **S3/H3 (en progreso):** arriendos, inspecciones, devolución, contrato,
-  conductores adicionales, daños, chat, reseñas y paneles por rol.
+- **S3/H3:** arriendos, inspecciones, devolución, contrato, conductores
+  adicionales, daños, chat, reseñas y paneles por rol.
+- **S4/H4:** cargos extra, multas, disputas, liquidaciones, notificaciones,
+  worker outbox, fotos de inspección y adjuntos de chat.
 
-Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md).
+Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md) · [`docs/DEMO-S4.md`](docs/DEMO-S4.md).
 
 ## Documentación
 
@@ -67,6 +69,11 @@ Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S
 - Chat: [`docs/CHAT.md`](docs/CHAT.md).
 - Reseñas: [`docs/RESENAS.md`](docs/RESENAS.md).
 - Paneles por rol: [`docs/PANELES.md`](docs/PANELES.md).
+- Cargos extra y multas: [`docs/CARGOS-MULTAS.md`](docs/CARGOS-MULTAS.md).
+- Disputas: [`docs/DISPUTAS.md`](docs/DISPUTAS.md).
+- Liquidaciones: [`docs/LIQUIDACIONES.md`](docs/LIQUIDACIONES.md).
+- Notificaciones y outbox: [`docs/NOTIFICACIONES.md`](docs/NOTIFICACIONES.md).
+- Adjuntos y fotos: [`docs/ADJUNTOS-FOTOS.md`](docs/ADJUNTOS-FOTOS.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 

@@ -4,6 +4,7 @@ import {
   type EnviarMensajeInput,
 } from '../schemas/chat.schema';
 import { AppError } from '../utils/AppError';
+import { guardarAdjuntoMensaje } from '../utils/uploads';
 
 export interface ConversacionDto {
   id: number;
@@ -26,6 +27,7 @@ export interface MensajeDto {
   contenido: string;
   leido: boolean;
   fecha: string;
+  adjuntos: repo.AdjuntoRow[];
 }
 
 function mapConversacion(row: repo.ConversacionRow): ConversacionDto {
@@ -52,6 +54,7 @@ function mapMensaje(row: repo.MensajeRow): MensajeDto {
     contenido: row.contenido_mensaje,
     leido: row.leido_mensaje,
     fecha: row.fecha_mensaje,
+    adjuntos: [],
   };
 }
 
@@ -75,8 +78,14 @@ export async function listarMensajes(
   idConversacion: number,
   idUsuario: number,
 ): Promise<MensajeDto[]> {
-  const rows = await repo.listarMensajes(idConversacion, idUsuario);
-  return rows.map(mapMensaje);
+  const [rows, adjuntos] = await Promise.all([
+    repo.listarMensajes(idConversacion, idUsuario),
+    repo.listarAdjuntosConversacion(idConversacion, idUsuario),
+  ]);
+  return rows.map((row) => ({
+    ...mapMensaje(row),
+    adjuntos: adjuntos.filter((adjunto) => adjunto.mensajeId === row.ID_mensaje),
+  }));
 }
 
 export async function enviarMensaje(
@@ -95,6 +104,47 @@ export async function enviarMensaje(
     throw new AppError(500, 'MENSAJE_NO_ENVIADO', 'No se pudo enviar el mensaje.');
   }
   return mapMensaje(row);
+}
+
+export async function enviarAdjuntos(
+  idConversacion: number,
+  idMensaje: number,
+  idUsuario: number,
+  files: Express.Multer.File[],
+): Promise<unknown[]> {
+  if (files.length === 0) {
+    throw new AppError(400, 'SIN_ARCHIVOS', 'No se recibieron archivos.');
+  }
+
+  const creados: unknown[] = [];
+  try {
+    for (const file of files) {
+      const url = await guardarAdjuntoMensaje(idConversacion, file.originalname, file.buffer);
+      creados.push(
+        await repo.registrarAdjunto({
+          ID_mensaje: idMensaje,
+          url,
+          nombre: file.originalname,
+          tipo_mime: file.mimetype,
+          tamano: file.size,
+          ID_usuario: idUsuario,
+        }),
+      );
+    }
+  } catch (error) {
+    const sqlError = error as { number?: number };
+    if (sqlError.number === 60302) {
+      throw new AppError(404, 'MENSAJE_NO_ENCONTRADO', 'Mensaje no encontrado.');
+    }
+    if (sqlError.number === 60303) {
+      throw new AppError(403, 'FORBIDDEN', 'No participa en la conversacion.');
+    }
+    if (sqlError.number === 60304 || sqlError.number === 60305) {
+      throw new AppError(400, 'ADJUNTO_INVALIDO', 'El adjunto no es valido.');
+    }
+    throw error;
+  }
+  return creados;
 }
 
 export async function marcarLeidos(

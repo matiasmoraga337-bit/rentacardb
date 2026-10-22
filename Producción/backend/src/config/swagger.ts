@@ -309,6 +309,91 @@ export const swaggerSpec = {
         responses: { '201': { description: 'Dano registrado' }, '409': { description: 'Inspeccion no es de devolucion' } },
       },
     },
+    '/arriendos/{id}/inspecciones/{inspeccionId}/fotos': {
+      post: {
+        summary: 'Subir fotos a una inspeccion',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'inspeccionId', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: { fotos: { type: 'array', items: { type: 'string', format: 'binary' } } },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Fotos registradas' }, '404': { description: 'Inspeccion no encontrada' } },
+      },
+    },
+    '/arriendos/{id}/cargos-extra': {
+      post: {
+        summary: 'Registrar un cargo extra en un arriendo finalizado',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['concepto', 'monto'],
+                properties: {
+                  concepto: { type: 'string', maxLength: 200 },
+                  monto: { type: 'number', exclusiveMinimum: 0 },
+                  tipo_cargo: {
+                    type: 'string',
+                    enum: ['COMBUSTIBLE', 'KM_EXCEDIDO', 'DANO', 'LIMPIEZA', 'MULTA_TRANSITO', 'OTRO'],
+                  },
+                  observaciones: { type: 'string', maxLength: 500 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Cargo registrado' },
+          '409': { description: 'Arriendo no finalizado' },
+        },
+      },
+    },
+    '/arriendos/{id}/multas': {
+      post: {
+        summary: 'Registrar una multa en un arriendo finalizado',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['fecha_multa', 'descripcion', 'monto'],
+                properties: {
+                  fecha_multa: { type: 'string', format: 'date' },
+                  descripcion: { type: 'string', maxLength: 500 },
+                  monto: { type: 'number', exclusiveMinimum: 0 },
+                  organismo: { type: 'string', maxLength: 150 },
+                  numero_parte: { type: 'string', maxLength: 50 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Multa registrada' },
+          '409': { description: 'Arriendo no finalizado' },
+        },
+      },
+    },
     '/arriendos/{id}/conductores': {
       post: {
         summary: 'Agregar conductor adicional por RUT (CLIENTE)',
@@ -388,6 +473,135 @@ export const swaggerSpec = {
         },
       },
     },
+    '/notificaciones': {
+      get: {
+        summary: 'Listar notificaciones del usuario',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['PENDIENTE', 'ENVIADA', 'FALLIDA', 'LEIDA'] } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Notificaciones paginadas' } },
+      },
+    },
+    '/notificaciones/no-leidas': {
+      get: {
+        summary: 'Contar notificaciones no leidas',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: '{ total }' } },
+      },
+    },
+    '/notificaciones/{id}/leer': {
+      post: {
+        summary: 'Marcar una notificacion como leida',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Notificacion leida' }, '404': { description: 'No encontrada o ya leida' } },
+      },
+    },
+    '/admin/outbox': {
+      get: {
+        summary: 'Listar eventos outbox (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'estado', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Eventos paginados' } },
+      },
+    },
+    '/admin/outbox/{id}/reintentar': {
+      post: {
+        summary: 'Reintentar un evento outbox en ERROR (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Evento en PENDIENTE' }, '409': { description: 'No reintentable' } },
+      },
+    },
+    '/disputas': {
+      get: {
+        summary: 'Listar disputas segun rol',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'scope', in: 'query', schema: { type: 'string', enum: ['cliente', 'proveedor', 'todos'] } },
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['ABIERTA', 'EN_REVISION', 'RESUELTA', 'CERRADA'] } },
+          { name: 'arriendo', in: 'query', schema: { type: 'integer' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Disputas paginadas' } },
+      },
+      post: {
+        summary: 'Abrir una disputa sobre un arriendo finalizado',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_arriendo', 'tipo_disputa', 'descripcion'],
+                properties: {
+                  ID_arriendo: { type: 'integer' },
+                  tipo_disputa: { type: 'string', enum: ['DANO', 'COBRO', 'SERVICIO', 'DOCUMENTO', 'OTRO'] },
+                  descripcion: { type: 'string', minLength: 10, maxLength: 1000 },
+                  monto_disputado: { type: 'number', exclusiveMinimum: 0 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Disputa abierta' },
+          '409': { description: 'Arriendo no finalizado o disputa duplicada' },
+        },
+      },
+    },
+    '/disputas/{id}': {
+      get: {
+        summary: 'Detalle de una disputa',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Disputa' }, '403': { description: 'Sin acceso' } },
+      },
+    },
+    '/disputas/{id}/resolver': {
+      post: {
+        summary: 'Resolver o cambiar el estado de una disputa (ADMIN)',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['estado'],
+                properties: {
+                  estado: { type: 'string', enum: ['EN_REVISION', 'RESUELTA', 'CERRADA'] },
+                  resolucion: { type: 'string', minLength: 10, maxLength: 1000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Disputa actualizada' },
+          '409': { description: 'Disputa ya cerrada' },
+        },
+      },
+    },
     '/conversaciones': {
       get: {
         summary: 'Listar conversaciones del usuario autenticado',
@@ -431,6 +645,29 @@ export const swaggerSpec = {
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: { '201': { description: 'Mensaje enviado' }, '409': { description: 'Conversacion cerrada' } },
+      },
+    },
+    '/conversaciones/{id}/mensajes/{mensajeId}/adjuntos': {
+      post: {
+        summary: 'Subir adjuntos a un mensaje',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'mensajeId', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: { archivos: { type: 'array', items: { type: 'string', format: 'binary' } } },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Adjuntos registrados' }, '403': { description: 'No participa' } },
       },
     },
     '/conversaciones/{id}/leidos': {
@@ -600,6 +837,63 @@ export const swaggerSpec = {
           { name: 'ID_proveedor', in: 'query', schema: { type: 'integer' } },
         ],
         responses: { '200': { description: 'Ingresos por mes' } },
+      },
+    },
+    '/liquidaciones': {
+      get: {
+        summary: 'Listar liquidaciones segun rol',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'proveedor', in: 'query', schema: { type: 'integer' } },
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['CALCULADA', 'APROBADA', 'PAGADA', 'ANULADA'] } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Liquidaciones paginadas' } },
+      },
+      post: {
+        summary: 'Generar una liquidacion por periodo (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_proveedor', 'periodo_inicio', 'periodo_fin'],
+                properties: {
+                  ID_proveedor: { type: 'integer' },
+                  periodo_inicio: { type: 'string', format: 'date' },
+                  periodo_fin: { type: 'string', format: 'date' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Liquidacion CALCULADA' },
+          '409': { description: 'Periodo solapado' },
+        },
+      },
+    },
+    '/liquidaciones/{id}/aprobar': {
+      post: {
+        summary: 'Aprobar una liquidacion (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Liquidacion APROBADA' }, '409': { description: 'No esta CALCULADA' } },
+      },
+    },
+    '/liquidaciones/{id}/pagar': {
+      post: {
+        summary: 'Marcar una liquidacion como pagada (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Liquidacion PAGADA' }, '409': { description: 'No esta APROBADA' } },
       },
     },
     '/admin/auditoria': {

@@ -112,6 +112,58 @@ describe('Conductores, contrato y danos', () => {
   });
 });
 
+describe('Cargos extra y multas', () => {
+  it('exige autenticacion para cargos', async () => {
+    const res = await request(app).post('/api/arriendos/1/cargos-extra').send({});
+    expect(res.status).toBe(401);
+  });
+
+  it('un cliente no puede registrar cargos', async () => {
+    const res = await request(app)
+      .post('/api/arriendos/1/cargos-extra')
+      .set('Authorization', `Bearer ${clienteToken}`)
+      .send({ concepto: 'Limpieza', monto: 10000 });
+    expect(res.status).toBe(403);
+  });
+
+  it('valida el monto del cargo', async () => {
+    const res = await request(app)
+      .post('/api/arriendos/1/cargos-extra')
+      .set('Authorization', `Bearer ${proveedorToken}`)
+      .send({ concepto: 'Limpieza', monto: -1 });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('exige autenticacion para multas', async () => {
+    const res = await request(app).post('/api/arriendos/1/multas').send({});
+    expect(res.status).toBe(401);
+  });
+
+  it('valida la fecha y el monto de la multa', async () => {
+    const res = await request(app)
+      .post('/api/arriendos/1/multas')
+      .set('Authorization', `Bearer ${proveedorToken}`)
+      .send({ fecha_multa: '2026-02-31', descripcion: 'Parte', monto: 0 });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+describe('Fotos de inspeccion', () => {
+  it('exige autenticacion', async () => {
+    const res = await request(app).post('/api/arriendos/1/inspecciones/1/fotos');
+    expect(res.status).toBe(401);
+  });
+
+  it('no permite CLIENTE', async () => {
+    const res = await request(app)
+      .post('/api/arriendos/1/inspecciones/1/fotos')
+      .set('Authorization', `Bearer ${clienteToken}`);
+    expect(res.status).toBe(403);
+  });
+});
+
 describe('GET /api/arriendos/:id/contrato', () => {
   it('exige autenticacion', async () => {
     const res = await request(app).get('/api/arriendos/1/contrato');

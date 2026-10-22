@@ -39,8 +39,27 @@ export const aceptarContratoSchema = z.object({
   aceptado: z.literal(true),
 });
 
+export const cargoExtraSchema = z.object({
+  concepto: z.string().trim().min(1).max(200),
+  monto: z.number().positive().max(999999999),
+  observaciones: z.string().trim().max(500).optional(),
+  tipo_cargo: z
+    .enum(['COMBUSTIBLE', 'KM_EXCEDIDO', 'DANO', 'LIMPIEZA', 'MULTA_TRANSITO', 'OTRO'])
+    .default('OTRO'),
+});
+
+export const multaSchema = z.object({
+  fecha_multa: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  descripcion: z.string().trim().min(1).max(500),
+  monto: z.number().positive().max(999999999),
+  organismo: z.string().trim().max(150).optional(),
+  numero_parte: z.string().trim().max(50).optional(),
+});
+
 export type ListarArriendosQuery = z.infer<typeof listarArriendosQuerySchema>;
 export type IniciarArriendoInput = z.infer<typeof iniciarArriendoSchema>;
 export type DevolucionArriendoInput = z.infer<typeof devolucionArriendoSchema>;
 export type DanoInspeccionInput = z.infer<typeof danoInspeccionSchema>;
 export type ConductorAdicionalInput = z.infer<typeof conductorAdicionalSchema>;
+export type CargoExtraInput = z.infer<typeof cargoExtraSchema>;
+export type MultaInput = z.infer<typeof multaSchema>;

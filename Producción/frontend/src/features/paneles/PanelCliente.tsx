@@ -141,6 +141,9 @@ export function PanelCliente() {
           <Link to="/arriendos">
             <Button variant="outline">Mis alquileres</Button>
           </Link>
+          <Link to="/disputas">
+            <Button variant="outline">Disputas</Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

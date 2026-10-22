@@ -24,6 +24,16 @@ export interface MensajeRow {
   fecha_mensaje: string;
 }
 
+export interface AdjuntoRow {
+  id: number;
+  mensajeId: number;
+  url: string;
+  nombre: string;
+  tipoMime: string;
+  tamano: number;
+  fecha: string;
+}
+
 export async function crearConversacion(
   idUsuario: number,
   idProveedor: number,
@@ -59,6 +69,62 @@ export async function listarMensajes(
     .input('ID_usuario', sql.Int, idUsuario)
     .execute<MensajeRow>('u_sp_ListarMensajes');
   return result.recordset;
+}
+
+export async function listarAdjuntosConversacion(
+  idConversacion: number,
+  idUsuario: number,
+): Promise<AdjuntoRow[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_conversacion', sql.Int, idConversacion)
+    .input('ID_usuario', sql.Int, idUsuario)
+    .query<AdjuntoRow>(
+      `SELECT a.ID_adjunto_mensaje_adjunto AS id,
+              a.ID_mensaje_mensaje_adjunto AS mensajeId,
+              a.url_archivo_mensaje_adjunto AS url,
+              a.nombre_archivo_mensaje_adjunto AS nombre,
+              a.tipo_mime_mensaje_adjunto AS tipoMime,
+              a.tamano_bytes_mensaje_adjunto AS tamano,
+              a.fecha_subida_mensaje_adjunto AS fecha
+       FROM dbo.MensajeAdjunto a
+       INNER JOIN dbo.Mensaje m ON m.ID_mensaje = a.ID_mensaje_mensaje_adjunto
+       INNER JOIN dbo.Conversacion c ON c.ID_conversacion = m.ID_conversacion_mensaje
+       WHERE m.ID_conversacion_mensaje = @ID_conversacion
+         AND a.activo_mensaje_adjunto = 1
+         AND (
+           c.ID_usuario_conversacion = @ID_usuario
+           OR EXISTS (
+             SELECT 1 FROM dbo.ProveedorUsuario pu
+             WHERE pu.ID_proveedor_proveedor_usuario = c.ID_proveedor_conversacion
+               AND pu.ID_usuario_proveedor_usuario = @ID_usuario
+           )
+         )
+       ORDER BY a.fecha_subida_mensaje_adjunto, a.ID_adjunto_mensaje_adjunto`,
+    );
+  return result.recordset;
+}
+
+export async function registrarAdjunto(params: {
+  ID_mensaje: number;
+  url: string;
+  nombre: string;
+  tipo_mime: string;
+  tamano: number;
+  ID_usuario: number;
+}): Promise<unknown | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_mensaje', sql.BigInt, params.ID_mensaje)
+    .input('url', sql.VarChar(500), params.url)
+    .input('nombre', sql.NVarChar(255), params.nombre)
+    .input('tipo_mime', sql.VarChar(100), params.tipo_mime)
+    .input('tamano', sql.Int, params.tamano)
+    .input('ID_usuario', sql.Int, params.ID_usuario)
+    .execute('u_sp_RegistrarMensajeAdjunto');
+  return result.recordset[0] ?? null;
 }
 
 export async function enviarMensaje(params: {

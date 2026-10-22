@@ -99,12 +99,22 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E10.2 | Registrar multa | 3 | `u_sp_RegistrarMulta`, UI |
 | E10.3 | Abrir/gestionar disputa | 5 | `Disputa`, UI |
 
+> **Estado S4-E10:** E10.1/E10.2 implementadas con movimiento financiero
+> (`CARGO_EXTRA`/`MULTA`) para liquidaciones. E10.3 implementada: apertura por
+> cliente/proveedor, listado por rol y resolucion ADMIN. Ver
+> [`../../docs/CARGOS-MULTAS.md`](../../docs/CARGOS-MULTAS.md) y
+> [`../../docs/DISPUTAS.md`](../../docs/DISPUTAS.md).
+
 ## E11 — Liquidaciones y comisiones `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
 | E11.1 | Generar liquidación por período | 5 | `u_sp_GenerarLiquidacion`, UI admin |
 | E11.2 | Aprobar/pagar liquidación | 3 | `u_sp_AprobarLiquidacion`, `u_sp_MarcarLiquidacionPagada` |
 | E11.3 | Ver liquidaciones (proveedor) | 3 | `LiquidacionProveedor`, UI |
+
+> **Estado S4-E11:** implementadas. Admin genera por proveedor/periodo y
+> aprueba/paga; el proveedor ve sus liquidaciones. Ver
+> [`../../docs/LIQUIDACIONES.md`](../../docs/LIQUIDACIONES.md).
 
 ## E12 — Chat y notificaciones `S`
 | ID | Historia | SP | Tareas |
@@ -113,9 +123,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E12.2 | Adjuntos en mensajes | 3 | `MensajeAdjunto`, upload |
 | E12.3 | Notificaciones + worker outbox | 5 | `Notificacion`, `OutboxEvento`, worker, UI campana |
 
-> **Estado S3-E12:** E12.1 implementada y verificada. Adjuntos (E12.2) y
-> notificaciones/worker outbox (E12.3) quedan para S4. Ver
-> [`../../docs/CHAT.md`](../../docs/CHAT.md).
+> **Estado S4-E12:** E12.1 implementada y verificada. E12.3 implementada:
+> notificaciones in-app, correo y worker outbox con reintentos. Adjuntos (E12.2)
+> quedan para el siguiente PR. Ver [`../../docs/CHAT.md`](../../docs/CHAT.md) y
+> [`../../docs/NOTIFICACIONES.md`](../../docs/NOTIFICACIONES.md).
 
 ## E13 — Reseñas `S`
 | ID | Historia | SP | Tareas |

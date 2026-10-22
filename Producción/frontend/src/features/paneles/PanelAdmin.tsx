@@ -145,6 +145,15 @@ export function PanelAdmin() {
           <Link to="/admin/auditoria">
             <Button variant="outline">Auditoria</Button>
           </Link>
+          <Link to="/admin/disputas">
+            <Button variant="outline">Disputas</Button>
+          </Link>
+          <Link to="/admin/liquidaciones">
+            <Button variant="outline">Liquidaciones</Button>
+          </Link>
+          <Link to="/admin/outbox">
+            <Button variant="outline">Outbox</Button>
+          </Link>
         </CardContent>
       </Card>
     </div>
