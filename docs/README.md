@@ -33,6 +33,7 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
+| — | [`DEMO-S4.md`](DEMO-S4.md) | Guion de extensiones S4: cargos, disputas, liquidaciones, notificaciones, fotos y adjuntos. |
 | — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (165 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 

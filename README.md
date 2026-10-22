@@ -52,10 +52,12 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
 - **S1/H1:** auth, catálogos, proveedores/sedes y vehículos.
 - **S2/H2:** búsqueda con fechas, reservas, pago WebPay simulado, cancelación con
   reembolso, panel de proveedor y reporte de ingresos.
-- **S3/H3 (en progreso):** arriendos, inspecciones, devolución, contrato,
-  conductores adicionales, daños, chat, reseñas y paneles por rol.
+- **S3/H3:** arriendos, inspecciones, devolución, contrato, conductores
+  adicionales, daños, chat, reseñas y paneles por rol.
+- **S4/H4:** cargos extra, multas, disputas, liquidaciones, notificaciones,
+  worker outbox, fotos de inspección y adjuntos de chat.
 
-Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md).
+Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md) · [`docs/DEMO-S4.md`](docs/DEMO-S4.md).
 
 ## Documentación
 

@@ -61,6 +61,20 @@ describe('POST /api/conversaciones/:id/mensajes', () => {
   });
 });
 
+describe('Adjuntos de chat', () => {
+  it('exige autenticacion', async () => {
+    const res = await request(app).post('/api/conversaciones/1/mensajes/1/adjuntos');
+    expect(res.status).toBe(401);
+  });
+
+  it('rechaza un id invalido', async () => {
+    const res = await request(app)
+      .post('/api/conversaciones/abc/mensajes/1/adjuntos')
+      .set('Authorization', `Bearer ${clienteToken}`);
+    expect(res.status).toBe(400);
+  });
+});
+
 describe('Acciones de conversacion', () => {
   it('exige autenticacion para marcar leidos', async () => {
     const res = await request(app).post('/api/conversaciones/1/leidos');

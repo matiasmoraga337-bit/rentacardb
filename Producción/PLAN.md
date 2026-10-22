@@ -41,11 +41,11 @@ cubra **todo el modelo** (82 tablas), desplegable con Docker.
 | H4 — Extensiones + QA | 16 nov | Liquidaciones/disputas/multas + tests + docs |
 | **Entrega** | **17 nov** | Presentación |
 
-> **Estado (22-oct-2026):** H0, H1, H2 y H3 completados y verificados. H3 incluye
-> arriendos, inspecciones, devolución, contrato, chat, reseñas y paneles por rol.
-> Ver `../docs/DEMO-S3.md`, `../docs/PRUEBAS-BD.md` y `../docs/PANELES.md`.
-> S4 en curso: cargos/multas, disputas, liquidaciones, notificaciones/outbox,
-> adjuntos/fotos, hardening y demo final.
+> **Estado (22-oct-2026):** H0, H1, H2, H3 y H4 completados y verificados. H4
+> incluye cargos/multas, disputas, liquidaciones, notificaciones/outbox,
+> fotos/adjuntos, hardening y demo. Ver `../docs/DEMO-S3.md`,
+> `../docs/DEMO-S4.md` y `../docs/PRUEBAS-BD.md`.
+> Pendiente menor: CRUD de catálogos (E3.2), hoy solo consulta.
 
 ## 5) Roadmap por sprints (detalle en `docs/CRONOGRAMA.md`)
 
