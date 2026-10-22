@@ -13,6 +13,7 @@ ficha publica.
   - `PROVEEDOR_A_CLIENTE`: usuario vinculado al proveedor del vehiculo.
 - Calificacion entera de 1 a 5; comentario opcional de hasta 1000 caracteres.
 - La ficha publica muestra solo resenas `CLIENTE_A_VEHICULO` activas.
+- Al crear una resena se recalcula `Vehiculo.calificacion_promedio_vehiculo` con `u_sp_RecalcularCalificacionVehiculo`.
 
 ## API
 

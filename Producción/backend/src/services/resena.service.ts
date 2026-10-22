@@ -83,6 +83,8 @@ export async function crearResena(
     traducirErrorSql(error);
   }
 
+  await repo.recalcularCalificacionVehiculo(input.ID_arriendo);
+
   const resena = await repo.obtenerResenaCreada(input.ID_arriendo, idUsuario, input.tipo_resena);
   if (!resena) {
     throw new AppError(500, 'RESENA_NO_REGISTRADA', 'No se pudo leer la resena registrada.');

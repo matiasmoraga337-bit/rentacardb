@@ -119,7 +119,53 @@ export const swaggerSpec = {
         },
       },
     },
-    '/reservas': {
+    '/favoritos': {
+      get: {
+        summary: 'Listar vehiculos favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Favoritos del usuario' } },
+      },
+    },
+    '/favoritos/{vehiculoId}': {
+      post: {
+        summary: 'Agregar un vehiculo a favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'vehiculoId', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Favorito agregado' } },
+      },
+      delete: {
+        summary: 'Quitar un vehiculo de favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'vehiculoId', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Favorito eliminado' } },
+      },
+    },
+    '/busquedas': {
+      get: {
+        summary: 'Listar busquedas guardadas',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Busquedas activas' } },
+      },
+      post: {
+        summary: 'Guardar una busqueda',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '201': { description: 'Busqueda guardada' } },
+      },
+    },
+    '/busquedas/{id}': {
+      delete: {
+        summary: 'Eliminar una busqueda guardada',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Busqueda eliminada' } },
+      },
+    },    '/reservas': {
       get: {
         summary: 'Listar reservas segun el rol y el scope solicitado',
         tags: ['Reservas'],
@@ -894,6 +940,47 @@ export const swaggerSpec = {
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: { '200': { description: 'Liquidacion PAGADA' }, '409': { description: 'No esta APROBADA' } },
+      },
+    },
+    '/admin/catalogos/{tipo}': {
+      get: {
+        summary: 'Listar catalogo para administracion',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'incluirInactivos', in: 'query', schema: { type: 'string', enum: ['1'] } },
+        ],
+        responses: { '200': { description: 'Registros del catalogo' } },
+      },
+      post: {
+        summary: 'Crear registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'tipo', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Registro creado' }, '409': { description: 'Duplicado' } },
+      },
+    },
+    '/admin/catalogos/{tipo}/{id}': {
+      put: {
+        summary: 'Actualizar registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        responses: { '200': { description: 'Registro actualizado' } },
+      },
+      delete: {
+        summary: 'Desactivar registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        responses: { '200': { description: 'Registro desactivado' } },
       },
     },
     '/admin/auditoria': {

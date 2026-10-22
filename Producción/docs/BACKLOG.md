@@ -32,6 +32,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E3.1 | Ver regiones/provincias/comunas | 3 | Endpoints + selects en UI |
 | E3.2 | CRUD de catálogos (admin) | 5 | Endpoints genéricos + UI admin |
 
+> **Estado S4-E3.2:** CRUD de catálogos de negocio implementado; los catálogos
+> de sistema (`tipos-proveedor`, `estados-*`) quedan de solo lectura. Ver
+> [`../../docs/CATALOGOS.md`](../../docs/CATALOGOS.md).
+
 ## E4 — Proveedores y sedes `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
@@ -57,6 +61,9 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E6.2 | Ver disponibilidad por fechas | 5 | `vw_VehiculosDisponibles` |
 | E6.3 | Favoritos | 3 | `FavoritoVehiculo`, UI |
 | E6.4 | Búsquedas guardadas | 3 | `BusquedaGuardada`, UI |
+
+> **Estado S4-E6.3/E6.4:** implementadas. Ver
+> [`../../docs/FAVORITOS-BUSQUEDAS.md`](../../docs/FAVORITOS-BUSQUEDAS.md).
 
 ## E7 — Reservas `M`
 | ID | Historia | SP | Tareas |

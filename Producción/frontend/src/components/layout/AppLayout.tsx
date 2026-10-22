@@ -26,6 +26,9 @@ export function AppLayout() {
                 <Link to="/arriendos" className="text-sm text-slate-600 hover:text-brand">
                   Mis alquileres
                 </Link>
+                <Link to="/favoritos" className="text-sm text-slate-600 hover:text-brand">
+                  Favoritos
+                </Link>
               </>
             )}
             {(usuario?.roles.includes('PROVEEDOR') ||
