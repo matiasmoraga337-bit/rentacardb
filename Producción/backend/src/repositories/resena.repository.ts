@@ -123,3 +123,11 @@ export async function listarResenasProveedor(idProveedor: number): Promise<Resen
     );
   return result.recordset;
 }
+
+export async function recalcularCalificacionVehiculo(idArriendo: number): Promise<void> {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('ID_arriendo', sql.Int, idArriendo)
+    .execute('u_sp_RecalcularCalificacionVehiculo');
+}
