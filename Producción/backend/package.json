@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest --passWithNoTests",
     "seed": "tsx scripts/seed-demo.ts",
-    "smoke:s2": "tsx scripts/smoke-s2.ts"
+    "smoke:s2": "tsx scripts/smoke-s2.ts",
+    "smoke:s3": "tsx scripts/smoke-s3.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

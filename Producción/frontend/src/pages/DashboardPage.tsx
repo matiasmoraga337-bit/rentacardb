@@ -39,16 +39,26 @@ export function DashboardPage() {
             <Button variant="outline">Buscar vehículos</Button>
           </Link>
           {usuario?.roles.includes('CLIENTE') && (
-            <Link to="/reservas">
-              <Button variant="outline">Mis reservas</Button>
-            </Link>
+            <>
+              <Link to="/reservas">
+                <Button variant="outline">Mis reservas</Button>
+              </Link>
+              <Link to="/arriendos">
+                <Button variant="outline">Mis alquileres</Button>
+              </Link>
+            </>
           )}
           {(usuario?.roles.includes('PROVEEDOR') ||
             usuario?.roles.includes('OPERADOR') ||
             usuario?.roles.includes('ADMIN')) && (
-            <Link to="/proveedor/reservas">
-              <Button variant="outline">Reservas de mis vehículos</Button>
-            </Link>
+            <>
+              <Link to="/proveedor/reservas">
+                <Button variant="outline">Reservas de mis vehículos</Button>
+              </Link>
+              <Link to="/proveedor/arriendos">
+                <Button variant="outline">Arriendos</Button>
+              </Link>
+            </>
           )}
           {usuario?.roles.includes('ADMIN') && (
             <Link to="/admin/reportes">

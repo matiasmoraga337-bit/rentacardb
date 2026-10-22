@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **99 PASS / 0 FAIL**
+- **Resultado global:** **121 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -19,6 +19,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/03_triggers_security_errorlog.sql` | 13 | Triggers de solapamiento/auditoría, permisos (`api_user`/`report_user`), ErrorLog, inyección |
 | `sql/tests/04_flows.sql` | 12 | Pagos, WebPay, arriendos, multas, chat (Unicode), liquidaciones/outbox |
 | `sql/tests/05_reservas_pagos.sql` | 30 | Reserva, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración (cursor) y vista |
+| `sql/tests/06_arriendos.sql` | 22 | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores |
 
 ## 2. Resultados por categoría
 
@@ -62,8 +63,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Liquidaciones y outbox: aprobar/pagar/reintentar inexistentes → errores esperados.
 
 ### S2 — Reservas y pagos (30/30)
-- Crear reserva `PENDIENTE` con total, snapshot, historial `CREAR` y bloqueo activo.
-- Idempotencia: misma `idempotency_key` → una sola fila.
+- Crear reserva `PENDIENTE` con total, snapshot, historial `CREAR` y bloqueo activo.- Idempotencia: misma `idempotency_key` → una sola fila.
 - Solapamiento rechazado (`70209`/`70900`); reserva adyacente permitida.
 - WebPay iniciar → token de 64 caracteres; confirmar → reserva `CONFIRMADA`.
 - Pago `APROBADO` y trigger de auditoría `FINANCIAL`.
@@ -83,6 +83,21 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Hardening: confirmación de reserva expirada rechazada (`52037`).
 - Hardening: historial `CONFIRMAR` creado por WebPay.
 
+### S3 — Arriendos e inspecciones (22/22)
+- Reserva confirmada con política de km y pago WebPay.
+- Inicio de arriendo: estado `ACTIVO`, reserva `EN_CURSO`, vehículo `ARRENDADO` e inspección `ENTREGA`.
+- Contrato aceptado con hash SHA-256.
+- Conductor adicional con persona y licencia verificada.
+- Daño en inspección `ENTREGA` rechazado (`60063`).
+- Reseña antes de finalizar rechazada (`53014`).
+- Devolución: arriendo `FINALIZADO`, reserva `COMPLETADA`, vehículo `DISPONIBLE` e inspección `DEVOLUCION`.
+- Cargo automático por km excedido y movimiento `CARGO_KM`.
+- Notificación `ARRIENDO_FINALIZADO`.
+- Daño registrado en `DEVOLUCION`.
+- Reseña tras finalizar y duplicado rechazado (`53017`).
+- Devolución duplicada rechazada (`53009`).
+- Inicio de arriendo sin licencia rechazado (`53014`).
+
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).
 2. **Falso positivo** en “Registro email duplicado”: usaba el RUT del admin y fallaba por RUT. Corregido con un RUT nuevo.
@@ -93,9 +108,11 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 7. **Doble confirmación WebPay** y reanimación de reservas canceladas/expiradas. Se endureció `u_sp_WebPay_ConfirmarTransaccion` con `UPDLOCK/HOLDLOCK`, validación de estado y `UPDATE` condicional; migración en `sql/migrations/2026-10-21_s2_webpay_hardening.sql`.
 8. **Fechas imposibles** (`2026-02-31`) llegaban a SQL como error 241. Se agregó validación de calendario en zod/servicios y mapeo a 400.
 9. **Reembolsos manuales de CLIENTE**. Las rutas `/reembolsos` y `/reembolsos/:id/completar` quedaron solo para ADMIN; el cliente usa `POST /reservas/:id/cancelar`.
+10. **RUT del fixture S3**: `21000000-K` no superaba `fn_ValidarRut`; se corrigió a `21000000-3`.
+11. **Sede actual del vehículo** en el smoke S3: el retiro debe usar la sede donde está el vehículo. El checkout y el smoke ahora preseleccionan `idSedeActual`.
 
 ## 4. Cobertura no incluida (pendiente / futura)
-- Flujo feliz de arriendo → devolución → liquidación (S3/S4).
+- Liquidaciones y reportes financieros finales (S4).
 - Concurrencia real con dos sesiones SQL (la carrera WebPay se prueba vía smoke API con `Promise.all`).
 - Rendimiento (`SET STATISTICS IO/TIME`) en búsqueda y reportes.
 - Cobertura exhaustiva de los 94 CHECK (se probaron los representativos).

@@ -72,3 +72,20 @@ npm run smoke:s2      # flujo completo contra la API
 ```
 
 Credenciales demo y guion: [`../docs/DEMO-S2.md`](../docs/DEMO-S2.md).
+
+## S3 — Arriendos e inspecciones
+
+El flujo de retiro y devolución está implementado:
+
+1. El proveedor inicia el arriendo desde una reserva confirmada.
+2. El cliente acepta el contrato y puede agregar conductores adicionales.
+3. El proveedor registra la devolución, km, combustible y limpieza.
+4. El sistema crea la inspección `DEVOLUCION`, calcula el cargo por km excedido y finaliza la reserva.
+5. El proveedor registra daños sobre la inspección de devolución.
+
+```powershell
+cd Producción/backend
+npm run smoke:s3   # reserva -> pago -> inicio -> devolución -> daño
+```
+
+Guion: [`../docs/DEMO-S3.md`](../docs/DEMO-S3.md) · Diseño y SQL: [`../docs/ARRIENDOS.md`](../docs/ARRIENDOS.md).

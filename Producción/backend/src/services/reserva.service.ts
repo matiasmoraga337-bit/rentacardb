@@ -11,6 +11,8 @@ import { calcularReembolso } from './reembolso-policy';
 export interface ReservaDto {
   id: number;
   idCliente: number;
+  idSedeRetiro: number;
+  idSedeDevolucion: number;
   fechaInicio: string;
   fechaFin: string;
   precioDia: number;
@@ -47,6 +49,8 @@ export function mapReserva(row: repo.ReservaViewRow): ReservaDto {
   return {
     id: row.ID_reserva,
     idCliente: row.ID_usuario_cliente_reserva,
+    idSedeRetiro: row.ID_sede_retiro_reserva,
+    idSedeDevolucion: row.ID_sede_devolucion_reserva,
     fechaInicio: row.fecha_inicio_reserva,
     fechaFin: row.fecha_fin_reserva,
     precioDia: row.precio_diario_aplicado_reserva,

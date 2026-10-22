@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import adminRoutes from './admin.routes';
+import arriendosRoutes from './arriendos.routes';
 import authRoutes from './auth.routes';
 import catalogoRoutes from './catalogo.routes';
 import healthRoutes from './health.routes';
@@ -19,6 +20,7 @@ router.use('/usuarios', usuariosRoutes);
 router.use('/proveedores', proveedorRoutes);
 router.use('/vehiculos', vehiculoRoutes);
 router.use('/reservas', reservasRoutes);
+router.use('/arriendos', arriendosRoutes);
 router.use('/pagos', pagosRoutes);
 router.use('/reembolsos', reembolsosRoutes);
 router.use('/reportes', reportesRoutes);

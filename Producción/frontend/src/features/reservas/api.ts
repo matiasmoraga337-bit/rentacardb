@@ -3,6 +3,8 @@ import { apiFetch } from '@/lib/api';
 export interface Reserva {
   id: number;
   idCliente: number;
+  idSedeRetiro: number;
+  idSedeDevolucion: number;
   fechaInicio: string;
   fechaFin: string;
   precioDia: number;
@@ -104,6 +106,8 @@ export interface CrearReservaData {
   fecha_fin: string;
   observaciones?: string;
   politica_combustible?: 'LLENO_LLENO' | 'MISMO_NIVEL' | 'LIBRE';
+  km_incluidos_dia?: number;
+  cargo_km_excedido?: number;
   idempotency_key?: string;
 }
 

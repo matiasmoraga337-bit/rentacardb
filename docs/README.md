@@ -21,9 +21,11 @@ con múltiples sedes y dueños por región de Chile.
 | 5 | [`05-Alcance.md`](05-Alcance.md) | Alcance, supuestos y límites del proyecto. |
 | 6 | [`06-ERD.md`](06-ERD.md) | Diagramas entidad‑relación por módulo (Mermaid) + pasos para SSMS. |
 | — | [`RESERVAS-PAGOS.md`](RESERVAS-PAGOS.md) | S2: flujo, endpoints, SQL, idempotencia y seguridad de reservas/pagos. |
+| — | [`ARRIENDOS.md`](ARRIENDOS.md) | S3: arriendos, inspecciones, devolución, contrato y daños. |
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (99 PASS). |
+| — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (121 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres

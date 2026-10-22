@@ -88,6 +88,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E9.4 | Conductores adicionales | 3 | `u_sp_RegistrarConductorAdicional` |
 | E9.5 | Aceptación de contrato | 3 | `u_sp_CrearAceptacionContrato`, UI firma |
 
+> **Estado S3-E9:** E9.1–E9.5 implementadas y verificadas. Ver
+> [`../../docs/ARRIENDOS.md`](../../docs/ARRIENDOS.md),
+> [`../../docs/DEMO-S3.md`](../../docs/DEMO-S3.md) y `sql/tests/06_arriendos.sql`.
+
 ## E10 — Cargos extra, multas, disputas `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

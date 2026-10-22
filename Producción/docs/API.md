@@ -94,16 +94,20 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 ## Arriendos
 
-| Método | Ruta | Acceso | SP / Tabla |
-|---|---|---|---|
-| POST | `/arriendos/iniciar` | ROL(OPERADOR/PROVEEDOR) | `u_sp_IniciarArriendo` |
-| POST | `/arriendos/:id/devolucion` | ROL(OPERADOR/PROVEEDOR) | `u_sp_RegistrarDevolucion` |
-| GET | `/arriendos/:id` | AUTH | `Arriendo` + inspecciones |
-| POST | `/arriendos/:id/inspecciones` | ROL(OPERADOR) | `InspeccionArriendo`, `u_sp_RegistrarDanoInspeccion` |
-| POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `u_sp_RegistrarConductorAdicional` |
-| POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `u_sp_CrearAceptacionContrato` |
-| POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR) | `u_sp_CrearCargoExtra` |
-| POST | `/arriendos/:id/multas` | ROL(OPERADOR/ADMIN) | `u_sp_RegistrarMulta` |
+| Método | Ruta | Acceso | SP / Tabla | Notas |
+|---|---|---|---|---|
+| GET | `/arriendos?scope=cliente\|proveedor\|todos&estado=&page=&pageSize=` | AUTH | `Arriendo`, `Reserva`, `Vehiculo`, `EstadoArriendo` | Cliente ve los suyos; proveedor los de sus vehículos; admin todos. |
+| GET | `/arriendos/:id` | AUTH dueño/proveedor/admin | `Arriendo` + inspecciones + daños + cargos + conductores + contrato + reseñas | Detalle completo. |
+| POST | `/arriendos/iniciar` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_IniciarArriendo` | Requiere reserva `CONFIRMADA`, licencia vigente y sede válida. |
+| POST | `/arriendos/:id/devolucion` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarDevolucion` | Calcula km excedido y crea cargo automático. |
+| POST | `/arriendos/:id/inspecciones/:inspeccionId/danos` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarDanoInspeccion` | Solo inspección `DEVOLUCION`. |
+| POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `u_sp_RegistrarConductorAdicional` | Body `{rut, ID_licencia_conducir?}`. |
+| POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `u_sp_CrearAceptacionContrato` | Body `{aceptado:true}`; guarda hash SHA-256. |
+| GET | `/arriendos/:id/contrato` | AUTH dueño/proveedor/admin | `AceptacionContratoArriendo` + datos de reserva | Devuelve texto, hash y aceptación vigente. |
+| POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR) | `u_sp_CrearCargoExtra` | S4. |
+| POST | `/arriendos/:id/multas` | ROL(OPERADOR/ADMIN) | `u_sp_RegistrarMulta` | S4. |
+
+> El flujo de arriendo se documenta en [`../../docs/ARRIENDOS.md`](../../docs/ARRIENDOS.md) y el guion en [`../../docs/DEMO-S3.md`](../../docs/DEMO-S3.md).
 
 ## Liquidaciones, disputas, reseñas, chat
 

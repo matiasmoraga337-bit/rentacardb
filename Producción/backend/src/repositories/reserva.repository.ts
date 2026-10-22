@@ -29,6 +29,8 @@ export interface CancelarReservaParams {
 export interface ReservaViewRow {
   ID_reserva: number;
   ID_usuario_cliente_reserva: number;
+  ID_sede_retiro_reserva: number;
+  ID_sede_devolucion_reserva: number;
   fecha_inicio_reserva: string;
   fecha_fin_reserva: string;
   precio_diario_aplicado_reserva: number;
@@ -101,6 +103,8 @@ export interface ListarReservasParams {
 const RESERVA_VIEW_SELECT = `
   SELECT vd.*,
          r.ID_usuario_cliente_reserva,
+         r.ID_sede_retiro_reserva,
+         r.ID_sede_devolucion_reserva,
          r.fecha_reserva,
          r.fecha_expiracion_reserva,
          r.observaciones_reserva
