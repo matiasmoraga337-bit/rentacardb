@@ -69,6 +69,23 @@ export async function dano(req: Request, res: Response): Promise<void> {
     );
 }
 
+export async function fotoInspeccion(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  const idInspeccion = parseId(req.params.inspeccionId, 'inspeccionId');
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+  res
+    .status(201)
+    .json(
+      await arriendoService.registrarFotoInspeccion(
+        id,
+        idInspeccion,
+        req.user!.id,
+        req.user!.roles,
+        files,
+      ),
+    );
+}
+
 export async function cargoExtra(req: Request, res: Response): Promise<void> {
   const id = parseId(req.params.id, 'id');
   res

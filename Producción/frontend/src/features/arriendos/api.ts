@@ -29,6 +29,15 @@ export interface Arriendo {
   emailCliente: string;
 }
 
+export interface InspeccionFoto {
+  id: number;
+  inspeccionId: number;
+  url: string;
+  thumbUrl: string;
+  angulo: string | null;
+  fecha: string;
+}
+
 export interface InspeccionArriendo {
   id: number;
   tipo: string;
@@ -39,6 +48,7 @@ export interface InspeccionArriendo {
   firmaCliente: boolean;
   fecha: string;
   idOperador: number | null;
+  fotos: InspeccionFoto[];
 }
 
 export interface DanoArriendo {
@@ -185,6 +195,19 @@ export const registrarDano = (
     method: 'POST',
     body: JSON.stringify(data),
   });
+
+export const subirFotosInspeccion = (
+  id: number,
+  idInspeccion: number,
+  files: FileList,
+): Promise<unknown> => {
+  const form = new FormData();
+  Array.from(files).forEach((file) => form.append('fotos', file));
+  return apiFetch(`/arriendos/${id}/inspecciones/${idInspeccion}/fotos`, {
+    method: 'POST',
+    body: form,
+  });
+};
 
 export const registrarCargoExtra = (
   id: number,

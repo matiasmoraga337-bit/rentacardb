@@ -309,6 +309,29 @@ export const swaggerSpec = {
         responses: { '201': { description: 'Dano registrado' }, '409': { description: 'Inspeccion no es de devolucion' } },
       },
     },
+    '/arriendos/{id}/inspecciones/{inspeccionId}/fotos': {
+      post: {
+        summary: 'Subir fotos a una inspeccion',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'inspeccionId', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: { fotos: { type: 'array', items: { type: 'string', format: 'binary' } } },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Fotos registradas' }, '404': { description: 'Inspeccion no encontrada' } },
+      },
+    },
     '/arriendos/{id}/cargos-extra': {
       post: {
         summary: 'Registrar un cargo extra en un arriendo finalizado',
@@ -622,6 +645,29 @@ export const swaggerSpec = {
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
         responses: { '201': { description: 'Mensaje enviado' }, '409': { description: 'Conversacion cerrada' } },
+      },
+    },
+    '/conversaciones/{id}/mensajes/{mensajeId}/adjuntos': {
+      post: {
+        summary: 'Subir adjuntos a un mensaje',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'mensajeId', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'multipart/form-data': {
+              schema: {
+                type: 'object',
+                properties: { archivos: { type: 'array', items: { type: 'string', format: 'binary' } } },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Adjuntos registrados' }, '403': { description: 'No participa' } },
       },
     },
     '/conversaciones/{id}/leidos': {

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import * as chatController from '../controllers/chat.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { authorize } from '../middlewares/authorize';
+import { attachmentUpload } from '../middlewares/upload';
 import { validate } from '../middlewares/validate';
 import { crearConversacionSchema, enviarMensajeSchema } from '../schemas/chat.schema';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -19,6 +20,13 @@ router.post(
 );
 
 router.get('/:id/mensajes', authenticate, asyncHandler(chatController.mensajes));
+
+router.post(
+  '/:id/mensajes/:mensajeId/adjuntos',
+  authenticate,
+  attachmentUpload.array('archivos', 4),
+  asyncHandler(chatController.adjuntos),
+);
 
 router.post(
   '/:id/mensajes',
