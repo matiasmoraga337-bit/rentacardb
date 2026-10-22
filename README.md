@@ -53,7 +53,7 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
 - **S2/H2:** búsqueda con fechas, reservas, pago WebPay simulado, cancelación con
   reembolso, panel de proveedor y reporte de ingresos.
 - **S3/H3 (en progreso):** arriendos, inspecciones, devolución, contrato,
-  conductores adicionales, daños, chat y reseñas. Falta el cierre de paneles (E14).
+  conductores adicionales, daños, chat, reseñas y paneles por rol.
 
 Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md).
 
@@ -66,6 +66,7 @@ Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S
 - S3 (arriendos e inspecciones): [`docs/ARRIENDOS.md`](docs/ARRIENDOS.md).
 - Chat: [`docs/CHAT.md`](docs/CHAT.md).
 - Reseñas: [`docs/RESENAS.md`](docs/RESENAS.md).
+- Paneles por rol: [`docs/PANELES.md`](docs/PANELES.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 

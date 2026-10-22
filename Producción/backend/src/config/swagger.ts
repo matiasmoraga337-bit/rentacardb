@@ -602,6 +602,19 @@ export const swaggerSpec = {
         responses: { '200': { description: 'Ingresos por mes' } },
       },
     },
+    '/admin/auditoria': {
+      get: {
+        summary: 'Listar eventos de auditoria (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'entidad', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Eventos paginados' }, '403': { description: 'Solo ADMIN' } },
+      },
+    },
     '/admin/reservas/expirar': {
       post: {
         summary: 'Ejecutar la expiracion manual de reservas (ADMIN)',

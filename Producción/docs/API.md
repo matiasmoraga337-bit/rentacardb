@@ -135,7 +135,7 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
 | GET/POST/PUT | `/admin/catalogos/:tabla` | ADMIN | `Tipo*`, `Estado*`, `Marca`, `Modelo`, `PoliticaCancelacion`, `CaracteristicaVehiculo`, `TipoCargoExtra` |
-| GET | `/admin/auditoria` | ADMIN | `Auditoria` |
+| GET | `/admin/auditoria?entidad=&page=&pageSize=` | ADMIN | `Auditoria` + usuario. Devuelve `{data, page, pageSize, total}`. |
 | GET | `/admin/outbox` | ADMIN | `u_sp_ObtenerOutboxPendiente` |
 | GET | `/admin/integridad` | ADMIN | `u_sp_ValidarIntegridad` |
 | POST | `/admin/reservas/expirar` | ADMIN | `u_sp_ExpirarReservas` |

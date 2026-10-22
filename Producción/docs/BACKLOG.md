@@ -134,6 +134,11 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E14.2 | Panel proveedor (vehículos, sedes, liquidaciones) | 8 | Layout + widgets |
 | E14.3 | Panel admin (proveedores, catálogos, disputas, auditoría) | 8 | Layout + widgets |
 
+> **Estado S3-E14:** paneles de cliente, proveedor y admin implementados sobre
+> `/panel`. Admin agrega `/admin/catalogos` (consulta) y `/admin/auditoria`.
+> Liquidaciones, disputas y edición de catálogos quedan para S4. Ver
+> [`../../docs/PANELES.md`](../../docs/PANELES.md).
+
 ## E15 — Calidad: testing, seguridad, docs `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
