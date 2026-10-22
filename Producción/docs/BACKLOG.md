@@ -123,9 +123,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E12.2 | Adjuntos en mensajes | 3 | `MensajeAdjunto`, upload |
 | E12.3 | Notificaciones + worker outbox | 5 | `Notificacion`, `OutboxEvento`, worker, UI campana |
 
-> **Estado S3-E12:** E12.1 implementada y verificada. Adjuntos (E12.2) y
-> notificaciones/worker outbox (E12.3) quedan para S4. Ver
-> [`../../docs/CHAT.md`](../../docs/CHAT.md).
+> **Estado S4-E12:** E12.1 implementada y verificada. E12.3 implementada:
+> notificaciones in-app, correo y worker outbox con reintentos. Adjuntos (E12.2)
+> quedan para el siguiente PR. Ver [`../../docs/CHAT.md`](../../docs/CHAT.md) y
+> [`../../docs/NOTIFICACIONES.md`](../../docs/NOTIFICACIONES.md).
 
 ## E13 — Reseñas `S`
 | ID | Historia | SP | Tareas |

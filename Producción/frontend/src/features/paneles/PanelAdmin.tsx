@@ -151,6 +151,9 @@ export function PanelAdmin() {
           <Link to="/admin/liquidaciones">
             <Button variant="outline">Liquidaciones</Button>
           </Link>
+          <Link to="/admin/outbox">
+            <Button variant="outline">Outbox</Button>
+          </Link>
         </CardContent>
       </Card>
     </div>

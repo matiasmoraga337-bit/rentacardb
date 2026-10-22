@@ -1,6 +1,7 @@
 import { app } from './app';
 import { closePool, getPool } from './config/db';
 import { env } from './config/env';
+import { startOutboxJob, stopOutboxJob } from './jobs/outbox.job';
 import { startReservasJob, stopReservasJob } from './jobs/reservas.job';
 
 async function bootstrap(): Promise<void> {
@@ -20,9 +21,11 @@ async function bootstrap(): Promise<void> {
   });
 
   startReservasJob();
+  startOutboxJob();
 
   const shutdown = async (): Promise<void> => {
     stopReservasJob();
+    stopOutboxJob();
     server.close();
     await closePool();
     process.exit(0);
