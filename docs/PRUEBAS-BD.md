@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **138 PASS / 0 FAIL**
+- **Resultado global:** **144 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -22,11 +22,12 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/06_arriendos.sql` | 22 | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores |
 | `sql/tests/07_chat.sql` | 10 | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre |
 | `sql/tests/08_cargos_multas.sql` | 7 | Cargo extra/multa sobre arriendo finalizado, movimiento financiero y errores de monto/arriendo |
+| `sql/tests/09_disputas.sql` | 6 | Apertura, duplicado, autor ajeno, EN_REVISION, resolucion y cierre |
 
 ## 2. Resultados por categoría
 
 ### Esquema (12/12)
-- 83 tablas, 69 SPs, 6 vistas, 3 funciones, 4 triggers.
+- 83 tablas, 71 SPs, 6 vistas, 3 funciones, 4 triggers.
 - 0 procedimientos `sp_` de usuario y 0 con doble prefijo `u_u_`.
 - Triggers, CHECK y FK habilitados; compat 160; `u_sp_ValidarIntegridad` sin errores.
 
@@ -115,6 +116,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Monto cero rechazado (`53020`/`60040`).
 - Arriendo inexistente rechazado (`53021`/`60041`).
 - Los cargos extra se suman al bruto de `u_sp_GenerarLiquidacion`.
+
+### S4 — Disputas (6/6)
+- Crear disputa sobre arriendo finalizado → `ABIERTA`.
+- Duplicado abierto rechazado (`60111`).
+- Usuario ajeno rechazado (`60112`).
+- Admin pasa a `EN_REVISION` y resuelve con fecha de cierre.
+- Resolver una disputa ya cerrada rechazado (`60116`).
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).

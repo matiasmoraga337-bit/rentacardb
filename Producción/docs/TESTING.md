@@ -126,3 +126,11 @@ npm run smoke:s3
 | Backend (API) | `Producción/backend/tests/arriendos.test.ts` | Auth, rol, validación de monto y fecha. |
 | Frontend | `Producción/frontend/src/features/arriendos/__tests__/CargoForm.test.tsx` | Envío de concepto, tipo y monto. |
 | Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Cargo y multa tras la devolución. |
+
+## 12) Sprint S4 — Disputas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/09_disputas.sql` | Apertura, duplicado, autor ajeno, revision, resolucion y cierre (6 casos). |
+| Backend (API) | `Producción/backend/tests/disputas.test.ts` | Auth, validacion, filtros y rol ADMIN. |
+| Frontend | `/disputas`, `/admin/disputas`, `DisputaForm` | Listado por rol, apertura y resolucion. |

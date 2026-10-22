@@ -450,6 +450,83 @@ export const swaggerSpec = {
         },
       },
     },
+    '/disputas': {
+      get: {
+        summary: 'Listar disputas segun rol',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'scope', in: 'query', schema: { type: 'string', enum: ['cliente', 'proveedor', 'todos'] } },
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['ABIERTA', 'EN_REVISION', 'RESUELTA', 'CERRADA'] } },
+          { name: 'arriendo', in: 'query', schema: { type: 'integer' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Disputas paginadas' } },
+      },
+      post: {
+        summary: 'Abrir una disputa sobre un arriendo finalizado',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_arriendo', 'tipo_disputa', 'descripcion'],
+                properties: {
+                  ID_arriendo: { type: 'integer' },
+                  tipo_disputa: { type: 'string', enum: ['DANO', 'COBRO', 'SERVICIO', 'DOCUMENTO', 'OTRO'] },
+                  descripcion: { type: 'string', minLength: 10, maxLength: 1000 },
+                  monto_disputado: { type: 'number', exclusiveMinimum: 0 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Disputa abierta' },
+          '409': { description: 'Arriendo no finalizado o disputa duplicada' },
+        },
+      },
+    },
+    '/disputas/{id}': {
+      get: {
+        summary: 'Detalle de una disputa',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Disputa' }, '403': { description: 'Sin acceso' } },
+      },
+    },
+    '/disputas/{id}/resolver': {
+      post: {
+        summary: 'Resolver o cambiar el estado de una disputa (ADMIN)',
+        tags: ['Disputas'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['estado'],
+                properties: {
+                  estado: { type: 'string', enum: ['EN_REVISION', 'RESUELTA', 'CERRADA'] },
+                  resolucion: { type: 'string', minLength: 10, maxLength: 1000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Disputa actualizada' },
+          '409': { description: 'Disputa ya cerrada' },
+        },
+      },
+    },
     '/conversaciones': {
       get: {
         summary: 'Listar conversaciones del usuario autenticado',

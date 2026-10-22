@@ -120,8 +120,10 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` |
 | POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` |
 | GET | `/reportes/liquidaciones` | ADMIN | `u_sp_ReporteLiquidaciones` |
-| POST | `/disputas` | AUTH | `Disputa` |
-| GET | `/disputas` | ADMIN | `Disputa` |
+| POST | `/disputas` | AUTH parte del arriendo | `u_sp_CrearDisputa`. Body `{ID_arriendo, tipo_disputa, descripcion, monto_disputado?}`. Solo arriendo `FINALIZADO`; una disputa abierta por autor. |
+| GET | `/disputas?scope=&estado=&arriendo=&page=&pageSize=` | AUTH | `Disputa` + arriendo/cliente/proveedor. Scope cliente/proveedor; ADMIN `todos`. |
+| GET | `/disputas/:id` | AUTH parte/ADMIN | Detalle de la disputa. |
+| POST | `/disputas/:id/resolver` | ADMIN | `u_sp_ResolverDisputa`. Body `{estado: EN_REVISION\|RESUELTA\|CERRADA, resolucion?}`. |
 | POST | `/resenas` | AUTH dueño/proveedor | `u_sp_CrearResena`. Body `{ID_arriendo, tipo_resena, calificacion, comentario?}`. Solo arriendo `FINALIZADO`; una reseña por autor y tipo. |
 | GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_VEHICULO`. |
 | GET | `/proveedores/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_PROVEEDOR`. |
