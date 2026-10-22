@@ -15,6 +15,8 @@ import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
 import { ChatPage } from '@/features/chat/ChatPage';
 import { AdminDisputasPage, DisputasPage } from '@/features/disputas/DisputasPage';
+import { AdminLiquidacionesPage } from '@/features/liquidaciones/AdminLiquidacionesPage';
+import { ProveedorLiquidacionesPage } from '@/features/liquidaciones/ProveedorLiquidacionesPage';
 import { PagoPage } from '@/features/pagos/PagoPage';
 import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
@@ -135,6 +137,14 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: 'proveedor/liquidaciones',
+        element: (
+          <RequireRole roles={['PROVEEDOR', 'OPERADOR']}>
+            <ProveedorLiquidacionesPage />
+          </RequireRole>
+        ),
+      },
+      {
         path: 'proveedor/vehiculos/nuevo',
         element: (
           <RequireRole roles={['PROVEEDOR', 'OPERADOR', 'ADMIN']}>
@@ -187,6 +197,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['ADMIN']}>
             <AdminDisputasPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/liquidaciones',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminLiquidacionesPage />
           </RequireRole>
         ),
       },

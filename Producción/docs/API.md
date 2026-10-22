@@ -115,10 +115,10 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/liquidaciones` | ADMIN | `u_sp_GenerarLiquidacion` |
-| GET | `/liquidaciones?proveedor=` | ROL(PROVEEDOR)/ADMIN | `LiquidacionProveedor` |
-| POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` |
-| POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` |
+| POST | `/liquidaciones` | ADMIN | `u_sp_GenerarLiquidacion`. Body `{ID_proveedor, periodo_inicio, periodo_fin}`. Idempotente por periodo. |
+| GET | `/liquidaciones?proveedor=&estado=&page=&pageSize=` | ROL(PROVEEDOR)/ADMIN | Proveedor ve solo las propias; ADMIN todas. |
+| POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` (`CALCULADA → APROBADA`). |
+| POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` (`APROBADA → PAGADA`). |
 | GET | `/reportes/liquidaciones` | ADMIN | `u_sp_ReporteLiquidaciones` |
 | POST | `/disputas` | AUTH parte del arriendo | `u_sp_CrearDisputa`. Body `{ID_arriendo, tipo_disputa, descripcion, monto_disputado?}`. Solo arriendo `FINALIZADO`; una disputa abierta por autor. |
 | GET | `/disputas?scope=&estado=&arriendo=&page=&pageSize=` | AUTH | `Disputa` + arriendo/cliente/proveedor. Scope cliente/proveedor; ADMIN `todos`. |

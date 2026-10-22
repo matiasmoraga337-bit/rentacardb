@@ -741,6 +741,63 @@ export const swaggerSpec = {
         responses: { '200': { description: 'Ingresos por mes' } },
       },
     },
+    '/liquidaciones': {
+      get: {
+        summary: 'Listar liquidaciones segun rol',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'proveedor', in: 'query', schema: { type: 'integer' } },
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['CALCULADA', 'APROBADA', 'PAGADA', 'ANULADA'] } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Liquidaciones paginadas' } },
+      },
+      post: {
+        summary: 'Generar una liquidacion por periodo (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_proveedor', 'periodo_inicio', 'periodo_fin'],
+                properties: {
+                  ID_proveedor: { type: 'integer' },
+                  periodo_inicio: { type: 'string', format: 'date' },
+                  periodo_fin: { type: 'string', format: 'date' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Liquidacion CALCULADA' },
+          '409': { description: 'Periodo solapado' },
+        },
+      },
+    },
+    '/liquidaciones/{id}/aprobar': {
+      post: {
+        summary: 'Aprobar una liquidacion (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Liquidacion APROBADA' }, '409': { description: 'No esta CALCULADA' } },
+      },
+    },
+    '/liquidaciones/{id}/pagar': {
+      post: {
+        summary: 'Marcar una liquidacion como pagada (ADMIN)',
+        tags: ['Liquidaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Liquidacion PAGADA' }, '409': { description: 'No esta APROBADA' } },
+      },
+    },
     '/admin/auditoria': {
       get: {
         summary: 'Listar eventos de auditoria (ADMIN)',

@@ -69,6 +69,7 @@ Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S
 - Paneles por rol: [`docs/PANELES.md`](docs/PANELES.md).
 - Cargos extra y multas: [`docs/CARGOS-MULTAS.md`](docs/CARGOS-MULTAS.md).
 - Disputas: [`docs/DISPUTAS.md`](docs/DISPUTAS.md).
+- Liquidaciones: [`docs/LIQUIDACIONES.md`](docs/LIQUIDACIONES.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 

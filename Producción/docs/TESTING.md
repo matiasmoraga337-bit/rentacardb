@@ -134,3 +134,11 @@ npm run smoke:s3
 | BD | `sql/tests/09_disputas.sql` | Apertura, duplicado, autor ajeno, revision, resolucion y cierre (6 casos). |
 | Backend (API) | `Producción/backend/tests/disputas.test.ts` | Auth, validacion, filtros y rol ADMIN. |
 | Frontend | `/disputas`, `/admin/disputas`, `DisputaForm` | Listado por rol, apertura y resolucion. |
+
+## 13) Sprint S4 — Liquidaciones
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/10_liquidaciones.sql` | Generacion, idempotencia, solapamiento, aprobacion y pago (7 casos). |
+| Backend (API) | `Producción/backend/tests/liquidaciones.test.ts` | Auth, roles y validacion de periodo/filtros. |
+| UI | `/admin/liquidaciones`, `/proveedor/liquidaciones` | Generacion, aprobacion, pago y consulta. |
