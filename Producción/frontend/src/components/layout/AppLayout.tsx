@@ -58,6 +58,9 @@ export function AppLayout() {
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil
             </Link>
+            <Link to="/chat" className="text-sm text-slate-600 hover:text-brand">
+              Chat
+            </Link>
             <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="h-4 w-4" />

@@ -82,3 +82,16 @@ npm run smoke:s2
 cd Producción/backend
 npm run smoke:s3
 ```
+
+## 8) Sprint S3 — Chat
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/07_chat.sql` | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre (10 casos). |
+| Backend (API) | `Producción/backend/tests/chat.test.ts` | Autenticación, roles y validación de mensajes. |
+| Smoke e2e | `Producción/backend/scripts/smoke-chat.ts` | Cliente abre chat, proveedor responde, lectura y cierre. |
+
+```powershell
+cd Producción/backend
+npm run smoke:chat
+```

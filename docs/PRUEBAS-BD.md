@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **121 PASS / 0 FAIL**
+- **Resultado global:** **131 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -20,6 +20,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/04_flows.sql` | 12 | Pagos, WebPay, arriendos, multas, chat (Unicode), liquidaciones/outbox |
 | `sql/tests/05_reservas_pagos.sql` | 30 | Reserva, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración (cursor) y vista |
 | `sql/tests/06_arriendos.sql` | 22 | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores |
+| `sql/tests/07_chat.sql` | 10 | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre |
 
 ## 2. Resultados por categoría
 
@@ -97,6 +98,14 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Reseña tras finalizar y duplicado rechazado (`53017`).
 - Devolución duplicada rechazada (`53009`).
 - Inicio de arriendo sin licencia rechazado (`53014`).
+
+### S3 — Chat (10/10)
+- Crear conversación activa y reutilizarla si ya existe.
+- Enviar mensaje Unicode (Ñ, áéíóú).
+- Actualizar preview del último mensaje.
+- Rechazar marcado de leídos y cierre por usuario ajeno (`60096`/`60094`).
+- Cerrar conversación y rechazar mensajes posteriores (`60091`).
+- Crear una nueva conversación activa tras cerrar la anterior.
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).

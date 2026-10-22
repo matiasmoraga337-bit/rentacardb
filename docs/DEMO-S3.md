@@ -50,7 +50,22 @@ El seed crea:
 10. Proveedor registra un daño sobre la inspección `DEVOLUCION`.
 11. Cliente y proveedor ven el detalle final: inspecciones, daños, cargos y contrato.
 
-## 3. Casos límite
+## 4. Chat
+
+1. Cliente abre el detalle de un vehículo y pulsa **Contactar proveedor**.
+2. Se abre `/chat/:id`; escribe un mensaje.
+3. Proveedor entra a **Chat**, ve el mensaje no leído y responde.
+4. Cliente ve la respuesta por polling y puede cerrar la conversación.
+
+Smoke:
+
+```powershell
+cd Producción/backend
+$env:API_URL='http://localhost:3000/api'
+npm run smoke:chat
+```
+
+## 5. Casos límite
 
 | Caso | Resultado |
 |---|---|
@@ -77,7 +92,7 @@ El script hace login cliente/proveedor, crea reserva con política de km, paga, 
 
 ## 5. Pendiente para cerrar H3
 
-- Chat (E12).
+- Chat (E12): implementado en `/chat` y botón **Contactar proveedor**.
 - Reseñas visibles en el detalle público (E13).
 - Paneles con widgets de alquileres (E14).
 - Fotos de inspección y cargos extra manuales (S4).

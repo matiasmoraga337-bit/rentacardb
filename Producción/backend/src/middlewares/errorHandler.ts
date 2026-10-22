@@ -131,6 +131,7 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   60091: { status: 404, code: 'CONVERSACION_NO_ENCONTRADA' },
   60092: { status: 403, code: 'FORBIDDEN' },
   60093: { status: 400, code: 'MENSAJE_PADRE_INVALIDO' },
+  60094: { status: 403, code: 'FORBIDDEN' },
   60095: { status: 404, code: 'USUARIO_NO_ENCONTRADO' },
   60096: { status: 403, code: 'FORBIDDEN' },
   60100: { status: 403, code: 'FORBIDDEN' },

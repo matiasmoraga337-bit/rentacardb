@@ -334,6 +334,69 @@ export const swaggerSpec = {
         responses: { '201': { description: 'Contrato aceptado' } },
       },
     },
+    '/conversaciones': {
+      get: {
+        summary: 'Listar conversaciones del usuario autenticado',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Conversaciones con no leidos y ultimo mensaje' } },
+      },
+      post: {
+        summary: 'Crear o reutilizar una conversacion (CLIENTE)',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_proveedor'],
+                properties: {
+                  ID_proveedor: { type: 'integer' },
+                  ID_vehiculo: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Conversacion creada' }, '200': { description: 'Conversacion existente reutilizada' } },
+      },
+    },
+    '/conversaciones/{id}/mensajes': {
+      get: {
+        summary: 'Listar mensajes de una conversacion',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Mensajes' }, '403': { description: 'Sin acceso' } },
+      },
+      post: {
+        summary: 'Enviar un mensaje de texto',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Mensaje enviado' }, '409': { description: 'Conversacion cerrada' } },
+      },
+    },
+    '/conversaciones/{id}/leidos': {
+      post: {
+        summary: 'Marcar mensajes como leidos',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Cantidad de mensajes marcados' } },
+      },
+    },
+    '/conversaciones/{id}/cerrar': {
+      post: {
+        summary: 'Cerrar una conversacion',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Conversacion cerrada' } },
+      },
+    },
     '/pagos': {
       get: {
         summary: 'Listar pagos de una reserva',
