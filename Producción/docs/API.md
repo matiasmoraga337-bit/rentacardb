@@ -133,6 +133,11 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_EnviarMensaje` (solo TEXTO en S3) |
 | POST | `/conversaciones/:id/leidos` | AUTH participante | `u_sp_MarcarMensajesLeidos` |
 | POST | `/conversaciones/:id/cerrar` | AUTH participante | `u_sp_CerrarConversacion` |
+| GET | `/notificaciones?estado=&page=&pageSize=` | AUTH | `Notificacion` del usuario. |
+| GET | `/notificaciones/no-leidas` | AUTH | Contador de no leidas. |
+| POST | `/notificaciones/:id/leer` | AUTH dueño | `u_sp_MarcarNotificacionLeida`. |
+| GET | `/admin/outbox?estado=&page=&pageSize=` | ADMIN | Monitor de `OutboxEvento`. |
+| POST | `/admin/outbox/:id/reintentar` | ADMIN | `u_sp_ReintentarOutboxError`. |
 
 ## Administración y catálogos
 

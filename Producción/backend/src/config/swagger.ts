@@ -450,6 +450,58 @@ export const swaggerSpec = {
         },
       },
     },
+    '/notificaciones': {
+      get: {
+        summary: 'Listar notificaciones del usuario',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'estado', in: 'query', schema: { type: 'string', enum: ['PENDIENTE', 'ENVIADA', 'FALLIDA', 'LEIDA'] } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Notificaciones paginadas' } },
+      },
+    },
+    '/notificaciones/no-leidas': {
+      get: {
+        summary: 'Contar notificaciones no leidas',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: '{ total }' } },
+      },
+    },
+    '/notificaciones/{id}/leer': {
+      post: {
+        summary: 'Marcar una notificacion como leida',
+        tags: ['Notificaciones'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Notificacion leida' }, '404': { description: 'No encontrada o ya leida' } },
+      },
+    },
+    '/admin/outbox': {
+      get: {
+        summary: 'Listar eventos outbox (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'estado', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Eventos paginados' } },
+      },
+    },
+    '/admin/outbox/{id}/reintentar': {
+      post: {
+        summary: 'Reintentar un evento outbox en ERROR (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Evento en PENDIENTE' }, '409': { description: 'No reintentable' } },
+      },
+    },
     '/disputas': {
       get: {
         summary: 'Listar disputas segun rol',

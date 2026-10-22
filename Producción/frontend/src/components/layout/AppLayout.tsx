@@ -2,6 +2,7 @@ import { LogOut } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/AuthContext';
+import { NotificationBell } from '@/features/notificaciones/NotificationBell';
 
 export function AppLayout() {
   const { usuario, logout } = useAuth();
@@ -68,11 +69,15 @@ export function AppLayout() {
                 <Link to="/admin/liquidaciones" className="text-sm text-slate-600 hover:text-brand">
                   Liquidaciones
                 </Link>
+                <Link to="/admin/outbox" className="text-sm text-slate-600 hover:text-brand">
+                  Outbox
+                </Link>
               </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil
             </Link>
+            <NotificationBell />
             <Link to="/chat" className="text-sm text-slate-600 hover:text-brand">
               Chat
             </Link>

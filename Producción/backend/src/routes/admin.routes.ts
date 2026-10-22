@@ -14,6 +14,20 @@ router.get(
   asyncHandler(adminController.auditoria),
 );
 
+router.get(
+  '/outbox',
+  authenticate,
+  authorize('ADMIN'),
+  asyncHandler(adminController.outbox),
+);
+
+router.post(
+  '/outbox/:id/reintentar',
+  authenticate,
+  authorize('ADMIN'),
+  asyncHandler(adminController.reintentarOutbox),
+);
+
 router.post(
   '/reservas/expirar',
   authenticate,

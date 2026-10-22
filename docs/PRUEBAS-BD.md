@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **151 PASS / 0 FAIL**
+- **Resultado global:** **159 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -24,11 +24,12 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/08_cargos_multas.sql` | 7 | Cargo extra/multa sobre arriendo finalizado, movimiento financiero y errores de monto/arriendo |
 | `sql/tests/09_disputas.sql` | 6 | Apertura, duplicado, autor ajeno, EN_REVISION, resolucion y cierre |
 | `sql/tests/10_liquidaciones.sql` | 7 | Generacion, idempotencia, solapamiento, aprobacion y pago |
+| `sql/tests/11_notificaciones_outbox.sql` | 8 | Notificacion leida, permisos y ciclo outbox (procesado/reintento) |
 
 ## 2. Resultados por categoría
 
 ### Esquema (12/12)
-- 83 tablas, 71 SPs, 6 vistas, 3 funciones, 4 triggers.
+- 83 tablas, 72 SPs, 6 vistas, 3 funciones, 4 triggers.
 - 0 procedimientos `sp_` de usuario y 0 con doble prefijo `u_u_`.
 - Triggers, CHECK y FK habilitados; compat 160; `u_sp_ValidarIntegridad` sin errores.
 
@@ -131,6 +132,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Periodo solapado rechazado (`70504`).
 - Aprobar → `APROBADA`; aprobar dos veces rechazado (`70502`).
 - Pagar → `PAGADA` con fecha; pagar dos veces rechazado (`70503`).
+
+### S4 — Notificaciones y outbox (8/8)
+- Crear notificacion `PUSH` y marcarla `LEIDA` con fecha.
+- Notificacion de otro usuario o ya leida rechazada (`60200`).
+- Publicar evento, bloquearlo con `u_sp_ObtenerOutboxPendiente` y marcarlo `PROCESADO`.
+- Reprocesar el mismo evento rechazado (`70311`).
+- Reintentar un evento ya procesado rechazado (`70312`).
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).

@@ -142,3 +142,12 @@ npm run smoke:s3
 | BD | `sql/tests/10_liquidaciones.sql` | Generacion, idempotencia, solapamiento, aprobacion y pago (7 casos). |
 | Backend (API) | `Producción/backend/tests/liquidaciones.test.ts` | Auth, roles y validacion de periodo/filtros. |
 | UI | `/admin/liquidaciones`, `/proveedor/liquidaciones` | Generacion, aprobacion, pago y consulta. |
+
+## 14) Sprint S4 — Notificaciones y outbox
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/11_notificaciones_outbox.sql` | Notificacion LEIDA, permisos y ciclo del outbox (8 casos). |
+| Backend (API) | `Producción/backend/tests/notificaciones.test.ts` | Auth, filtros, lectura y outbox admin. |
+| Frontend | `Producción/frontend/src/features/notificaciones/__tests__/NotificationBell.test.tsx` | Contador de no leidas. |
+| Worker | `Producción/backend/src/jobs/outbox.job.ts` | Procesa pendientes, envia correo y marca resultado. |
