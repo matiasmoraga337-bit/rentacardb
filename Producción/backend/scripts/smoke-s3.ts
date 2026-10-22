@@ -1,5 +1,5 @@
 /**
- * Smoke S3 (E9) contra una API en ejecucion.
+ * Smoke S3 (E9 + E13) contra una API en ejecucion.
  * Uso: npm run smoke:s3   (requiere API + BD con `npm run seed`)
  */
 import assert from 'node:assert/strict';
@@ -75,7 +75,7 @@ interface Arriendo {
 }
 
 async function main(): Promise<void> {
-  console.log(`Smoke S3/E9 contra ${API_URL}`);
+  console.log(`Smoke S3/E9+E13 contra ${API_URL}`);
 
   const clienteLogin = await api<{ token: string }>('/auth/login', {
     method: 'POST',
@@ -95,6 +95,7 @@ async function main(): Promise<void> {
   assert.ok(vehiculo, 'No hay vehiculos disponibles. Ejecuta npm run seed.');
   const detalleVehiculo = await api<{
     kilometraje: number;
+    idProveedor: number;
     idSedeActual: number | null;
     sedes: { id: number; permiteEntrega: boolean; permiteDevolucion: boolean }[];
   }>(`/vehiculos/${vehiculo.ID_vehiculo}`);
@@ -105,6 +106,12 @@ async function main(): Promise<void> {
     )?.id ??
     detalleVehiculo.sedes.find((s) => s.permiteEntrega && s.permiteDevolucion)?.id;
   assert.ok(idSede, 'El vehiculo demo no tiene una sede habilitada para retiro y devolucion.');
+  const resenasVehiculoAntes = await api<{ total: number }>(
+    `/vehiculos/${vehiculo.ID_vehiculo}/resenas`,
+  );
+  const resenasProveedorAntes = await api<{ total: number }>(
+    `/proveedores/${detalleVehiculo.idProveedor}/resenas`,
+  );
   console.log('PASS busqueda y vehiculo');
 
   const key = `smoke-s3-${crypto.randomUUID()}`;
@@ -226,10 +233,68 @@ async function main(): Promise<void> {
   assert.ok(detalleFinal.danos.length > 0);
   console.log('PASS dano de devolucion');
 
-  console.log('SMOKE S3/E9 OK');
+  const resenaVehiculo = await api<{ id: number; tipo: string; calificacion: number }>(
+    '/resenas',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        ID_arriendo: arriendoDevuelto.id,
+        tipo_resena: 'CLIENTE_A_VEHICULO',
+        calificacion: 5,
+        comentario: 'Excelente vehiculo (smoke)',
+      }),
+    },
+    clienteLogin.token,
+  );
+  assert.equal(resenaVehiculo.tipo, 'CLIENTE_A_VEHICULO');
+
+  await api(
+    '/resenas',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        ID_arriendo: arriendoDevuelto.id,
+        tipo_resena: 'CLIENTE_A_PROVEEDOR',
+        calificacion: 5,
+        comentario: 'Excelente proveedor (smoke)',
+      }),
+    },
+    clienteLogin.token,
+  );
+
+  const resenaCliente = await api<{ tipo: string }>(
+    '/resenas',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        ID_arriendo: arriendoDevuelto.id,
+        tipo_resena: 'PROVEEDOR_A_CLIENTE',
+        calificacion: 4,
+        comentario: 'Cliente puntual (smoke)',
+      }),
+    },
+    proveedorLogin.token,
+  );
+  assert.equal(resenaCliente.tipo, 'PROVEEDOR_A_CLIENTE');
+
+  const resenasVehiculo = await api<{
+    total: number;
+    promedio: number | null;
+    resenas: { calificacion: number; autor: string }[];
+  }>(`/vehiculos/${vehiculo.ID_vehiculo}/resenas`);
+  assert.equal(resenasVehiculo.total, resenasVehiculoAntes.total + 1);
+  assert.equal(resenasVehiculo.resenas[0]?.calificacion, 5);
+
+  const resenasProveedor = await api<{ total: number; promedio: number | null }>(
+    `/proveedores/${detalleVehiculo.idProveedor}/resenas`,
+  );
+  assert.equal(resenasProveedor.total, resenasProveedorAntes.total + 1);
+  console.log('PASS resenas cliente/proveedor y listado publico');
+
+  console.log('SMOKE S3/E9+E13 OK');
 }
 
 main().catch((err: unknown) => {
-  console.error('SMOKE S3/E9 FAIL:', (err as Error).message);
+  console.error('SMOKE S3/E9+E13 FAIL:', (err as Error).message);
   process.exit(1);
 });

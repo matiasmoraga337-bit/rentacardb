@@ -95,3 +95,17 @@ npm run smoke:s3
 cd Producción/backend
 npm run smoke:chat
 ```
+
+## 9) Sprint S3 — Resenas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/06_arriendos.sql` | Creacion de resena tras finalizar, rechazo antes de finalizar y duplicado. |
+| Backend (API) | `Producción/backend/tests/resenas.test.ts` | Autenticacion, validacion de calificacion, tipo, comentario y listado publico. |
+| Frontend | `Producción/frontend/src/features/resenas/__tests__/ResenaForm.test.tsx` | Seleccion de estrellas y envio de la resena. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Resenas cliente→vehiculo/proveedor, proveedor→cliente y listado publico. |
+
+```powershell
+cd Producción/backend
+npm run smoke:s3
+```

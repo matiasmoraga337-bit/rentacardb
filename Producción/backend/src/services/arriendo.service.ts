@@ -41,7 +41,7 @@ async function elegirScope(
   throw new AppError(403, 'FORBIDDEN', 'El usuario no tiene acceso a arriendos.');
 }
 
-async function assertAccesoArriendo(
+export async function assertAccesoArriendo(
   idArriendo: number,
   idUsuario: number,
   roles: string[],

@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/AuthContext';
 import { formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
+import { ResenaForm } from '@/features/resenas/ResenaForm';
+import type { TipoResena } from '@/features/resenas/api';
 import { fetchArriendo } from './api';
 import { ConductorForm } from './ConductorForm';
 import { ContratoPanel } from './ContratoPanel';
@@ -33,7 +35,19 @@ export function ArriendoDetallePage() {
     usuario?.roles.includes('PROVEEDOR') ||
     usuario?.roles.includes('OPERADOR') ||
     usuario?.roles.includes('ADMIN');
+  const esProveedorOperador =
+    usuario?.roles.includes('PROVEEDOR') || usuario?.roles.includes('OPERADOR');
   const inspeccionDevolucion = arriendo.inspecciones.find((i) => i.tipo === 'DEVOLUCION');
+  const tiposDisponibles: TipoResena[] = [
+    ...(esCliente
+      ? (['CLIENTE_A_VEHICULO', 'CLIENTE_A_PROVEEDOR'] as TipoResena[])
+      : []),
+    ...(esProveedorOperador ? (['PROVEEDOR_A_CLIENTE'] as TipoResena[]) : []),
+  ];
+  const tiposRegistrados = new Set(
+    arriendo.resenas.filter((resena) => resena.autorId === usuario?.id).map((resena) => resena.tipo),
+  );
+  const tiposPendientes = tiposDisponibles.filter((tipo) => !tiposRegistrados.has(tipo));
 
   return (
     <div className="space-y-6">
@@ -249,6 +263,25 @@ export function ArriendoDetallePage() {
           ))}
         </CardContent>
       </Card>
+
+      {arriendo.estado === 'FINALIZADO' && tiposDisponibles.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dejar resena</CardTitle>
+            <CardDescription>
+              La resena queda asociada al arriendo y solo se puede registrar una vez por tipo.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {tiposPendientes.length === 0 && (
+              <p className="text-sm text-slate-500">Ya registraste tus resenas para este arriendo.</p>
+            )}
+            {tiposPendientes.map((tipo) => (
+              <ResenaForm key={tipo} idArriendo={arriendo.id} tipo={tipo} />
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

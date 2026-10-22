@@ -123,6 +123,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E13.1 | Crear reseña tras arriendo | 3 | `u_sp_CrearResena`, UI |
 | E13.2 | Ver reseñas de vehículo/proveedor | 2 | `Resena`, UI |
 
+> **Estado S3-E13:** E13.1 y E13.2 implementadas. Cliente y proveedor califican
+> el arriendo `FINALIZADO` desde el detalle; el vehículo público muestra promedio
+> y reseñas. Ver [`../../docs/RESENAS.md`](../../docs/RESENAS.md).
+
 ## E14 — Paneles `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

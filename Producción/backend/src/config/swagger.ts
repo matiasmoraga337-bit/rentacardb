@@ -334,6 +334,60 @@ export const swaggerSpec = {
         responses: { '201': { description: 'Contrato aceptado' } },
       },
     },
+    '/resenas': {
+      post: {
+        summary: 'Crear una resena de un arriendo finalizado',
+        tags: ['Resenas'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_arriendo', 'tipo_resena', 'calificacion'],
+                properties: {
+                  ID_arriendo: { type: 'integer' },
+                  tipo_resena: {
+                    type: 'string',
+                    enum: ['CLIENTE_A_PROVEEDOR', 'CLIENTE_A_VEHICULO', 'PROVEEDOR_A_CLIENTE'],
+                  },
+                  calificacion: { type: 'integer', minimum: 1, maximum: 5 },
+                  comentario: { type: 'string', maxLength: 1000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Resena registrada' },
+          '403': { description: 'Autor no corresponde al arriendo' },
+          '409': { description: 'Arriendo no finalizado o resena duplicada' },
+        },
+      },
+    },
+    '/vehiculos/{id}/resenas': {
+      get: {
+        summary: 'Listar resenas publicas de un vehiculo',
+        tags: ['Resenas'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          '200': { description: 'Resenas, total y promedio' },
+          '404': { description: 'Vehiculo no encontrado' },
+        },
+      },
+    },
+    '/proveedores/{id}/resenas': {
+      get: {
+        summary: 'Listar resenas publicas de un proveedor',
+        tags: ['Resenas'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          '200': { description: 'Resenas, total y promedio' },
+          '404': { description: 'Proveedor no encontrado' },
+        },
+      },
+    },
     '/conversaciones': {
       get: {
         summary: 'Listar conversaciones del usuario autenticado',
