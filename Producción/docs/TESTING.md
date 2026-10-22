@@ -151,3 +151,11 @@ npm run smoke:s3
 | Backend (API) | `Producción/backend/tests/notificaciones.test.ts` | Auth, filtros, lectura y outbox admin. |
 | Frontend | `Producción/frontend/src/features/notificaciones/__tests__/NotificationBell.test.tsx` | Contador de no leidas. |
 | Worker | `Producción/backend/src/jobs/outbox.job.ts` | Procesa pendientes, envia correo y marca resultado. |
+
+## 15) Sprint S4 — Fotos y adjuntos
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/12_adjuntos_fotos.sql` | Foto de inspeccion, adjunto de chat, permisos y tamano (6 casos). |
+| Backend | `Producción/backend/tests/arriendos.test.ts`, `chat.test.ts` | Validacion base de endpoints. |
+| UI | `InspeccionFotos`, formulario de adjuntos en chat | Subida y visualizacion. |

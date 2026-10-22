@@ -57,6 +57,15 @@ export interface ArriendoAcceso {
   combustibleInicial: number;
 }
 
+export interface InspeccionFotoRow {
+  id: number;
+  inspeccionId: number;
+  url: string;
+  thumbUrl: string;
+  angulo: string | null;
+  fecha: string;
+}
+
 export interface InspeccionRow {
   id: number;
   tipo: string;
@@ -67,6 +76,7 @@ export interface InspeccionRow {
   firmaCliente: boolean;
   fecha: string;
   idOperador: number | null;
+  fotos?: InspeccionFotoRow[];
 }
 
 export interface DanoRow {
@@ -468,6 +478,45 @@ export async function listarInspecciones(idArriendo: number): Promise<Inspeccion
        ORDER BY fecha_inspeccion, ID_inspeccion_arriendo`,
     );
   return result.recordset;
+}
+
+export async function listarFotosInspecciones(
+  idArriendo: number,
+): Promise<InspeccionFotoRow[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idArriendo)
+    .query<InspeccionFotoRow>(
+      `SELECT f.ID_inspeccion_foto AS id,
+              f.ID_inspeccion_arriendo_inspeccion_foto AS inspeccionId,
+              f.url_foto_inspeccion AS url,
+              f.url_foto_inspeccion AS thumbUrl,
+              f.angulo_foto_inspeccion AS angulo,
+              f.fecha_subida_foto_inspeccion AS fecha
+       FROM dbo.InspeccionFoto f
+       INNER JOIN dbo.InspeccionArriendo i
+         ON i.ID_inspeccion_arriendo = f.ID_inspeccion_arriendo_inspeccion_foto
+       WHERE i.ID_arriendo_inspeccion_arriendo = @id
+         AND f.activa_foto_inspeccion = 1
+       ORDER BY f.fecha_subida_foto_inspeccion, f.ID_inspeccion_foto`,
+    );
+  return result.recordset;
+}
+
+export async function registrarFotoInspeccion(params: {
+  ID_inspeccion: number;
+  url_foto: string;
+  angulo?: string | null;
+}): Promise<unknown | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_inspeccion', sql.Int, params.ID_inspeccion)
+    .input('url_foto', sql.VarChar(500), params.url_foto)
+    .input('angulo', sql.VarChar(30), params.angulo ?? null)
+    .execute('u_sp_RegistrarInspeccionFoto');
+  return result.recordset[0] ?? null;
 }
 
 export async function listarDanos(idArriendo: number): Promise<DanoRow[]> {

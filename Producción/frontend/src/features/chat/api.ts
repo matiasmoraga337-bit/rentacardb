@@ -14,6 +14,16 @@ export interface Conversacion {
   fueCreada?: boolean;
 }
 
+export interface Adjunto {
+  id: number;
+  mensajeId: number;
+  url: string;
+  nombre: string;
+  tipoMime: string;
+  tamano: number;
+  fecha: string;
+}
+
 export interface Mensaje {
   id: number;
   conversacionId: number;
@@ -21,6 +31,7 @@ export interface Mensaje {
   contenido: string;
   leido: boolean;
   fecha: string;
+  adjuntos: Adjunto[];
 }
 
 export const fetchConversaciones = (): Promise<Conversacion[]> =>
@@ -51,6 +62,19 @@ export const enviarMensaje = (
       ID_mensaje_padre: idMensajePadre,
     }),
   });
+
+export const subirAdjuntos = (
+  id: number,
+  idMensaje: number,
+  files: FileList,
+): Promise<unknown> => {
+  const form = new FormData();
+  Array.from(files).forEach((file) => form.append('archivos', file));
+  return apiFetch(`/conversaciones/${id}/mensajes/${idMensaje}/adjuntos`, {
+    method: 'POST',
+    body: form,
+  });
+};
 
 export const marcarLeidos = (id: number): Promise<{ mensajesMarcados: number }> =>
   apiFetch<{ mensajesMarcados: number }>(`/conversaciones/${id}/leidos`, {

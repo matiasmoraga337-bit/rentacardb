@@ -3,7 +3,7 @@
 Sistema web de reserva y arriendo de vehículos con múltiples proveedores y sedes por
 región de Chile. Proyecto universitario de Base de Datos + aplicación web full‑stack.
 
-- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 113 FK, 72 SP, 3 funciones, 6 vistas).
+- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 113 FK, 74 SP, 3 funciones, 6 vistas).
 - **API:** Node.js + Express + TypeScript · acceso a datos con `mssql` (llamando a los SPs).
 - **Web:** React + Vite + TypeScript + Tailwind CSS + shadcn/ui.
 - **Despliegue:** Docker Compose (local). Render opcional para la demo.
@@ -71,6 +71,7 @@ Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S
 - Disputas: [`docs/DISPUTAS.md`](docs/DISPUTAS.md).
 - Liquidaciones: [`docs/LIQUIDACIONES.md`](docs/LIQUIDACIONES.md).
 - Notificaciones y outbox: [`docs/NOTIFICACIONES.md`](docs/NOTIFICACIONES.md).
+- Adjuntos y fotos: [`docs/ADJUNTOS-FOTOS.md`](docs/ADJUNTOS-FOTOS.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 

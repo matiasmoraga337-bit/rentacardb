@@ -103,6 +103,7 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/arriendos/:id/inspecciones/:inspeccionId/danos` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarDanoInspeccion` | Solo inspección `DEVOLUCION`. |
 | POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_CrearCargoExtra` | Solo arriendo `FINALIZADO`; body `{concepto, monto, tipo_cargo?, observaciones?}`. Crea movimiento `CARGO_EXTRA`. |
 | POST | `/arriendos/:id/multas` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarMulta` | Solo arriendo `FINALIZADO`; body `{fecha_multa, descripcion, monto, organismo?, numero_parte?}`. Crea movimiento `MULTA`. |
+| POST | `/arriendos/:id/inspecciones/:inspeccionId/fotos` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarInspeccionFoto` | `multipart/form-data` campo `fotos[]` (hasta 8). |
 | POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `u_sp_RegistrarConductorAdicional` | Body `{rut, ID_licencia_conducir?}`. |
 | POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `u_sp_CrearAceptacionContrato` | Body `{aceptado:true}`; guarda hash SHA-256. |
 | GET | `/arriendos/:id/contrato` | AUTH dueño/proveedor/admin | `AceptacionContratoArriendo` + datos de reserva | Devuelve texto, hash y aceptación vigente. |
@@ -133,6 +134,7 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_EnviarMensaje` (solo TEXTO en S3) |
 | POST | `/conversaciones/:id/leidos` | AUTH participante | `u_sp_MarcarMensajesLeidos` |
 | POST | `/conversaciones/:id/cerrar` | AUTH participante | `u_sp_CerrarConversacion` |
+| POST | `/conversaciones/:id/mensajes/:mensajeId/adjuntos` | AUTH participante | `u_sp_RegistrarMensajeAdjunto` | `multipart/form-data` campo `archivos[]` (imagen/PDF). |
 | GET | `/notificaciones?estado=&page=&pageSize=` | AUTH | `Notificacion` del usuario. |
 | GET | `/notificaciones/no-leidas` | AUTH | Contador de no leidas. |
 | POST | `/notificaciones/:id/leer` | AUTH dueño | `u_sp_MarcarNotificacionLeida`. |

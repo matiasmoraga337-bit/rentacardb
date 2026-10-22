@@ -14,6 +14,7 @@ import { ContratoPanel } from './ContratoPanel';
 import { DanosForm } from './DanosForm';
 import { DevolucionForm } from './DevolucionForm';
 import { EstadoArriendoBadge } from './EstadoArriendoBadge';
+import { InspeccionFotos } from './InspeccionFotos';
 import { MultaForm } from './MultaForm';
 
 export function ArriendoDetallePage() {
@@ -162,6 +163,7 @@ export function ArriendoDetallePage() {
               {inspeccion.observaciones && (
                 <p className="text-slate-600">{inspeccion.observaciones}</p>
               )}
+              {esOperador && <InspeccionFotos idArriendo={arriendo.id} inspeccion={inspeccion} />}
             </div>
           ))}
         </CardContent>

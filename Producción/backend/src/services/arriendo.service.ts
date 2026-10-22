@@ -12,6 +12,7 @@ import {
 import { AppError } from '../utils/AppError';
 import { generarContratoTexto, hashContrato } from '../utils/contract';
 import { esFechaValida } from '../utils/dates';
+import { guardarFotoInspeccion } from '../utils/uploads';
 import { assertAccesoReserva } from './reserva.service';
 
 const esAdmin = (roles: string[]): boolean => roles.includes('ADMIN');
@@ -139,16 +140,31 @@ export async function obtenerArriendo(
   if (!row) {
     throw new AppError(404, 'ARRIENDO_NO_ENCONTRADO', 'Arriendo no encontrado.');
   }
-  const [inspecciones, danos, cargos, conductores, contrato, resenas, multas] = await Promise.all([
-    repo.listarInspecciones(idArriendo),
-    repo.listarDanos(idArriendo),
-    repo.listarCargos(idArriendo),
-    repo.listarConductores(idArriendo),
-    repo.obtenerContrato(idArriendo),
-    repo.listarResenas(idArriendo),
-    repo.listarMultas(idArriendo),
-  ]);
-  return { ...row, inspecciones, danos, cargos, conductores, contrato, resenas, multas };
+  const [inspecciones, fotos, danos, cargos, conductores, contrato, resenas, multas] =
+    await Promise.all([
+      repo.listarInspecciones(idArriendo),
+      repo.listarFotosInspecciones(idArriendo),
+      repo.listarDanos(idArriendo),
+      repo.listarCargos(idArriendo),
+      repo.listarConductores(idArriendo),
+      repo.obtenerContrato(idArriendo),
+      repo.listarResenas(idArriendo),
+      repo.listarMultas(idArriendo),
+    ]);
+  const inspeccionesConFotos = inspecciones.map((inspeccion) => ({
+    ...inspeccion,
+    fotos: fotos.filter((foto) => foto.inspeccionId === inspeccion.id),
+  }));
+  return {
+    ...row,
+    inspecciones: inspeccionesConFotos,
+    danos,
+    cargos,
+    conductores,
+    contrato,
+    resenas,
+    multas,
+  };
 }
 
 export async function iniciarArriendo(
@@ -251,6 +267,37 @@ export async function registrarDano(
     throw new AppError(500, 'DANO_NO_REGISTRADO', 'No se pudo registrar el dano.');
   }
   return dano;
+}
+
+export async function registrarFotoInspeccion(
+  idArriendo: number,
+  idInspeccion: number,
+  idUsuario: number,
+  roles: string[],
+  files: Express.Multer.File[],
+): Promise<unknown[]> {
+  const acceso = await assertAccesoArriendo(idArriendo, idUsuario, roles);
+  await assertOperador(acceso, idUsuario, roles);
+
+  const inspeccion = await repo.obtenerInspeccion(idInspeccion);
+  if (!inspeccion || inspeccion.idArriendo !== idArriendo) {
+    throw new AppError(404, 'INSPECCION_NO_ENCONTRADA', 'Inspeccion no encontrada.');
+  }
+  if (files.length === 0) {
+    throw new AppError(400, 'SIN_ARCHIVOS', 'No se recibieron imagenes.');
+  }
+
+  const creadas: unknown[] = [];
+  for (const file of files) {
+    const { url } = await guardarFotoInspeccion(idArriendo, idInspeccion, file.buffer);
+    creadas.push(
+      await repo.registrarFotoInspeccion({
+        ID_inspeccion: idInspeccion,
+        url_foto: url,
+      }),
+    );
+  }
+  return creadas;
 }
 
 export async function registrarCargoExtra(

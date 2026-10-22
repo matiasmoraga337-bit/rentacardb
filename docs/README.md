@@ -7,7 +7,7 @@ con múltiples sedes y dueños por región de Chile.
 - **Base de datos:** `RentaCarDB`
 - **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
 - Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
-- **Conteo:** 83 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 72 procedimientos almacenados · 3 funciones · 6 vistas.
+- **Conteo:** 83 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 74 procedimientos almacenados · 3 funciones · 6 vistas.
 
 ## Índice
 
@@ -29,10 +29,11 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`DISPUTAS.md`](DISPUTAS.md) | S4: apertura, listado y resolución de disputas. |
 | — | [`LIQUIDACIONES.md`](LIQUIDACIONES.md) | S4: generación, aprobación, pago y consulta de liquidaciones. |
 | — | [`NOTIFICACIONES.md`](NOTIFICACIONES.md) | S4: notificaciones in-app, correo y worker outbox. |
+| — | [`ADJUNTOS-FOTOS.md`](ADJUNTOS-FOTOS.md) | S4: fotos de inspeccion y adjuntos de chat. |
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (159 PASS). |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (165 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres
