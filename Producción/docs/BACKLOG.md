@@ -62,6 +62,9 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E6.3 | Favoritos | 3 | `FavoritoVehiculo`, UI |
 | E6.4 | Búsquedas guardadas | 3 | `BusquedaGuardada`, UI |
 
+> **Estado S4-E6.3/E6.4:** implementadas. Ver
+> [`../../docs/FAVORITOS-BUSQUEDAS.md`](../../docs/FAVORITOS-BUSQUEDAS.md).
+
 ## E7 — Reservas `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

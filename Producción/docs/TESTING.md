@@ -167,3 +167,11 @@ npm run smoke:s3
 | BD | `sql/tests/13_catalogos.sql` | CRUD simple, modelo, caracteristica, politica y errores (8 casos). |
 | Backend (API) | `Producción/backend/tests/catalogos.test.ts` | Auth, rol ADMIN, validacion y solo lectura. |
 | UI | `Producción/frontend/src/features/admin/AdminCatalogosPage.tsx` | Alta, edicion y desactivacion por catalogo. |
+
+## 17) Sprint S4 — Favoritos y busquedas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/14_favoritos_busquedas.sql` | Favoritos idempotentes, permisos, busquedas y soft delete (8 casos). |
+| Backend (API) | `Producción/backend/tests/favoritos.test.ts` | Auth, ids invalidos y formato de fechas. |
+| UI | `FavoritosPage`, `BusquedasPage`, `FavoritoButton`, `GuardarBusqueda` | Corazon, listado, guardar y aplicar busqueda. |

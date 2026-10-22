@@ -10,7 +10,7 @@ SELECT @n = COUNT(*) FROM sys.tables;
 INSERT #R VALUES ('Tablas = 83', '83', CASE WHEN @n = 83 THEN 'PASS' ELSE 'FAIL' END, CONCAT('tablas=', @n));
 
 SELECT @n = COUNT(*) FROM sys.procedures WHERE is_ms_shipped = 0;
-INSERT #R VALUES ('Procedimientos = 79', '79', CASE WHEN @n = 79 THEN 'PASS' ELSE 'FAIL' END, CONCAT('sps=', @n));
+INSERT #R VALUES ('Procedimientos = 83', '83', CASE WHEN @n = 83 THEN 'PASS' ELSE 'FAIL' END, CONCAT('sps=', @n));
 
 SELECT @n = COUNT(*) FROM sys.views WHERE is_ms_shipped = 0;
 INSERT #R VALUES ('Vistas = 6', '6', CASE WHEN @n = 6 THEN 'PASS' ELSE 'FAIL' END, CONCAT('vistas=', @n));

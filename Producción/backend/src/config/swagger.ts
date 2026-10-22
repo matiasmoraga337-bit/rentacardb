@@ -119,7 +119,53 @@ export const swaggerSpec = {
         },
       },
     },
-    '/reservas': {
+    '/favoritos': {
+      get: {
+        summary: 'Listar vehiculos favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Favoritos del usuario' } },
+      },
+    },
+    '/favoritos/{vehiculoId}': {
+      post: {
+        summary: 'Agregar un vehiculo a favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'vehiculoId', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Favorito agregado' } },
+      },
+      delete: {
+        summary: 'Quitar un vehiculo de favoritos',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'vehiculoId', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Favorito eliminado' } },
+      },
+    },
+    '/busquedas': {
+      get: {
+        summary: 'Listar busquedas guardadas',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Busquedas activas' } },
+      },
+      post: {
+        summary: 'Guardar una busqueda',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        responses: { '201': { description: 'Busqueda guardada' } },
+      },
+    },
+    '/busquedas/{id}': {
+      delete: {
+        summary: 'Eliminar una busqueda guardada',
+        tags: ['Favoritos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '204': { description: 'Busqueda eliminada' } },
+      },
+    },    '/reservas': {
       get: {
         summary: 'Listar reservas segun el rol y el scope solicitado',
         tags: ['Reservas'],

@@ -15,6 +15,8 @@ import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
 import { ChatPage } from '@/features/chat/ChatPage';
+import { BusquedasPage } from '@/features/favoritos/BusquedasPage';
+import { FavoritosPage } from '@/features/favoritos/FavoritosPage';
 import { AdminDisputasPage, DisputasPage } from '@/features/disputas/DisputasPage';
 import { AdminLiquidacionesPage } from '@/features/liquidaciones/AdminLiquidacionesPage';
 import { ProveedorLiquidacionesPage } from '@/features/liquidaciones/ProveedorLiquidacionesPage';
@@ -98,6 +100,8 @@ export const router = createBrowserRouter([
       { path: 'chat/:id', element: <ChatPage /> },
       { path: 'disputas', element: <DisputasPage /> },
       { path: 'notificaciones', element: <NotificacionesPage /> },
+      { path: 'favoritos', element: <FavoritosPage /> },
+      { path: 'busquedas', element: <BusquedasPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       {
         path: 'proveedor/panel',
