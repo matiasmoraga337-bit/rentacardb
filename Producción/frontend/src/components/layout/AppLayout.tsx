@@ -59,6 +59,9 @@ export function AppLayout() {
                 <Link to="/admin/auditoria" className="text-sm text-slate-600 hover:text-brand">
                   Auditoria
                 </Link>
+                <Link to="/admin/disputas" className="text-sm text-slate-600 hover:text-brand">
+                  Disputas
+                </Link>
               </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
@@ -67,6 +70,13 @@ export function AppLayout() {
             <Link to="/chat" className="text-sm text-slate-600 hover:text-brand">
               Chat
             </Link>
+            {(usuario?.roles.includes('CLIENTE') ||
+              usuario?.roles.includes('PROVEEDOR') ||
+              usuario?.roles.includes('OPERADOR')) && (
+              <Link to="/disputas" className="text-sm text-slate-600 hover:text-brand">
+                Disputas
+              </Link>
+            )}
             <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="h-4 w-4" />

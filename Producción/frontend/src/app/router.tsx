@@ -14,6 +14,7 @@ import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
 import { ChatPage } from '@/features/chat/ChatPage';
+import { AdminDisputasPage, DisputasPage } from '@/features/disputas/DisputasPage';
 import { PagoPage } from '@/features/pagos/PagoPage';
 import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
@@ -91,6 +92,7 @@ export const router = createBrowserRouter([
       { path: 'arriendos/:id', element: <ArriendoDetallePage /> },
       { path: 'chat', element: <ChatPage /> },
       { path: 'chat/:id', element: <ChatPage /> },
+      { path: 'disputas', element: <DisputasPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       {
         path: 'proveedor/panel',
@@ -177,6 +179,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['ADMIN']}>
             <AdminAuditoriaPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/disputas',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminDisputasPage />
           </RequireRole>
         ),
       },

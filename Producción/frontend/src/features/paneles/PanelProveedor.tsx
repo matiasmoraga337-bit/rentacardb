@@ -162,6 +162,9 @@ export function PanelProveedor() {
             <Link to="/chat">
               <Button variant="outline">Chat</Button>
             </Link>
+            <Link to="/disputas">
+              <Button variant="outline">Disputas</Button>
+            </Link>
           </CardContent>
         </Card>
 

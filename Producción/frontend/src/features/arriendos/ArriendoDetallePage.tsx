@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/AuthContext';
+import { DisputaForm } from '@/features/disputas/DisputaForm';
 import { formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
 import { ResenaForm } from '@/features/resenas/ResenaForm';
 import type { TipoResena } from '@/features/resenas/api';
@@ -274,6 +275,10 @@ export function ArriendoDetallePage() {
           <CargoForm idArriendo={arriendo.id} />
           <MultaForm idArriendo={arriendo.id} />
         </>
+      )}
+
+      {arriendo.estado === 'FINALIZADO' && (esCliente || esProveedorOperador) && (
+        <DisputaForm idArriendo={arriendo.id} />
       )}
 
       <Card>

@@ -99,10 +99,11 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E10.2 | Registrar multa | 3 | `u_sp_RegistrarMulta`, UI |
 | E10.3 | Abrir/gestionar disputa | 5 | `Disputa`, UI |
 
-> **Estado S4-E10.1/E10.2:** implementadas. Cargos y multas solo sobre arriendo
-> `FINALIZADO`, con movimiento financiero (`CARGO_EXTRA`/`MULTA`) para
-> liquidaciones. Ver [`../../docs/CARGOS-MULTAS.md`](../../docs/CARGOS-MULTAS.md).
-> E10.3 (disputas) queda para el siguiente PR.
+> **Estado S4-E10:** E10.1/E10.2 implementadas con movimiento financiero
+> (`CARGO_EXTRA`/`MULTA`) para liquidaciones. E10.3 implementada: apertura por
+> cliente/proveedor, listado por rol y resolucion ADMIN. Ver
+> [`../../docs/CARGOS-MULTAS.md`](../../docs/CARGOS-MULTAS.md) y
+> [`../../docs/DISPUTAS.md`](../../docs/DISPUTAS.md).
 
 ## E11 — Liquidaciones y comisiones `S`
 | ID | Historia | SP | Tareas |
