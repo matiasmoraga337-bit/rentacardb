@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **165 PASS / 0 FAIL**
+- **Resultado global:** **173 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -26,11 +26,12 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/10_liquidaciones.sql` | 7 | Generacion, idempotencia, solapamiento, aprobacion y pago |
 | `sql/tests/11_notificaciones_outbox.sql` | 8 | Notificacion leida, permisos y ciclo outbox (procesado/reintento) |
 | `sql/tests/12_adjuntos_fotos.sql` | 6 | Fotos de inspeccion y adjuntos de chat con permisos |
+| `sql/tests/13_catalogos.sql` | 8 | CRUD de catalogo simple, modelo, caracteristica y politica |
 
 ## 2. Resultados por categoría
 
 ### Esquema (12/12)
-- 83 tablas, 74 SPs, 6 vistas, 3 funciones, 4 triggers.
+- 83 tablas, 79 SPs, 6 vistas, 3 funciones, 4 triggers.
 - 0 procedimientos `sp_` de usuario y 0 con doble prefijo `u_u_`.
 - Triggers, CHECK y FK habilitados; compat 160; `u_sp_ValidarIntegridad` sin errores.
 
@@ -148,6 +149,12 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Adjunto de usuario ajeno rechazado (`60303`).
 - Tamano invalido rechazado (`60305`).
 - Mensaje inexistente rechazado (`60302`).
+
+### S4 — Catalogos (8/8)
+- Crear/editar marca; duplicado rechazado (`60403`).
+- Crear/desactivar modelo; inexistente rechazado (`60402`).
+- Crear caracteristica.
+- Politica con porcentaje invalido rechazada (`60406`).
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).

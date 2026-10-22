@@ -896,6 +896,47 @@ export const swaggerSpec = {
         responses: { '200': { description: 'Liquidacion PAGADA' }, '409': { description: 'No esta APROBADA' } },
       },
     },
+    '/admin/catalogos/{tipo}': {
+      get: {
+        summary: 'Listar catalogo para administracion',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'incluirInactivos', in: 'query', schema: { type: 'string', enum: ['1'] } },
+        ],
+        responses: { '200': { description: 'Registros del catalogo' } },
+      },
+      post: {
+        summary: 'Crear registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'tipo', in: 'path', required: true, schema: { type: 'string' } }],
+        responses: { '201': { description: 'Registro creado' }, '409': { description: 'Duplicado' } },
+      },
+    },
+    '/admin/catalogos/{tipo}/{id}': {
+      put: {
+        summary: 'Actualizar registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        responses: { '200': { description: 'Registro actualizado' } },
+      },
+      delete: {
+        summary: 'Desactivar registro de catalogo',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'tipo', in: 'path', required: true, schema: { type: 'string' } },
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        responses: { '200': { description: 'Registro desactivado' } },
+      },
+    },
     '/admin/auditoria': {
       get: {
         summary: 'Listar eventos de auditoria (ADMIN)',

@@ -145,7 +145,11 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| GET/POST/PUT | `/admin/catalogos/:tabla` | ADMIN | `Tipo*`, `Estado*`, `Marca`, `Modelo`, `PoliticaCancelacion`, `CaracteristicaVehiculo`, `TipoCargoExtra` |
+| GET | `/admin/catalogos/:tipo?incluirInactivos=1` | ADMIN | Lista del catalogo, incluyendo inactivos. |
+| POST | `/admin/catalogos/:tipo` | ADMIN | Crea registro; body segun catalogo. |
+| PUT | `/admin/catalogos/:tipo/:id` | ADMIN | Actualiza registro. |
+| DELETE | `/admin/catalogos/:tipo/:id` | ADMIN | Desactiva (soft delete). |
+| — | Catálogos de sistema | ADMIN | `tipos-proveedor`, `estados-vehiculo`, `estados-publicacion`: solo lectura. |
 | GET | `/admin/auditoria?entidad=&page=&pageSize=` | ADMIN | `Auditoria` + usuario. Devuelve `{data, page, pageSize, total}`. |
 | GET | `/admin/outbox` | ADMIN | `u_sp_ObtenerOutboxPendiente` |
 | GET | `/admin/integridad` | ADMIN | `u_sp_ValidarIntegridad` |

@@ -32,6 +32,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E3.1 | Ver regiones/provincias/comunas | 3 | Endpoints + selects en UI |
 | E3.2 | CRUD de catálogos (admin) | 5 | Endpoints genéricos + UI admin |
 
+> **Estado S4-E3.2:** CRUD de catálogos de negocio implementado; los catálogos
+> de sistema (`tipos-proveedor`, `estados-*`) quedan de solo lectura. Ver
+> [`../../docs/CATALOGOS.md`](../../docs/CATALOGOS.md).
+
 ## E4 — Proveedores y sedes `M`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|

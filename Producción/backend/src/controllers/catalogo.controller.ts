@@ -1,5 +1,6 @@
 import { type Request, type Response } from 'express';
 import * as catalogoRepo from '../repositories/catalogo.repository';
+import * as catalogoService from '../services/catalogo.service';
 import { AppError } from '../utils/AppError';
 
 const parseId = (value: string, name: string): number => {
@@ -42,4 +43,23 @@ export async function catalogo(req: Request, res: Response): Promise<void> {
     marca = parseId(req.query.marca, 'marca');
   }
   res.status(200).json(await catalogoRepo.listarCatalogo(tipo, marca));
+}
+
+export async function adminListar(req: Request, res: Response): Promise<void> {
+  const incluirInactivos = req.query.incluirInactivos === '1';
+  res.status(200).json(await catalogoService.listarAdmin(req.params.tipo, incluirInactivos));
+}
+
+export async function adminCrear(req: Request, res: Response): Promise<void> {
+  res.status(201).json(await catalogoService.crear(req.params.tipo, req.body));
+}
+
+export async function adminActualizar(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res.status(200).json(await catalogoService.actualizar(req.params.tipo, id, req.body));
+}
+
+export async function adminDesactivar(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res.status(200).json(await catalogoService.desactivar(req.params.tipo, id));
 }
