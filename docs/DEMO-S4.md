@@ -14,12 +14,22 @@ $env:DB_PORT='14330'
 npm run seed
 $env:API_URL='http://localhost:3000/api'
 npm run seed:s4
+$env:SMOKE_EXPECT_OUTBOX='1'
 npm run smoke:s4
 ```
 
+Prerrequisitos:
+
+- API disponible en `http://localhost:3000/api`.
+- `OUTBOX_JOB_ENABLED=true` (el compose demo ya lo activa) para correo/worker.
+- Mailpit en `http://localhost:8026`.
+
 `seed:s4` deja un arriendo `FINALIZADO` con cargo por km, daño, cargo extra,
 multa, reseñas, disputa, liquidación, favorito, búsqueda, chat con adjunto y foto
-de inspección. `smoke:s4` verifica el flujo completo.
+de inspección. Es idempotente: si existe un escenario `DEMO-S4` incompleto,
+aborta con un mensaje para limpiarlo/completarlo. `smoke:s4` verifica el flujo
+completo, incluyendo una notificación marcada como leída y un evento
+`PROCESADO` en outbox cuando `SMOKE_EXPECT_OUTBOX=1`.
 
 ## 2. Liquidaciones
 
@@ -66,6 +76,7 @@ npm run lint; npm run typecheck; npm test; npm run build
 
 # Smoke S4 (API + BD + seed:s4)
 cd Producción/backend
+$env:SMOKE_EXPECT_OUTBOX='1'
 npm run smoke:s4
 ```
 

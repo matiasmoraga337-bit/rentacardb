@@ -180,11 +180,12 @@ npm run smoke:s3
 
 | Capa | Archivo | Qué cubre |
 |---|---|---|
-| Seed | `Producción/backend/scripts/seed-s4.ts` | Crea/verifica arriendo finalizado, disputa, liquidación, favorito, búsqueda, chat/adjunto y foto. Idempotente. |
-| Smoke | `Producción/backend/scripts/smoke-s4.ts` | Catálogos, favoritos, búsquedas, arriendo, cargos/multas, reseñas, disputa, liquidación, notificaciones, foto y adjunto. |
+| Seed | `Producción/backend/scripts/seed-s4.ts` | Crea/verifica arriendo finalizado, disputa, liquidación, favorito, búsqueda, chat/adjunto y foto. Pagina reservas, evita duplicados y aborta ante escenario incompleto. |
+| Smoke | `Producción/backend/scripts/smoke-s4.ts` | Catálogos, favoritos, búsquedas, arriendo, cargos/multas, reseñas, disputa, liquidación, notificaciones leídas, outbox y URLs de foto/adjunto. |
 
 ```powershell
 cd Producción/backend
 npm run seed:s4
+$env:SMOKE_EXPECT_OUTBOX='1'
 npm run smoke:s4
 ```
