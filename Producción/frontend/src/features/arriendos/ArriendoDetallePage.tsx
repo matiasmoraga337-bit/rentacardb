@@ -7,11 +7,13 @@ import { formatearCLP, formatearFecha, formatearFechaHora } from '@/features/res
 import { ResenaForm } from '@/features/resenas/ResenaForm';
 import type { TipoResena } from '@/features/resenas/api';
 import { fetchArriendo } from './api';
+import { CargoForm } from './CargoForm';
 import { ConductorForm } from './ConductorForm';
 import { ContratoPanel } from './ContratoPanel';
 import { DanosForm } from './DanosForm';
 import { DevolucionForm } from './DevolucionForm';
 import { EstadoArriendoBadge } from './EstadoArriendoBadge';
+import { MultaForm } from './MultaForm';
 
 export function ArriendoDetallePage() {
   const { id } = useParams();
@@ -207,6 +209,31 @@ export function ArriendoDetallePage() {
 
       <Card>
         <CardHeader>
+          <CardTitle>Multas</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {arriendo.multas.length === 0 && (
+            <p className="text-sm text-slate-500">Sin multas registradas.</p>
+          )}
+          {arriendo.multas.map((multa) => (
+            <div key={multa.id} className="rounded-lg border border-slate-200 p-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="font-medium">
+                  {formatearFecha(multa.fecha)} · {multa.descripcion}
+                </span>
+                <span className="font-medium">{formatearCLP(multa.monto)}</span>
+              </div>
+              <p className="text-slate-600">
+                {multa.organismo ?? 'Sin organismo'}
+                {multa.numeroParte ? ` · Parte ${multa.numeroParte}` : ''} · {multa.estado}
+              </p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Conductores adicionales</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -240,6 +267,13 @@ export function ArriendoDetallePage() {
       {esOperador && arriendo.estado === 'ACTIVO' && <DevolucionForm arriendo={arriendo} />}
       {esOperador && inspeccionDevolucion && (
         <DanosForm idArriendo={arriendo.id} inspeccion={inspeccionDevolucion} />
+      )}
+
+      {esOperador && arriendo.estado === 'FINALIZADO' && (
+        <>
+          <CargoForm idArriendo={arriendo.id} />
+          <MultaForm idArriendo={arriendo.id} />
+        </>
       )}
 
       <Card>

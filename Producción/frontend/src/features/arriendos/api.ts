@@ -63,6 +63,17 @@ export interface CargoArriendo {
   observaciones: string | null;
 }
 
+export interface MultaArriendo {
+  id: number;
+  fecha: string;
+  descripcion: string;
+  organismo: string | null;
+  numeroParte: string | null;
+  monto: number;
+  estado: string;
+  fechaRegistro: string;
+}
+
 export interface ConductorArriendo {
   id: number;
   idPersona: number;
@@ -100,6 +111,7 @@ export interface ArriendoDetalle extends Arriendo {
   conductores: ConductorArriendo[];
   contrato: ContratoArriendo | null;
   resenas: ResenaArriendo[];
+  multas: MultaArriendo[];
 }
 
 export interface ArriendosResponse {
@@ -170,6 +182,41 @@ export const registrarDano = (
   },
 ): Promise<unknown> =>
   apiFetch(`/arriendos/${id}/inspecciones/${idInspeccion}/danos`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const registrarCargoExtra = (
+  id: number,
+  data: {
+    concepto: string;
+    monto: number;
+    observaciones?: string;
+    tipo_cargo?:
+      | 'COMBUSTIBLE'
+      | 'KM_EXCEDIDO'
+      | 'DANO'
+      | 'LIMPIEZA'
+      | 'MULTA_TRANSITO'
+      | 'OTRO';
+  },
+): Promise<unknown> =>
+  apiFetch(`/arriendos/${id}/cargos-extra`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const registrarMulta = (
+  id: number,
+  data: {
+    fecha_multa: string;
+    descripcion: string;
+    monto: number;
+    organismo?: string;
+    numero_parte?: string;
+  },
+): Promise<unknown> =>
+  apiFetch(`/arriendos/${id}/multas`, {
     method: 'POST',
     body: JSON.stringify(data),
   });

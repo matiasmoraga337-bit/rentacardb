@@ -117,3 +117,12 @@ npm run smoke:s3
 | Backend (API) | `Producción/backend/tests/admin.test.ts` | Autenticacion y rol ADMIN en `GET /admin/auditoria`. |
 | Frontend | `Producción/frontend/src/features/paneles/__tests__/MetricCard.test.tsx` | Tarjeta de metrica reutilizable. |
 | UI | `/panel`, `/admin/catalogos`, `/admin/auditoria` | Widgets por rol, consulta de catalogos y auditoria paginada. |
+
+## 11) Sprint S4 — Cargos extra y multas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/08_cargos_multas.sql` | Cargo y multa sobre arriendo finalizado, movimientos financieros y errores (7 casos). |
+| Backend (API) | `Producción/backend/tests/arriendos.test.ts` | Auth, rol, validación de monto y fecha. |
+| Frontend | `Producción/frontend/src/features/arriendos/__tests__/CargoForm.test.tsx` | Envío de concepto, tipo y monto. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Cargo y multa tras la devolución. |

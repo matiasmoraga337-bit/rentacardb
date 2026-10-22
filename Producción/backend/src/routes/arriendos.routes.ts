@@ -5,11 +5,13 @@ import { authorize } from '../middlewares/authorize';
 import { validate } from '../middlewares/validate';
 import {
   aceptarContratoSchema,
+  cargoExtraSchema,
   conductorAdicionalSchema,
   danoInspeccionSchema,
   devolucionArriendoSchema,
   iniciarArriendoSchema,
   listarArriendosQuerySchema,
+  multaSchema,
 } from '../schemas/arriendo.schema';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -54,6 +56,22 @@ router.post(
   authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
   validate(danoInspeccionSchema),
   asyncHandler(arriendoController.dano),
+);
+
+router.post(
+  '/:id/cargos-extra',
+  authenticate,
+  authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
+  validate(cargoExtraSchema),
+  asyncHandler(arriendoController.cargoExtra),
+);
+
+router.post(
+  '/:id/multas',
+  authenticate,
+  authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
+  validate(multaSchema),
+  asyncHandler(arriendoController.multa),
 );
 
 router.post(

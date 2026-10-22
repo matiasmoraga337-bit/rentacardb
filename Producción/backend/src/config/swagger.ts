@@ -309,6 +309,68 @@ export const swaggerSpec = {
         responses: { '201': { description: 'Dano registrado' }, '409': { description: 'Inspeccion no es de devolucion' } },
       },
     },
+    '/arriendos/{id}/cargos-extra': {
+      post: {
+        summary: 'Registrar un cargo extra en un arriendo finalizado',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['concepto', 'monto'],
+                properties: {
+                  concepto: { type: 'string', maxLength: 200 },
+                  monto: { type: 'number', exclusiveMinimum: 0 },
+                  tipo_cargo: {
+                    type: 'string',
+                    enum: ['COMBUSTIBLE', 'KM_EXCEDIDO', 'DANO', 'LIMPIEZA', 'MULTA_TRANSITO', 'OTRO'],
+                  },
+                  observaciones: { type: 'string', maxLength: 500 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Cargo registrado' },
+          '409': { description: 'Arriendo no finalizado' },
+        },
+      },
+    },
+    '/arriendos/{id}/multas': {
+      post: {
+        summary: 'Registrar una multa en un arriendo finalizado',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['fecha_multa', 'descripcion', 'monto'],
+                properties: {
+                  fecha_multa: { type: 'string', format: 'date' },
+                  descripcion: { type: 'string', maxLength: 500 },
+                  monto: { type: 'number', exclusiveMinimum: 0 },
+                  organismo: { type: 'string', maxLength: 150 },
+                  numero_parte: { type: 'string', maxLength: 50 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Multa registrada' },
+          '409': { description: 'Arriendo no finalizado' },
+        },
+      },
+    },
     '/arriendos/{id}/conductores': {
       post: {
         summary: 'Agregar conductor adicional por RUT (CLIENTE)',

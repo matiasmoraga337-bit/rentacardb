@@ -25,10 +25,11 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`CHAT.md`](CHAT.md) | S3: chat cliente-proveedor y reglas de mensajería. |
 | — | [`RESENAS.md`](RESENAS.md) | S3: reseñas de arriendo, reglas y listado público. |
 | — | [`PANELES.md`](PANELES.md) | S3: paneles por rol, catálogos y auditoría. |
+| — | [`CARGOS-MULTAS.md`](CARGOS-MULTAS.md) | S4: cargos extra y multas sobre arriendos finalizados. |
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (131 PASS). |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (138 PASS). |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres

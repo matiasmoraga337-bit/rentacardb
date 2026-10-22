@@ -1,10 +1,12 @@
 import { type Request, type Response } from 'express';
 import {
+  type CargoExtraInput,
   type ConductorAdicionalInput,
   type DanoInspeccionInput,
   type DevolucionArriendoInput,
   type IniciarArriendoInput,
   type ListarArriendosQuery,
+  type MultaInput,
 } from '../schemas/arriendo.schema';
 import * as arriendoService from '../services/arriendo.service';
 import { AppError } from '../utils/AppError';
@@ -63,6 +65,34 @@ export async function dano(req: Request, res: Response): Promise<void> {
         req.user!.id,
         req.user!.roles,
         req.body as DanoInspeccionInput,
+      ),
+    );
+}
+
+export async function cargoExtra(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res
+    .status(201)
+    .json(
+      await arriendoService.registrarCargoExtra(
+        id,
+        req.user!.id,
+        req.user!.roles,
+        req.body as CargoExtraInput,
+      ),
+    );
+}
+
+export async function multa(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res
+    .status(201)
+    .json(
+      await arriendoService.registrarMulta(
+        id,
+        req.user!.id,
+        req.user!.roles,
+        req.body as MultaInput,
       ),
     );
 }
