@@ -32,6 +32,20 @@ export function createApp(): Express {
       dotfiles: 'deny',
     }),
   );
+  app.use(
+    '/uploads/inspecciones',
+    express.static(path.join(env.UPLOAD_DIR, 'inspecciones'), {
+      maxAge: '1d',
+      dotfiles: 'deny',
+    }),
+  );
+  app.use(
+    '/uploads/adjuntos',
+    express.static(path.join(env.UPLOAD_DIR, 'adjuntos'), {
+      maxAge: '1d',
+      dotfiles: 'deny',
+    }),
+  );
 
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
   app.use('/api', routes);

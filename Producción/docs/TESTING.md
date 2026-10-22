@@ -117,3 +117,45 @@ npm run smoke:s3
 | Backend (API) | `Producción/backend/tests/admin.test.ts` | Autenticacion y rol ADMIN en `GET /admin/auditoria`. |
 | Frontend | `Producción/frontend/src/features/paneles/__tests__/MetricCard.test.tsx` | Tarjeta de metrica reutilizable. |
 | UI | `/panel`, `/admin/catalogos`, `/admin/auditoria` | Widgets por rol, consulta de catalogos y auditoria paginada. |
+
+## 11) Sprint S4 — Cargos extra y multas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/08_cargos_multas.sql` | Cargo y multa sobre arriendo finalizado, movimientos financieros y errores (7 casos). |
+| Backend (API) | `Producción/backend/tests/arriendos.test.ts` | Auth, rol, validación de monto y fecha. |
+| Frontend | `Producción/frontend/src/features/arriendos/__tests__/CargoForm.test.tsx` | Envío de concepto, tipo y monto. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Cargo y multa tras la devolución. |
+
+## 12) Sprint S4 — Disputas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/09_disputas.sql` | Apertura, duplicado, autor ajeno, revision, resolucion y cierre (6 casos). |
+| Backend (API) | `Producción/backend/tests/disputas.test.ts` | Auth, validacion, filtros y rol ADMIN. |
+| Frontend | `/disputas`, `/admin/disputas`, `DisputaForm` | Listado por rol, apertura y resolucion. |
+
+## 13) Sprint S4 — Liquidaciones
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/10_liquidaciones.sql` | Generacion, idempotencia, solapamiento, aprobacion y pago (7 casos). |
+| Backend (API) | `Producción/backend/tests/liquidaciones.test.ts` | Auth, roles y validacion de periodo/filtros. |
+| UI | `/admin/liquidaciones`, `/proveedor/liquidaciones` | Generacion, aprobacion, pago y consulta. |
+
+## 14) Sprint S4 — Notificaciones y outbox
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/11_notificaciones_outbox.sql` | Notificacion LEIDA, permisos y ciclo del outbox (8 casos). |
+| Backend (API) | `Producción/backend/tests/notificaciones.test.ts` | Auth, filtros, lectura y outbox admin. |
+| Frontend | `Producción/frontend/src/features/notificaciones/__tests__/NotificationBell.test.tsx` | Contador de no leidas. |
+| Worker | `Producción/backend/src/jobs/outbox.job.ts` | Procesa pendientes, envia correo y marca resultado. |
+
+## 15) Sprint S4 — Fotos y adjuntos
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/12_adjuntos_fotos.sql` | Foto de inspeccion, adjunto de chat, permisos y tamano (6 casos). |
+| Backend | `Producción/backend/tests/arriendos.test.ts`, `chat.test.ts` | Validacion base de endpoints. |
+| UI | `InspeccionFotos`, formulario de adjuntos en chat | Subida y visualizacion. |

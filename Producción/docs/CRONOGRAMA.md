@@ -50,6 +50,9 @@ review/retro (viernes).
 - **P2:** pulido de UI, accesibilidad, estados de error/vacío, i18n.
 - **P3:** testing integral, seguridad, documentación, datos de demo, guion de presentación.
 - **Meta (H4):** app estable, documentada y con demo reproducible.
+- **Estado:** completado con cargos/multas, disputas, liquidaciones,
+  notificaciones/outbox, fotos/adjuntos y demo S4. Pendiente: CRUD de
+  catálogos (E3.2). Ver `../../docs/DEMO-S4.md`.
 
 ## 17 nov — Entrega
 - Presentación con datos de ejemplo cargados y guion por rol.

@@ -2,6 +2,7 @@ import { LogOut } from 'lucide-react';
 import { Link, Outlet } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/AuthContext';
+import { NotificationBell } from '@/features/notificaciones/NotificationBell';
 
 export function AppLayout() {
   const { usuario, logout } = useAuth();
@@ -43,6 +44,9 @@ export function AppLayout() {
                 <Link to="/proveedor/panel" className="text-sm text-slate-600 hover:text-brand">
                   Proveedor
                 </Link>
+                <Link to="/proveedor/liquidaciones" className="text-sm text-slate-600 hover:text-brand">
+                  Liquidaciones
+                </Link>
               </>
             )}
             {usuario?.roles.includes('ADMIN') && (
@@ -59,14 +63,31 @@ export function AppLayout() {
                 <Link to="/admin/auditoria" className="text-sm text-slate-600 hover:text-brand">
                   Auditoria
                 </Link>
+                <Link to="/admin/disputas" className="text-sm text-slate-600 hover:text-brand">
+                  Disputas
+                </Link>
+                <Link to="/admin/liquidaciones" className="text-sm text-slate-600 hover:text-brand">
+                  Liquidaciones
+                </Link>
+                <Link to="/admin/outbox" className="text-sm text-slate-600 hover:text-brand">
+                  Outbox
+                </Link>
               </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil
             </Link>
+            <NotificationBell />
             <Link to="/chat" className="text-sm text-slate-600 hover:text-brand">
               Chat
             </Link>
+            {(usuario?.roles.includes('CLIENTE') ||
+              usuario?.roles.includes('PROVEEDOR') ||
+              usuario?.roles.includes('OPERADOR')) && (
+              <Link to="/disputas" className="text-sm text-slate-600 hover:text-brand">
+                Disputas
+              </Link>
+            )}
             <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
             <Button variant="outline" size="sm" onClick={logout}>
               <LogOut className="h-4 w-4" />

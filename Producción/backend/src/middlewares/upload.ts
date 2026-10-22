@@ -19,6 +19,20 @@ export const imageUpload = multer({
   },
 });
 
+const attachmentMimes = new Set([...imageMimes, ...documentMimes]);
+
+export const attachmentUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: mb(env.MAX_DOC_MB), files: 4 },
+  fileFilter: (_req, file, cb) => {
+    if (!attachmentMimes.has(file.mimetype)) {
+      cb(new AppError(400, 'MIME_INVALIDO', 'Solo se permiten imagenes o PDF.'));
+      return;
+    }
+    cb(null, true);
+  },
+});
+
 export const documentUpload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: mb(env.MAX_DOC_MB), files: 1 },

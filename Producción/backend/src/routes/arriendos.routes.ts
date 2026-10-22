@@ -2,14 +2,17 @@ import { Router } from 'express';
 import * as arriendoController from '../controllers/arriendo.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { authorize } from '../middlewares/authorize';
+import { imageUpload } from '../middlewares/upload';
 import { validate } from '../middlewares/validate';
 import {
   aceptarContratoSchema,
+  cargoExtraSchema,
   conductorAdicionalSchema,
   danoInspeccionSchema,
   devolucionArriendoSchema,
   iniciarArriendoSchema,
   listarArriendosQuerySchema,
+  multaSchema,
 } from '../schemas/arriendo.schema';
 import { asyncHandler } from '../utils/asyncHandler';
 
@@ -54,6 +57,30 @@ router.post(
   authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
   validate(danoInspeccionSchema),
   asyncHandler(arriendoController.dano),
+);
+
+router.post(
+  '/:id/inspecciones/:inspeccionId/fotos',
+  authenticate,
+  authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
+  imageUpload.array('fotos', 8),
+  asyncHandler(arriendoController.fotoInspeccion),
+);
+
+router.post(
+  '/:id/cargos-extra',
+  authenticate,
+  authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
+  validate(cargoExtraSchema),
+  asyncHandler(arriendoController.cargoExtra),
+);
+
+router.post(
+  '/:id/multas',
+  authenticate,
+  authorize('PROVEEDOR', 'OPERADOR', 'ADMIN'),
+  validate(multaSchema),
+  asyncHandler(arriendoController.multa),
 );
 
 router.post(

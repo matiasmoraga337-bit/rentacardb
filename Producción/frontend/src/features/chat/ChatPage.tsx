@@ -13,6 +13,7 @@ import {
   fetchConversaciones,
   fetchMensajes,
   marcarLeidos,
+  subirAdjuntos,
 } from './api';
 
 export function ChatPage() {
@@ -21,6 +22,7 @@ export function ChatPage() {
   const { usuario } = useAuth();
   const queryClient = useQueryClient();
   const [texto, setTexto] = useState('');
+  const [archivos, setArchivos] = useState<FileList | null>(null);
   const [error, setError] = useState('');
 
   const conversacionesQuery = useQuery({
@@ -49,9 +51,16 @@ export function ChatPage() {
   }, [idConversacion, mensajesQuery.isSuccess, mensajesQuery.data?.length]);
 
   const enviarMutation = useMutation({
-    mutationFn: () => enviarMensaje(idConversacion, texto),
+    mutationFn: async () => {
+      const mensaje = await enviarMensaje(idConversacion, texto);
+      if (archivos && archivos.length > 0) {
+        await subirAdjuntos(idConversacion, mensaje.id, archivos);
+      }
+      return mensaje;
+    },
     onSuccess: () => {
       setTexto('');
+      setArchivos(null);
       setError('');
       queryClient.invalidateQueries({ queryKey: ['mensajes', idConversacion] });
       queryClient.invalidateQueries({ queryKey: ['conversaciones'] });
@@ -160,6 +169,17 @@ export function ChatPage() {
                         }`}
                       >
                         <p className="whitespace-pre-wrap">{mensaje.contenido}</p>
+                        {mensaje.adjuntos?.map((adjunto) => (
+                          <a
+                            key={adjunto.id}
+                            href={adjunto.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-1 block break-all text-xs underline"
+                          >
+                            {adjunto.nombre}
+                          </a>
+                        ))}
                         <p
                           className={`mt-1 text-xs ${
                             propio ? 'text-teal-100' : 'text-slate-500'
@@ -192,6 +212,19 @@ export function ChatPage() {
                       maxLength={2000}
                       placeholder="Escribe un mensaje…"
                       onChange={(event) => setTexto(event.target.value)}
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <Label htmlFor="adjuntos" className="sr-only">
+                      Adjuntos
+                    </Label>
+                    <input
+                      id="adjuntos"
+                      type="file"
+                      multiple
+                      accept="image/*,application/pdf"
+                      onChange={(event) => setArchivos(event.target.files)}
+                      className="w-36 text-xs text-slate-600"
                     />
                   </div>
                   <Button type="submit" disabled={enviarMutation.isPending || !texto.trim()}>

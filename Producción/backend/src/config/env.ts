@@ -30,6 +30,10 @@ const envSchema = z.object({
   RESERVAS_JOB_ENABLED: boolFromString(false),
   RESERVAS_JOB_INTERVAL_MS: z.coerce.number().int().positive().default(300000),
 
+  OUTBOX_JOB_ENABLED: boolFromString(false),
+  OUTBOX_JOB_INTERVAL_MS: z.coerce.number().int().positive().default(60000),
+  OUTBOX_BATCH_SIZE: z.coerce.number().int().positive().max(500).default(20),
+
   SMTP_HOST: z.string().default('localhost'),
   SMTP_PORT: z.coerce.number().int().positive().default(1025),
   SMTP_SECURE: boolFromString(false),

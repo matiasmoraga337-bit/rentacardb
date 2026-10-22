@@ -1,5 +1,5 @@
 /**
- * Smoke S3 (E9 + E13) contra una API en ejecucion.
+ * Smoke S3 (E9 + E10.1/E10.2 + E13) contra una API en ejecucion.
  * Uso: npm run smoke:s3   (requiere API + BD con `npm run seed`)
  */
 import assert from 'node:assert/strict';
@@ -72,10 +72,11 @@ interface Arriendo {
   inspecciones: { id: number; tipo: string }[];
   cargos: { tipo: string | null; monto: number }[];
   danos: { id: number; zona: string }[];
+  multas: { id: number; descripcion: string; monto: number }[];
 }
 
 async function main(): Promise<void> {
-  console.log(`Smoke S3/E9+E13 contra ${API_URL}`);
+  console.log(`Smoke S3/E9+E10+E13 contra ${API_URL}`);
 
   const clienteLogin = await api<{ token: string }>('/auth/login', {
     method: 'POST',
@@ -233,6 +234,48 @@ async function main(): Promise<void> {
   assert.ok(detalleFinal.danos.length > 0);
   console.log('PASS dano de devolucion');
 
+  await api(
+    `/arriendos/${arriendoDevuelto.id}/cargos-extra`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        concepto: 'Limpieza especial (smoke)',
+        monto: 12000,
+        tipo_cargo: 'LIMPIEZA',
+        observaciones: 'Smoke S3',
+      }),
+    },
+    proveedorLogin.token,
+  );
+  await api(
+    `/arriendos/${arriendoDevuelto.id}/multas`,
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        fecha_multa: new Date().toISOString().slice(0, 10),
+        descripcion: 'Parte de prueba (smoke)',
+        monto: 5000,
+        organismo: 'Municipalidad',
+        numero_parte: `SMOKE-${arriendoDevuelto.id}`,
+      }),
+    },
+    proveedorLogin.token,
+  );
+  const detalleConCargos = await api<Arriendo>(
+    `/arriendos/${arriendoDevuelto.id}`,
+    {},
+    proveedorLogin.token,
+  );
+  assert.ok(
+    detalleConCargos.cargos.some((cargo) => cargo.tipo === 'LIMPIEZA' && cargo.monto === 12000),
+    'No se creo el cargo extra.',
+  );
+  assert.ok(
+    detalleConCargos.multas.some((multa) => multa.monto === 5000),
+    'No se creo la multa.',
+  );
+  console.log('PASS cargo extra y multa');
+
   const resenaVehiculo = await api<{ id: number; tipo: string; calificacion: number }>(
     '/resenas',
     {
@@ -291,10 +334,10 @@ async function main(): Promise<void> {
   assert.equal(resenasProveedor.total, resenasProveedorAntes.total + 1);
   console.log('PASS resenas cliente/proveedor y listado publico');
 
-  console.log('SMOKE S3/E9+E13 OK');
+  console.log('SMOKE S3/E9+E10+E13 OK');
 }
 
 main().catch((err: unknown) => {
-  console.error('SMOKE S3/E9+E13 FAIL:', (err as Error).message);
+  console.error('SMOKE S3/E9+E10+E13 FAIL:', (err as Error).message);
   process.exit(1);
 });

@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { AdminAuditoriaPage } from '@/features/admin/AdminAuditoriaPage';
 import { AdminCatalogosPage } from '@/features/admin/AdminCatalogosPage';
+import { AdminOutboxPage } from '@/features/admin/AdminOutboxPage';
 import { ReporteIngresosPage } from '@/features/admin/ReporteIngresosPage';
 import { ArriendoDetallePage } from '@/features/arriendos/ArriendoDetallePage';
 import { ArriendosProveedorPage, MisArriendosPage } from '@/features/arriendos/ArriendosPage';
@@ -14,6 +15,10 @@ import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
 import { ChatPage } from '@/features/chat/ChatPage';
+import { AdminDisputasPage, DisputasPage } from '@/features/disputas/DisputasPage';
+import { AdminLiquidacionesPage } from '@/features/liquidaciones/AdminLiquidacionesPage';
+import { ProveedorLiquidacionesPage } from '@/features/liquidaciones/ProveedorLiquidacionesPage';
+import { NotificacionesPage } from '@/features/notificaciones/NotificacionesPage';
 import { PagoPage } from '@/features/pagos/PagoPage';
 import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
@@ -91,6 +96,8 @@ export const router = createBrowserRouter([
       { path: 'arriendos/:id', element: <ArriendoDetallePage /> },
       { path: 'chat', element: <ChatPage /> },
       { path: 'chat/:id', element: <ChatPage /> },
+      { path: 'disputas', element: <DisputasPage /> },
+      { path: 'notificaciones', element: <NotificacionesPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       {
         path: 'proveedor/panel',
@@ -129,6 +136,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['PROVEEDOR', 'OPERADOR', 'ADMIN']}>
             <MisVehiculosPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'proveedor/liquidaciones',
+        element: (
+          <RequireRole roles={['PROVEEDOR', 'OPERADOR']}>
+            <ProveedorLiquidacionesPage />
           </RequireRole>
         ),
       },
@@ -177,6 +192,30 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['ADMIN']}>
             <AdminAuditoriaPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/disputas',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminDisputasPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/liquidaciones',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminLiquidacionesPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/outbox',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminOutboxPage />
           </RequireRole>
         ),
       },

@@ -29,6 +29,15 @@ export interface Arriendo {
   emailCliente: string;
 }
 
+export interface InspeccionFoto {
+  id: number;
+  inspeccionId: number;
+  url: string;
+  thumbUrl: string;
+  angulo: string | null;
+  fecha: string;
+}
+
 export interface InspeccionArriendo {
   id: number;
   tipo: string;
@@ -39,6 +48,7 @@ export interface InspeccionArriendo {
   firmaCliente: boolean;
   fecha: string;
   idOperador: number | null;
+  fotos: InspeccionFoto[];
 }
 
 export interface DanoArriendo {
@@ -61,6 +71,17 @@ export interface CargoArriendo {
   estado: string;
   fecha: string;
   observaciones: string | null;
+}
+
+export interface MultaArriendo {
+  id: number;
+  fecha: string;
+  descripcion: string;
+  organismo: string | null;
+  numeroParte: string | null;
+  monto: number;
+  estado: string;
+  fechaRegistro: string;
 }
 
 export interface ConductorArriendo {
@@ -100,6 +121,7 @@ export interface ArriendoDetalle extends Arriendo {
   conductores: ConductorArriendo[];
   contrato: ContratoArriendo | null;
   resenas: ResenaArriendo[];
+  multas: MultaArriendo[];
 }
 
 export interface ArriendosResponse {
@@ -170,6 +192,54 @@ export const registrarDano = (
   },
 ): Promise<unknown> =>
   apiFetch(`/arriendos/${id}/inspecciones/${idInspeccion}/danos`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const subirFotosInspeccion = (
+  id: number,
+  idInspeccion: number,
+  files: FileList,
+): Promise<unknown> => {
+  const form = new FormData();
+  Array.from(files).forEach((file) => form.append('fotos', file));
+  return apiFetch(`/arriendos/${id}/inspecciones/${idInspeccion}/fotos`, {
+    method: 'POST',
+    body: form,
+  });
+};
+
+export const registrarCargoExtra = (
+  id: number,
+  data: {
+    concepto: string;
+    monto: number;
+    observaciones?: string;
+    tipo_cargo?:
+      | 'COMBUSTIBLE'
+      | 'KM_EXCEDIDO'
+      | 'DANO'
+      | 'LIMPIEZA'
+      | 'MULTA_TRANSITO'
+      | 'OTRO';
+  },
+): Promise<unknown> =>
+  apiFetch(`/arriendos/${id}/cargos-extra`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const registrarMulta = (
+  id: number,
+  data: {
+    fecha_multa: string;
+    descripcion: string;
+    monto: number;
+    organismo?: string;
+    numero_parte?: string;
+  },
+): Promise<unknown> =>
+  apiFetch(`/arriendos/${id}/multas`, {
     method: 'POST',
     body: JSON.stringify(data),
   });

@@ -97,10 +97,13 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | Método | Ruta | Acceso | SP / Tabla | Notas |
 |---|---|---|---|---|
 | GET | `/arriendos?scope=cliente\|proveedor\|todos&estado=&page=&pageSize=` | AUTH | `Arriendo`, `Reserva`, `Vehiculo`, `EstadoArriendo` | Cliente ve los suyos; proveedor los de sus vehículos; admin todos. |
-| GET | `/arriendos/:id` | AUTH dueño/proveedor/admin | `Arriendo` + inspecciones + daños + cargos + conductores + contrato + reseñas | Detalle completo. |
+| GET | `/arriendos/:id` | AUTH dueño/proveedor/admin | `Arriendo` + inspecciones + daños + cargos + multas + conductores + contrato + reseñas | Detalle completo. |
 | POST | `/arriendos/iniciar` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_IniciarArriendo` | Requiere reserva `CONFIRMADA`, licencia vigente y sede válida. |
 | POST | `/arriendos/:id/devolucion` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarDevolucion` | Calcula km excedido y crea cargo automático. |
 | POST | `/arriendos/:id/inspecciones/:inspeccionId/danos` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarDanoInspeccion` | Solo inspección `DEVOLUCION`. |
+| POST | `/arriendos/:id/cargos-extra` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_CrearCargoExtra` | Solo arriendo `FINALIZADO`; body `{concepto, monto, tipo_cargo?, observaciones?}`. Crea movimiento `CARGO_EXTRA`. |
+| POST | `/arriendos/:id/multas` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarMulta` | Solo arriendo `FINALIZADO`; body `{fecha_multa, descripcion, monto, organismo?, numero_parte?}`. Crea movimiento `MULTA`. |
+| POST | `/arriendos/:id/inspecciones/:inspeccionId/fotos` | ROL(OPERADOR/PROVEEDOR/ADMIN) | `u_sp_RegistrarInspeccionFoto` | `multipart/form-data` campo `fotos[]` (hasta 8). |
 | POST | `/arriendos/:id/conductores` | ROL(CLIENTE) | `u_sp_RegistrarConductorAdicional` | Body `{rut, ID_licencia_conducir?}`. |
 | POST | `/arriendos/:id/contrato` | ROL(CLIENTE) | `u_sp_CrearAceptacionContrato` | Body `{aceptado:true}`; guarda hash SHA-256. |
 | GET | `/arriendos/:id/contrato` | AUTH dueño/proveedor/admin | `AceptacionContratoArriendo` + datos de reserva | Devuelve texto, hash y aceptación vigente. |
@@ -113,13 +116,15 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
-| POST | `/liquidaciones` | ADMIN | `u_sp_GenerarLiquidacion` |
-| GET | `/liquidaciones?proveedor=` | ROL(PROVEEDOR)/ADMIN | `LiquidacionProveedor` |
-| POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` |
-| POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` |
+| POST | `/liquidaciones` | ADMIN | `u_sp_GenerarLiquidacion`. Body `{ID_proveedor, periodo_inicio, periodo_fin}`. Idempotente por periodo. |
+| GET | `/liquidaciones?proveedor=&estado=&page=&pageSize=` | ROL(PROVEEDOR)/ADMIN | Proveedor ve solo las propias; ADMIN todas. |
+| POST | `/liquidaciones/:id/aprobar` | ADMIN | `u_sp_AprobarLiquidacion` (`CALCULADA → APROBADA`). |
+| POST | `/liquidaciones/:id/pagar` | ADMIN | `u_sp_MarcarLiquidacionPagada` (`APROBADA → PAGADA`). |
 | GET | `/reportes/liquidaciones` | ADMIN | `u_sp_ReporteLiquidaciones` |
-| POST | `/disputas` | AUTH | `Disputa` |
-| GET | `/disputas` | ADMIN | `Disputa` |
+| POST | `/disputas` | AUTH parte del arriendo | `u_sp_CrearDisputa`. Body `{ID_arriendo, tipo_disputa, descripcion, monto_disputado?}`. Solo arriendo `FINALIZADO`; una disputa abierta por autor. |
+| GET | `/disputas?scope=&estado=&arriendo=&page=&pageSize=` | AUTH | `Disputa` + arriendo/cliente/proveedor. Scope cliente/proveedor; ADMIN `todos`. |
+| GET | `/disputas/:id` | AUTH parte/ADMIN | Detalle de la disputa. |
+| POST | `/disputas/:id/resolver` | ADMIN | `u_sp_ResolverDisputa`. Body `{estado: EN_REVISION\|RESUELTA\|CERRADA, resolucion?}`. |
 | POST | `/resenas` | AUTH dueño/proveedor | `u_sp_CrearResena`. Body `{ID_arriendo, tipo_resena, calificacion, comentario?}`. Solo arriendo `FINALIZADO`; una reseña por autor y tipo. |
 | GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_VEHICULO`. |
 | GET | `/proveedores/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_PROVEEDOR`. |
@@ -129,6 +134,12 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | POST | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_EnviarMensaje` (solo TEXTO en S3) |
 | POST | `/conversaciones/:id/leidos` | AUTH participante | `u_sp_MarcarMensajesLeidos` |
 | POST | `/conversaciones/:id/cerrar` | AUTH participante | `u_sp_CerrarConversacion` |
+| POST | `/conversaciones/:id/mensajes/:mensajeId/adjuntos` | AUTH participante | `u_sp_RegistrarMensajeAdjunto` | `multipart/form-data` campo `archivos[]` (imagen/PDF). |
+| GET | `/notificaciones?estado=&page=&pageSize=` | AUTH | `Notificacion` del usuario. |
+| GET | `/notificaciones/no-leidas` | AUTH | Contador de no leidas. |
+| POST | `/notificaciones/:id/leer` | AUTH dueño | `u_sp_MarcarNotificacionLeida`. |
+| GET | `/admin/outbox?estado=&page=&pageSize=` | ADMIN | Monitor de `OutboxEvento`. |
+| POST | `/admin/outbox/:id/reintentar` | ADMIN | `u_sp_ReintentarOutboxError`. |
 
 ## Administración y catálogos
 

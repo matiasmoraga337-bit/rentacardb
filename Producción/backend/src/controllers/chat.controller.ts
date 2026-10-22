@@ -38,6 +38,15 @@ export async function enviar(req: Request, res: Response): Promise<void> {
     .json(await chatService.enviarMensaje(id, req.user!.id, req.body as EnviarMensajeInput));
 }
 
+export async function adjuntos(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  const idMensaje = parseId(req.params.mensajeId, 'mensajeId');
+  const files = (req.files as Express.Multer.File[] | undefined) ?? [];
+  res
+    .status(201)
+    .json(await chatService.enviarAdjuntos(id, idMensaje, req.user!.id, files));
+}
+
 export async function leidos(req: Request, res: Response): Promise<void> {
   const id = parseId(req.params.id, 'id');
   res.status(200).json(await chatService.marcarLeidos(id, req.user!.id));

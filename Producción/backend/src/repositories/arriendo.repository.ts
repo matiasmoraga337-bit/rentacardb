@@ -57,6 +57,15 @@ export interface ArriendoAcceso {
   combustibleInicial: number;
 }
 
+export interface InspeccionFotoRow {
+  id: number;
+  inspeccionId: number;
+  url: string;
+  thumbUrl: string;
+  angulo: string | null;
+  fecha: string;
+}
+
 export interface InspeccionRow {
   id: number;
   tipo: string;
@@ -67,6 +76,7 @@ export interface InspeccionRow {
   firmaCliente: boolean;
   fecha: string;
   idOperador: number | null;
+  fotos?: InspeccionFotoRow[];
 }
 
 export interface DanoRow {
@@ -89,6 +99,17 @@ export interface CargoRow {
   estado: string;
   fecha: string;
   observaciones: string | null;
+}
+
+export interface MultaRow {
+  id: number;
+  fecha: string;
+  descripcion: string;
+  organismo: string | null;
+  numeroParte: string | null;
+  monto: number;
+  estado: string;
+  fechaRegistro: string;
 }
 
 export interface ConductorRow {
@@ -459,6 +480,45 @@ export async function listarInspecciones(idArriendo: number): Promise<Inspeccion
   return result.recordset;
 }
 
+export async function listarFotosInspecciones(
+  idArriendo: number,
+): Promise<InspeccionFotoRow[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idArriendo)
+    .query<InspeccionFotoRow>(
+      `SELECT f.ID_inspeccion_foto AS id,
+              f.ID_inspeccion_arriendo_inspeccion_foto AS inspeccionId,
+              f.url_foto_inspeccion AS url,
+              f.url_foto_inspeccion AS thumbUrl,
+              f.angulo_foto_inspeccion AS angulo,
+              f.fecha_subida_foto_inspeccion AS fecha
+       FROM dbo.InspeccionFoto f
+       INNER JOIN dbo.InspeccionArriendo i
+         ON i.ID_inspeccion_arriendo = f.ID_inspeccion_arriendo_inspeccion_foto
+       WHERE i.ID_arriendo_inspeccion_arriendo = @id
+         AND f.activa_foto_inspeccion = 1
+       ORDER BY f.fecha_subida_foto_inspeccion, f.ID_inspeccion_foto`,
+    );
+  return result.recordset;
+}
+
+export async function registrarFotoInspeccion(params: {
+  ID_inspeccion: number;
+  url_foto: string;
+  angulo?: string | null;
+}): Promise<unknown | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_inspeccion', sql.Int, params.ID_inspeccion)
+    .input('url_foto', sql.VarChar(500), params.url_foto)
+    .input('angulo', sql.VarChar(30), params.angulo ?? null)
+    .execute('u_sp_RegistrarInspeccionFoto');
+  return result.recordset[0] ?? null;
+}
+
 export async function listarDanos(idArriendo: number): Promise<DanoRow[]> {
   const pool = await getPool();
   const result = await pool
@@ -504,6 +564,72 @@ export async function listarCargos(idArriendo: number): Promise<CargoRow[]> {
          ON tce.ID_tipo_cargo_extra = ce.ID_tipo_cargo_extra_cargo_extra
        WHERE ce.ID_arriendo_cargo_extra = @id
        ORDER BY ce.fecha_registro_cargo_extra, ce.ID_cargo_extra`,
+    );
+  return result.recordset;
+}
+
+export async function crearCargoExtra(params: {
+  ID_arriendo: number;
+  concepto: string;
+  monto: number;
+  observaciones?: string | null;
+  ID_usuario_operador: number;
+  nombre_tipo_cargo: string;
+}): Promise<unknown | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_arriendo', sql.Int, params.ID_arriendo)
+    .input('concepto', sql.NVarChar(200), params.concepto)
+    .input('monto', sql.Decimal(12, 2), params.monto)
+    .input('observaciones', sql.NVarChar(500), params.observaciones ?? null)
+    .input('ID_usuario_operador', sql.Int, params.ID_usuario_operador)
+    .input('nombre_tipo_cargo', sql.VarChar(30), params.nombre_tipo_cargo)
+    .execute('u_sp_CrearCargoExtra');
+  return result.recordset[0] ?? null;
+}
+
+export async function registrarMulta(params: {
+  ID_arriendo: number;
+  fecha_multa: string;
+  descripcion: string;
+  monto: number;
+  organismo?: string | null;
+  numero_parte?: string | null;
+  ID_usuario_registro: number;
+}): Promise<unknown | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_arriendo', sql.Int, params.ID_arriendo)
+    .input('fecha_multa', sql.Date, params.fecha_multa)
+    .input('descripcion', sql.NVarChar(500), params.descripcion)
+    .input('monto', sql.Decimal(12, 2), params.monto)
+    .input('organismo', sql.NVarChar(150), params.organismo ?? null)
+    .input('numero_parte', sql.VarChar(50), params.numero_parte ?? null)
+    .input('ID_usuario_registro', sql.Int, params.ID_usuario_registro)
+    .execute('u_sp_RegistrarMulta');
+  return result.recordset[0] ?? null;
+}
+
+export async function listarMultas(idArriendo: number): Promise<MultaRow[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idArriendo)
+    .query<MultaRow>(
+      `SELECT m.ID_multa AS id,
+              CONVERT(char(10), m.fecha_multa, 23) AS fecha,
+              m.descripcion_multa AS descripcion,
+              m.organismo_multa AS organismo,
+              m.numero_parte_multa AS numeroParte,
+              m.monto_multa AS monto,
+              em.nombre_estado_multa AS estado,
+              m.fecha_registro_multa AS fechaRegistro
+       FROM dbo.Multa m
+       INNER JOIN dbo.EstadoMulta em ON em.ID_estado_multa = m.ID_estado_multa_multa
+       WHERE m.ID_arriendo_multa = @id
+       ORDER BY m.fecha_registro_multa, m.ID_multa`,
     );
   return result.recordset;
 }

@@ -1,14 +1,18 @@
 import { env } from '../config/env';
 import * as repo from '../repositories/arriendo.repository';
 import {
+  type CargoExtraInput,
   type ConductorAdicionalInput,
   type DanoInspeccionInput,
   type DevolucionArriendoInput,
   type IniciarArriendoInput,
   type ListarArriendosQuery,
+  type MultaInput,
 } from '../schemas/arriendo.schema';
 import { AppError } from '../utils/AppError';
 import { generarContratoTexto, hashContrato } from '../utils/contract';
+import { esFechaValida } from '../utils/dates';
+import { guardarFotoInspeccion } from '../utils/uploads';
 import { assertAccesoReserva } from './reserva.service';
 
 const esAdmin = (roles: string[]): boolean => roles.includes('ADMIN');
@@ -70,6 +74,36 @@ async function assertOperador(
   throw new AppError(403, 'FORBIDDEN', 'Solo el proveedor u operador puede realizar esta accion.');
 }
 
+const CARGO_ERROR_MAP: Record<number, { status: number; code: string; message: string }> = {
+  53020: { status: 400, code: 'MONTO_INVALIDO', message: 'El monto debe ser mayor que cero.' },
+  53021: { status: 404, code: 'ARRIENDO_NO_ENCONTRADO', message: 'Arriendo no encontrado.' },
+  53022: {
+    status: 409,
+    code: 'ARRIENDO_NO_FINALIZADO',
+    message: 'Solo se registran cargos en un arriendo finalizado.',
+  },
+};
+
+const MULTA_ERROR_MAP: Record<number, { status: number; code: string; message: string }> = {
+  60040: { status: 400, code: 'MONTO_INVALIDO', message: 'El monto debe ser mayor que cero.' },
+  60041: {
+    status: 409,
+    code: 'ARRIENDO_NO_FINALIZADO',
+    message: 'Solo se registran multas en un arriendo finalizado.',
+  },
+  60042: { status: 404, code: 'USUARIO_NO_ENCONTRADO', message: 'Usuario no encontrado.' },
+};
+
+function traducirError(
+  error: unknown,
+  mapa: Record<number, { status: number; code: string; message: string }>,
+): never {
+  const sqlError = error as { number?: number };
+  const mapped = sqlError.number ? mapa[sqlError.number] : undefined;
+  if (mapped) throw new AppError(mapped.status, mapped.code, mapped.message);
+  throw error;
+}
+
 export async function listarArriendos(
   idUsuario: number,
   roles: string[],
@@ -98,6 +132,7 @@ export async function obtenerArriendo(
     conductores: repo.ConductorRow[];
     contrato: repo.ContratoRow | null;
     resenas: repo.ResenaRow[];
+    multas: repo.MultaRow[];
   }
 > {
   await assertAccesoArriendo(idArriendo, idUsuario, roles);
@@ -105,15 +140,31 @@ export async function obtenerArriendo(
   if (!row) {
     throw new AppError(404, 'ARRIENDO_NO_ENCONTRADO', 'Arriendo no encontrado.');
   }
-  const [inspecciones, danos, cargos, conductores, contrato, resenas] = await Promise.all([
-    repo.listarInspecciones(idArriendo),
-    repo.listarDanos(idArriendo),
-    repo.listarCargos(idArriendo),
-    repo.listarConductores(idArriendo),
-    repo.obtenerContrato(idArriendo),
-    repo.listarResenas(idArriendo),
-  ]);
-  return { ...row, inspecciones, danos, cargos, conductores, contrato, resenas };
+  const [inspecciones, fotos, danos, cargos, conductores, contrato, resenas, multas] =
+    await Promise.all([
+      repo.listarInspecciones(idArriendo),
+      repo.listarFotosInspecciones(idArriendo),
+      repo.listarDanos(idArriendo),
+      repo.listarCargos(idArriendo),
+      repo.listarConductores(idArriendo),
+      repo.obtenerContrato(idArriendo),
+      repo.listarResenas(idArriendo),
+      repo.listarMultas(idArriendo),
+    ]);
+  const inspeccionesConFotos = inspecciones.map((inspeccion) => ({
+    ...inspeccion,
+    fotos: fotos.filter((foto) => foto.inspeccionId === inspeccion.id),
+  }));
+  return {
+    ...row,
+    inspecciones: inspeccionesConFotos,
+    danos,
+    cargos,
+    conductores,
+    contrato,
+    resenas,
+    multas,
+  };
 }
 
 export async function iniciarArriendo(
@@ -216,6 +267,101 @@ export async function registrarDano(
     throw new AppError(500, 'DANO_NO_REGISTRADO', 'No se pudo registrar el dano.');
   }
   return dano;
+}
+
+export async function registrarFotoInspeccion(
+  idArriendo: number,
+  idInspeccion: number,
+  idUsuario: number,
+  roles: string[],
+  files: Express.Multer.File[],
+): Promise<unknown[]> {
+  const acceso = await assertAccesoArriendo(idArriendo, idUsuario, roles);
+  await assertOperador(acceso, idUsuario, roles);
+
+  const inspeccion = await repo.obtenerInspeccion(idInspeccion);
+  if (!inspeccion || inspeccion.idArriendo !== idArriendo) {
+    throw new AppError(404, 'INSPECCION_NO_ENCONTRADA', 'Inspeccion no encontrada.');
+  }
+  if (files.length === 0) {
+    throw new AppError(400, 'SIN_ARCHIVOS', 'No se recibieron imagenes.');
+  }
+
+  const creadas: unknown[] = [];
+  for (const file of files) {
+    const { url } = await guardarFotoInspeccion(idArriendo, idInspeccion, file.buffer);
+    creadas.push(
+      await repo.registrarFotoInspeccion({
+        ID_inspeccion: idInspeccion,
+        url_foto: url,
+      }),
+    );
+  }
+  return creadas;
+}
+
+export async function registrarCargoExtra(
+  idArriendo: number,
+  idUsuario: number,
+  roles: string[],
+  input: CargoExtraInput,
+): Promise<unknown | null> {
+  const acceso = await assertAccesoArriendo(idArriendo, idUsuario, roles);
+  await assertOperador(acceso, idUsuario, roles);
+  if (acceso.estadoArriendo !== 'FINALIZADO') {
+    throw new AppError(
+      409,
+      'ARRIENDO_NO_FINALIZADO',
+      'Solo se registran cargos en un arriendo finalizado.',
+    );
+  }
+
+  try {
+    return await repo.crearCargoExtra({
+      ID_arriendo: idArriendo,
+      concepto: input.concepto,
+      monto: input.monto,
+      observaciones: input.observaciones ?? null,
+      ID_usuario_operador: idUsuario,
+      nombre_tipo_cargo: input.tipo_cargo,
+    });
+  } catch (error) {
+    traducirError(error, CARGO_ERROR_MAP);
+  }
+}
+
+export async function registrarMulta(
+  idArriendo: number,
+  idUsuario: number,
+  roles: string[],
+  input: MultaInput,
+): Promise<unknown | null> {
+  const acceso = await assertAccesoArriendo(idArriendo, idUsuario, roles);
+  await assertOperador(acceso, idUsuario, roles);
+  if (acceso.estadoArriendo !== 'FINALIZADO') {
+    throw new AppError(
+      409,
+      'ARRIENDO_NO_FINALIZADO',
+      'Solo se registran multas en un arriendo finalizado.',
+    );
+  }
+  if (!esFechaValida(input.fecha_multa)) {
+    throw new AppError(400, 'FECHA_INVALIDA', 'La fecha de la multa no es valida.');
+  }
+
+  try {
+    return await repo.registrarMulta({
+      ID_arriendo: idArriendo,
+      fecha_multa: input.fecha_multa,
+      descripcion: input.descripcion,
+      monto: input.monto,
+      organismo: input.organismo ?? null,
+      numero_parte: input.numero_parte ?? null,
+      ID_usuario_registro: idUsuario,
+    });
+  } catch (error) {
+    traducirError(error, MULTA_ERROR_MAP);
+  }
 }
 
 export async function registrarConductor(
