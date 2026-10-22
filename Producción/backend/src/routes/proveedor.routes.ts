@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import * as proveedorController from '../controllers/proveedor.controller';
+import * as resenaController from '../controllers/resena.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { authorize } from '../middlewares/authorize';
 import { validate } from '../middlewares/validate';
@@ -20,6 +21,7 @@ router.post(
   asyncHandler(proveedorController.registrar),
 );
 router.get('/mio', authenticate, asyncHandler(proveedorController.mio));
+router.get('/:id/resenas', asyncHandler(resenaController.listarProveedor));
 router.get('/', authenticate, authorize('ADMIN'), asyncHandler(proveedorController.listar));
 router.get('/:id', authenticate, asyncHandler(proveedorController.obtener));
 router.patch(

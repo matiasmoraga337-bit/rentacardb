@@ -41,6 +41,9 @@ review/retro (viernes).
 - **P2:** paneles cliente/proveedor, chat, reseñas.
 - **P3:** panel admin, notificaciones/worker outbox, tests de UI.
 - **Meta (H3):** ciclo completo retiro → devolución → reseña; chat funcionando.
+- **Estado:** completado y verificado con Docker (`rentacardb-s2`), seed y smokes
+  S2/S3. Incluye chat, reseñas y paneles por rol. Ver `../../docs/DEMO-S3.md`
+  y `../../docs/PANELES.md`.
 
 ## S4 — 11–16 nov
 - **P1:** liquidaciones, disputas, multas (extensión) + hardening.

@@ -1,4 +1,5 @@
 import * as repo from '../repositories/reserva.repository';
+import { CARGO_KM_EXCEDIDO, KM_INCLUIDOS_DIA } from '../config/km-policy';
 import {
   type CambiarEstadoReservaInput,
   type CancelarReservaInput,
@@ -11,6 +12,8 @@ import { calcularReembolso } from './reembolso-policy';
 export interface ReservaDto {
   id: number;
   idCliente: number;
+  idSedeRetiro: number;
+  idSedeDevolucion: number;
   fechaInicio: string;
   fechaFin: string;
   precioDia: number;
@@ -47,6 +50,8 @@ export function mapReserva(row: repo.ReservaViewRow): ReservaDto {
   return {
     id: row.ID_reserva,
     idCliente: row.ID_usuario_cliente_reserva,
+    idSedeRetiro: row.ID_sede_retiro_reserva,
+    idSedeDevolucion: row.ID_sede_devolucion_reserva,
     fechaInicio: row.fecha_inicio_reserva,
     fechaFin: row.fecha_fin_reserva,
     precioDia: row.precio_diario_aplicado_reserva,
@@ -126,8 +131,8 @@ export async function crearReserva(
     fecha_fin: input.fecha_fin,
     observaciones: input.observaciones ?? null,
     politica_combustible: input.politica_combustible ?? 'MISMO_NIVEL',
-    km_incluidos_dia: input.km_incluidos_dia ?? null,
-    cargo_km_excedido: input.cargo_km_excedido ?? null,
+    km_incluidos_dia: KM_INCLUIDOS_DIA,
+    cargo_km_excedido: CARGO_KM_EXCEDIDO,
     idempotency_key: idempotencyKey,
   });
   if (!row) {

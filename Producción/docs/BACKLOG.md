@@ -88,6 +88,10 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E9.4 | Conductores adicionales | 3 | `u_sp_RegistrarConductorAdicional` |
 | E9.5 | Aceptación de contrato | 3 | `u_sp_CrearAceptacionContrato`, UI firma |
 
+> **Estado S3-E9:** E9.1–E9.5 implementadas y verificadas. Ver
+> [`../../docs/ARRIENDOS.md`](../../docs/ARRIENDOS.md),
+> [`../../docs/DEMO-S3.md`](../../docs/DEMO-S3.md) y `sql/tests/06_arriendos.sql`.
+
 ## E10 — Cargos extra, multas, disputas `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
@@ -109,11 +113,19 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E12.2 | Adjuntos en mensajes | 3 | `MensajeAdjunto`, upload |
 | E12.3 | Notificaciones + worker outbox | 5 | `Notificacion`, `OutboxEvento`, worker, UI campana |
 
+> **Estado S3-E12:** E12.1 implementada y verificada. Adjuntos (E12.2) y
+> notificaciones/worker outbox (E12.3) quedan para S4. Ver
+> [`../../docs/CHAT.md`](../../docs/CHAT.md).
+
 ## E13 — Reseñas `S`
 | ID | Historia | SP | Tareas |
 |---|---|---|---|
 | E13.1 | Crear reseña tras arriendo | 3 | `u_sp_CrearResena`, UI |
 | E13.2 | Ver reseñas de vehículo/proveedor | 2 | `Resena`, UI |
+
+> **Estado S3-E13:** E13.1 y E13.2 implementadas. Cliente y proveedor califican
+> el arriendo `FINALIZADO` desde el detalle; el vehículo público muestra promedio
+> y reseñas. Ver [`../../docs/RESENAS.md`](../../docs/RESENAS.md).
 
 ## E14 — Paneles `M`
 | ID | Historia | SP | Tareas |
@@ -121,6 +133,11 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 | E14.1 | Panel cliente (reservas, pagos, chat) | 8 | Layout + widgets |
 | E14.2 | Panel proveedor (vehículos, sedes, liquidaciones) | 8 | Layout + widgets |
 | E14.3 | Panel admin (proveedores, catálogos, disputas, auditoría) | 8 | Layout + widgets |
+
+> **Estado S3-E14:** paneles de cliente, proveedor y admin implementados sobre
+> `/panel`. Admin agrega `/admin/catalogos` (consulta) y `/admin/auditoria`.
+> Liquidaciones, disputas y edición de catálogos quedan para S4. Ver
+> [`../../docs/PANELES.md`](../../docs/PANELES.md).
 
 ## E15 — Calidad: testing, seguridad, docs `M`
 | ID | Historia | SP | Tareas |

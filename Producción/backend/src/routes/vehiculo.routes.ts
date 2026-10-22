@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import * as resenaController from '../controllers/resena.controller';
 import * as vehiculoController from '../controllers/vehiculo.controller';
 import { authenticate } from '../middlewares/authenticate';
 import { documentUpload, imageUpload } from '../middlewares/upload';
@@ -16,6 +17,7 @@ const router = Router();
 router.get('/mios', authenticate, asyncHandler(vehiculoController.listarMios));
 router.get('/buscar', asyncHandler(vehiculoController.buscar));
 router.get('/:id/disponibilidad', asyncHandler(vehiculoController.disponibilidad));
+router.get('/:id/resenas', asyncHandler(resenaController.listarVehiculo));
 router.post(
   '/',
   authenticate,
