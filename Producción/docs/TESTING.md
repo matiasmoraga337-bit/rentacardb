@@ -189,3 +189,15 @@ npm run seed:s4
 $env:SMOKE_EXPECT_OUTBOX='1'
 npm run smoke:s4
 ```
+
+## 19) CI — suite SQL
+
+El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-15)**:
+
+- inicia `mcr.microsoft.com/mssql/server:2022-latest`;
+- espera disponibilidad con `sqlcmd`;
+- ejecuta `sql/tests/run_tests.ps1` con PowerShell 7;
+- publica `sql/tests/results` como artifact;
+- elimina el contenedor incluso si falla.
+
+La suite debe quedar en **183 PASS / 0 FAIL**.
