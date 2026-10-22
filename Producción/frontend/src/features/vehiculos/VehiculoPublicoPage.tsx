@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/AuthContext';
+import { crearConversacion } from '@/features/chat/api';
 import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
 import { fetchDisponibilidad, fetchVehiculo } from './api';
 
@@ -14,6 +15,7 @@ export function VehiculoPublicoPage() {
   const vehiculoId = Number(id);
   const [searchParams] = useSearchParams();
   const { usuario } = useAuth();
+  const navigate = useNavigate();
   const [fechaInicio, setFechaInicio] = useState(
     searchParams.get('desde') || fechaFutura(7),
   );
@@ -31,6 +33,15 @@ export function VehiculoPublicoPage() {
     queryFn: () => fetchDisponibilidad(vehiculoId, fechaInicio, fechaFin),
     enabled: Boolean(query.data) && fechasValidas,
     retry: false,
+  });
+
+  const contactoMutation = useMutation({
+    mutationFn: () =>
+      crearConversacion({
+        ID_proveedor: query.data!.idProveedor,
+        ID_vehiculo: vehiculoId,
+      }),
+    onSuccess: (conversacion) => navigate(`/chat/${conversacion.id}`),
   });
 
   const checkoutUrl = `/checkout/${vehiculoId}?desde=${fechaInicio}&hasta=${fechaFin}`;
@@ -157,6 +168,22 @@ export function VehiculoPublicoPage() {
                       Continuar al checkout
                     </Button>
                   </Link>
+                )}
+                {usuario && usuario.roles.includes('CLIENTE') && (
+                  <Button
+                    variant="outline"
+                    disabled={contactoMutation.isPending}
+                    onClick={() => contactoMutation.mutate()}
+                  >
+                    {contactoMutation.isPending ? 'Abriendo chat…' : 'Contactar proveedor'}
+                  </Button>
+                )}
+                {contactoMutation.isError && (
+                  <p className="text-sm text-red-600">
+                    {contactoMutation.error instanceof Error
+                      ? contactoMutation.error.message
+                      : 'No se pudo abrir el chat.'}
+                  </p>
                 )}
                 {usuario && !usuario.roles.includes('CLIENTE') && (
                   <p className="text-sm text-slate-600">

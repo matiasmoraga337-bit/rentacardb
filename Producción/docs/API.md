@@ -122,12 +122,12 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET | `/disputas` | ADMIN | `Disputa` |
 | POST | `/resenas` | AUTH | `u_sp_CrearResena` |
 | GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` |
-| POST | `/conversaciones` | AUTH | `u_sp_CrearConversacion` |
+| POST | `/conversaciones` | ROL(CLIENTE) | `u_sp_CrearConversacion` |
 | GET | `/conversaciones` | AUTH | `u_sp_ListarConversaciones` |
-| GET | `/conversaciones/:id/mensajes` | AUTH | `u_sp_ListarMensajes` |
-| POST | `/conversaciones/:id/mensajes` | AUTH | `u_sp_EnviarMensaje` |
-| POST | `/conversaciones/:id/leidos` | AUTH | `u_sp_MarcarMensajesLeidos` |
-| POST | `/conversaciones/:id/cerrar` | AUTH | `u_sp_CerrarConversacion` |
+| GET | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_ListarMensajes` |
+| POST | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_EnviarMensaje` (solo TEXTO en S3) |
+| POST | `/conversaciones/:id/leidos` | AUTH participante | `u_sp_MarcarMensajesLeidos` |
+| POST | `/conversaciones/:id/cerrar` | AUTH participante | `u_sp_CerrarConversacion` |
 
 ## Administración y catálogos
 

@@ -53,7 +53,7 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
 - **S2/H2:** búsqueda con fechas, reservas, pago WebPay simulado, cancelación con
   reembolso, panel de proveedor y reporte de ingresos.
 - **S3/H3 (en progreso):** arriendos, inspecciones, devolución, contrato,
-  conductores adicionales y daños. Faltan chat, reseñas y paneles.
+  conductores adicionales, daños y chat. Faltan reseñas y paneles.
 
 Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md).
 
@@ -64,6 +64,7 @@ Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S
 - Contratos de la API: [`Producción/docs/API.md`](Producción/docs/API.md).
 - S2 (reservas/pagos, SQL y seguridad): [`docs/RESERVAS-PAGOS.md`](docs/RESERVAS-PAGOS.md).
 - S3 (arriendos e inspecciones): [`docs/ARRIENDOS.md`](docs/ARRIENDOS.md).
+- Chat: [`docs/CHAT.md`](docs/CHAT.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 

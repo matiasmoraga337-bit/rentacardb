@@ -11,6 +11,7 @@ import { RecuperarPage } from '@/features/auth/RecuperarPage';
 import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
+import { ChatPage } from '@/features/chat/ChatPage';
 import { PagoPage } from '@/features/pagos/PagoPage';
 import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
@@ -86,6 +87,8 @@ export const router = createBrowserRouter([
         ),
       },
       { path: 'arriendos/:id', element: <ArriendoDetallePage /> },
+      { path: 'chat', element: <ChatPage /> },
+      { path: 'chat/:id', element: <ChatPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       {
         path: 'proveedor/panel',
