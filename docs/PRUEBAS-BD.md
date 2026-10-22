@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **131 PASS / 0 FAIL**
+- **Resultado global:** **138 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -21,6 +21,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/05_reservas_pagos.sql` | 30 | Reserva, idempotencia, solapamiento, WebPay, reutilización/doble confirmación, reembolso, expiración (cursor) y vista |
 | `sql/tests/06_arriendos.sql` | 22 | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores |
 | `sql/tests/07_chat.sql` | 10 | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre |
+| `sql/tests/08_cargos_multas.sql` | 7 | Cargo extra/multa sobre arriendo finalizado, movimiento financiero y errores de monto/arriendo |
 
 ## 2. Resultados por categoría
 
@@ -107,6 +108,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Rechazar marcado de leídos y cierre por usuario ajeno (`60096`/`60094`).
 - Cerrar conversación y rechazar mensajes posteriores (`60091`).
 - Crear una nueva conversación activa tras cerrar la anterior.
+
+### S4 — Cargos extra y multas (7/7)
+- Cargo extra sobre arriendo `FINALIZADO` crea `CargoExtra` y `MovimientoFinanciero CARGO_EXTRA`.
+- Multa sobre arriendo `FINALIZADO` crea `Multa` y `MovimientoFinanciero MULTA`.
+- Monto cero rechazado (`53020`/`60040`).
+- Arriendo inexistente rechazado (`53021`/`60041`).
+- Los cargos extra se suman al bruto de `u_sp_GenerarLiquidacion`.
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).
