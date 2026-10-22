@@ -120,8 +120,6 @@ async function main(): Promise<void> {
         fecha_inicio: fechas.inicio,
         fecha_fin: fechas.fin,
         politica_combustible: 'MISMO_NIVEL',
-        km_incluidos_dia: 200,
-        cargo_km_excedido: 100,
       }),
     },
     clienteLogin.token,
@@ -169,7 +167,7 @@ async function main(): Promise<void> {
 
   await api(
     `/arriendos/${arriendoIniciado.id}/conductores`,
-    { method: 'POST', body: JSON.stringify({ rut: '44444444-4' }) },
+    { method: 'POST', body: JSON.stringify({ rut: '44.444.444-4' }) },
     clienteLogin.token,
   );
   console.log('PASS conductor adicional');

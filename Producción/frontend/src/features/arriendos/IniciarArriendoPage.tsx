@@ -35,13 +35,13 @@ export function IniciarArriendoPage() {
   const [combustible, setCombustible] = useState<number>(100);
 
   useEffect(() => {
-    if (!reserva) return;
-    if (idSede === undefined) setIdSede(reserva.idSedeRetiro);
-  }, [reserva, idSede]);
-
-  useEffect(() => {
-    if (vehiculo) setKmInicial(vehiculo.kilometraje);
-  }, [vehiculo]);
+    if (!vehiculo) return;
+    const sedeActual = vehiculo.sedes.find(
+      (sede) => sede.id === vehiculo.idSedeActual && sede.permiteEntrega,
+    );
+    setIdSede(sedeActual?.id ?? reserva?.idSedeRetiro);
+    setKmInicial(vehiculo.kilometraje);
+  }, [vehiculo, reserva?.idSedeRetiro]);
 
   const mutation = useMutation({
     mutationFn: () =>

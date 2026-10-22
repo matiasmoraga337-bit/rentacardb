@@ -43,6 +43,7 @@ stateDiagram-v2
 - El arriendo debe estar `ACTIVO`.
 - El kilometraje final no puede ser menor al inicial.
 - La sede de devolución debe pertenecer al proveedor y estar habilitada.
+- La política de km es del servidor: `200` km incluidos por día y `$100` por km excedido (configurable por proveedor queda para S4). El cliente no puede editarla.
 - Si la reserva tiene `km_incluidos_dia` y `cargo_km_excedido`, se calcula el exceso y se crea un `CargoExtra` `KM_EXCEDIDO`.
 - Se crea la inspección `DEVOLUCION`, el arriendo pasa a `FINALIZADO`, la reserva a `COMPLETADA` y el vehículo a `DISPONIBLE` en la sede de devolución.
 - Se registra una `Notificacion` para el cliente.
@@ -79,7 +80,11 @@ stateDiagram-v2
 - No se implementan fotos de inspección (S4).
 - No se implementan cargos extra manuales ni multas (S4).
 - La devolución no recalcula comisión; la comisión se registra al pagar.
-- El contrato es texto plano con hash; no se genera PDF firmado.
+- El contrato es texto plano con hash; no se genera PDF firmado. El hash se recalcula con datos vivos, por lo que cambios posteriores de nombres/sedes pueden alterarlo; el texto aceptado no se persiste.
+- `u_sp_IniciarArriendo` y `u_sp_RegistrarDevolucion` actualizan `Reserva` directamente y no insertan en `HistorialEstadoReserva`; el trigger de auditoría registra el cambio en `Auditoria`, pero el historial de la API no muestra `EN_CURSO`/`COMPLETADA`.
+- El seed restaura estado/sede/km del vehículo solo si no hay un arriendo `ACTIVO`; no ejecutarlo durante una demo en curso.
+- La política de km es global del servidor; configurarla por proveedor requiere cambios de esquema (S4).
+- No todos los SP de E9 usan `SESSION_CONTEXT`/transacción: conductor y daño son operaciones simples.
 
 ## 6. Pruebas
 

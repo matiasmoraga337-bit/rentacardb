@@ -24,10 +24,13 @@ El seed crea:
 - vehículos con sede actual y sedes habilitadas;
 - datos de proveedor y tarifas.
 
+> No ejecutes el seed durante una demo con un arriendo `ACTIVO`: el seed restaura
+> el estado del vehículo solo cuando no hay arriendos activos.
+
 ## 2. Flujo cliente → proveedor
 
 1. Cliente `demo@rentacar.cl` crea una reserva en `/catalogo`.
-2. En el checkout, informar **km incluidos por día** (ej. `200`) y **cargo por km excedido** (ej. `100`).
+2. En el checkout se muestra la política del servidor: **200 km incluidos por día** y **$100 por km excedido**. El cliente no puede editarla.
 3. Pagar la reserva con WebPay simulado.
 4. Proveedor `proveedor@rentacar.cl` abre **Reservas**, entra al detalle de la reserva `CONFIRMADA` y pulsa **Iniciar arriendo**.
 5. En el formulario de inicio:

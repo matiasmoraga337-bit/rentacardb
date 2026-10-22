@@ -1,4 +1,5 @@
 import * as repo from '../repositories/reserva.repository';
+import { CARGO_KM_EXCEDIDO, KM_INCLUIDOS_DIA } from '../config/km-policy';
 import {
   type CambiarEstadoReservaInput,
   type CancelarReservaInput,
@@ -130,8 +131,8 @@ export async function crearReserva(
     fecha_fin: input.fecha_fin,
     observaciones: input.observaciones ?? null,
     politica_combustible: input.politica_combustible ?? 'MISMO_NIVEL',
-    km_incluidos_dia: input.km_incluidos_dia ?? null,
-    cargo_km_excedido: input.cargo_km_excedido ?? null,
+    km_incluidos_dia: KM_INCLUIDOS_DIA,
+    cargo_km_excedido: CARGO_KM_EXCEDIDO,
     idempotency_key: idempotencyKey,
   });
   if (!row) {

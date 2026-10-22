@@ -106,8 +106,6 @@ export interface CrearReservaData {
   fecha_fin: string;
   observaciones?: string;
   politica_combustible?: 'LLENO_LLENO' | 'MISMO_NIVEL' | 'LIBRE';
-  km_incluidos_dia?: number;
-  cargo_km_excedido?: number;
   idempotency_key?: string;
 }
 

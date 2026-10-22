@@ -216,8 +216,11 @@ export function ArriendoDetallePage() {
       </Card>
 
       {esCliente && arriendo.estado === 'ACTIVO' && <ConductorForm idArriendo={arriendo.id} />}
-      {esCliente && (
-        <ContratoPanel idArriendo={arriendo.id} puedeAceptar={arriendo.estado === 'ACTIVO'} />
+      {(esCliente || esOperador) && (
+        <ContratoPanel
+          idArriendo={arriendo.id}
+          puedeAceptar={esCliente && arriendo.estado === 'ACTIVO'}
+        />
       )}
 
       {esOperador && arriendo.estado === 'ACTIVO' && <DevolucionForm arriendo={arriendo} />}

@@ -135,6 +135,11 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   60096: { status: 403, code: 'FORBIDDEN' },
   60100: { status: 403, code: 'FORBIDDEN' },
 
+  70410: { status: 400, code: 'HASH_CONTRATO_INVALIDO' },
+  70411: { status: 404, code: 'ARRIENDO_NO_ENCONTRADO' },
+  70412: { status: 400, code: 'USUARIO_REQUERIDO' },
+  70413: { status: 403, code: 'FORBIDDEN' },
+
   241: { status: 400, code: 'FECHA_INVALIDA' },
   2627: { status: 409, code: 'OPERACION_DUPLICADA' },
   2601: { status: 409, code: 'OPERACION_DUPLICADA' },

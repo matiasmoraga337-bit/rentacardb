@@ -9,15 +9,10 @@ import { registrarConductor } from './api';
 export function ConductorForm({ idArriendo }: { idArriendo: number }) {
   const queryClient = useQueryClient();
   const [rut, setRut] = useState('44444444-4');
-  const [idLicencia, setIdLicencia] = useState<number | undefined>();
   const [mensaje, setMensaje] = useState('');
 
   const mutation = useMutation({
-    mutationFn: () =>
-      registrarConductor(idArriendo, {
-        rut,
-        ID_licencia_conducir: idLicencia,
-      }),
+    mutationFn: () => registrarConductor(idArriendo, { rut }),
     onSuccess: () => {
       setMensaje('Conductor adicional registrado.');
       queryClient.invalidateQueries({ queryKey: ['arriendo', idArriendo] });
@@ -29,32 +24,18 @@ export function ConductorForm({ idArriendo }: { idArriendo: number }) {
       <CardHeader>
         <CardTitle>Agregar conductor adicional</CardTitle>
         <CardDescription>
-          Busca una persona registrada por RUT. La licencia es opcional; si la indicas, debe
-          pertenecer a la persona y estar vigente.
+          Busca una persona registrada por RUT. Si tiene una licencia activa y verificada, se
+          asocia automaticamente.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="space-y-1">
-            <Label htmlFor="rutConductor">RUT</Label>
-            <Input
-              id="rutConductor"
-              value={rut}
-              onChange={(event) => setRut(event.target.value)}
-            />
-          </div>
-          <div className="space-y-1">
-            <Label htmlFor="licenciaConductor">ID licencia (opcional)</Label>
-            <Input
-              id="licenciaConductor"
-              type="number"
-              min={1}
-              value={idLicencia ?? ''}
-              onChange={(event) =>
-                setIdLicencia(event.target.value === '' ? undefined : Number(event.target.value))
-              }
-            />
-          </div>
+        <div className="space-y-1">
+          <Label htmlFor="rutConductor">RUT</Label>
+          <Input
+            id="rutConductor"
+            value={rut}
+            onChange={(event) => setRut(event.target.value)}
+          />
         </div>
 
         {mutation.isError && (

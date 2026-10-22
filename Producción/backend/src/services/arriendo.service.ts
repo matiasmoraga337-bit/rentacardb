@@ -125,6 +125,17 @@ export async function iniciarArriendo(
   if (!esAdmin(roles)) {
     await assertOperador(accesoReserva, idUsuario, roles);
   }
+  const kmActual = await repo.obtenerKilometrajeVehiculoPorReserva(input.ID_reserva);
+  if (kmActual === null) {
+    throw new AppError(404, 'RESERVA_NO_ENCONTRADA', 'Reserva no encontrada.');
+  }
+  if (input.kilometraje_inicial < kmActual) {
+    throw new AppError(
+      400,
+      'KILOMETRAJE_INVALIDO',
+      `El kilometraje inicial no puede ser menor al odometro actual (${kmActual}).`,
+    );
+  }
 
   const idArriendo = await repo.iniciarArriendo({
     ...input,
@@ -193,7 +204,7 @@ export async function registrarDano(
     );
   }
 
-  return repo.registrarDano({
+  const dano = await repo.registrarDano({
     ID_inspeccion: idInspeccion,
     zona: input.zona,
     tipo: input.tipo,
@@ -201,6 +212,10 @@ export async function registrarDano(
     descripcion: input.descripcion ?? null,
     monto_estimado: input.monto_estimado ?? null,
   });
+  if (!dano) {
+    throw new AppError(500, 'DANO_NO_REGISTRADO', 'No se pudo registrar el dano.');
+  }
+  return dano;
 }
 
 export async function registrarConductor(
@@ -221,12 +236,18 @@ export async function registrarConductor(
   if (!persona) {
     throw new AppError(404, 'PERSONA_NO_ENCONTRADA', 'No existe una persona con ese RUT.');
   }
+  const idLicencia =
+    input.ID_licencia_conducir ?? (await repo.obtenerLicenciaActivaPersona(persona.id));
 
-  return repo.registrarConductor({
+  const conductor = await repo.registrarConductor({
     ID_arriendo: idArriendo,
     ID_persona: persona.id,
-    ID_licencia_conducir: input.ID_licencia_conducir ?? null,
+    ID_licencia_conducir: idLicencia,
   });
+  if (!conductor) {
+    throw new AppError(500, 'CONDUCTOR_NO_REGISTRADO', 'No se pudo registrar el conductor.');
+  }
+  return conductor;
 }
 
 export async function obtenerContrato(
@@ -290,5 +311,8 @@ export async function aceptarContrato(
     user_agent: userAgent ?? null,
     ID_usuario: idUsuario,
   });
+  if (!contrato) {
+    throw new AppError(500, 'CONTRATO_NO_REGISTRADO', 'No se pudo registrar la aceptacion.');
+  }
   return { contrato, texto, hash, url };
 }

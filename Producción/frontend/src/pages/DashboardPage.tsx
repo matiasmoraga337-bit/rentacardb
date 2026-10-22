@@ -69,7 +69,7 @@ export function DashboardPage() {
       </Card>
 
       <p className="text-sm text-slate-500">
-        Sprint S2: reservas, disponibilidad, pagos WebPay simulado y reembolsos.
+        Sprint S3: reservas, pagos, arriendos, inspecciones y devoluciones.
       </p>
     </div>
   );

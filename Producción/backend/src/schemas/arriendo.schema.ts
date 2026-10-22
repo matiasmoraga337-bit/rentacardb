@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const listarArriendosQuerySchema = z.object({
   scope: z.enum(['cliente', 'proveedor', 'todos']).optional(),
   estado: z.string().max(50).optional(),
-  page: z.coerce.number().int().positive().default(1),
+  page: z.coerce.number().int().positive().max(100000).default(1),
   pageSize: z.coerce.number().int().positive().max(100).default(20),
 });
 
@@ -31,7 +31,7 @@ export const danoInspeccionSchema = z.object({
 });
 
 export const conductorAdicionalSchema = z.object({
-  rut: z.string().min(3).max(12),
+  rut: z.string().trim().min(3).max(12),
   ID_licencia_conducir: z.number().int().positive().optional(),
 });
 

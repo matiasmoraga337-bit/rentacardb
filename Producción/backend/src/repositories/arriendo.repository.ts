@@ -301,6 +301,21 @@ export async function esProveedorDelVehiculo(
   return result.recordset.length > 0;
 }
 
+export async function obtenerKilometrajeVehiculoPorReserva(
+  idReserva: number,
+): Promise<number | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idReserva)
+    .query<{ kmActual: number }>(
+      `SELECT v.kilometraje_vehiculo AS kmActual
+       FROM dbo.Reserva r
+       INNER JOIN dbo.Vehiculo v ON v.ID_vehiculo = r.ID_vehiculo_reserva
+       WHERE r.ID_reserva = @id`,
+    );
+  return result.recordset[0]?.kmActual ?? null;
+}
 export async function iniciarArriendo(params: {
   ID_reserva: number;
   ID_sede_retiro_real: number;
@@ -511,6 +526,7 @@ export async function listarConductores(idArriendo: number): Promise<ConductorRo
        LEFT JOIN dbo.LicenciaConducir lc
          ON lc.ID_licencia_conducir = ca.ID_licencia_conducir_conductor_adicional
        WHERE ca.ID_arriendo_conductor_adicional = @id
+         AND ca.activo_conductor_adicional = 1
        ORDER BY ca.ID_conductor_adicional`,
     );
   return result.recordset;
@@ -608,11 +624,28 @@ export async function obtenerPersonaPorRut(
               rut_persona AS rut,
               CONCAT(nombres_persona, ' ', apellido_paterno_persona) AS nombre
        FROM dbo.Persona
-       WHERE rut_persona = @rut`,
+       WHERE REPLACE(REPLACE(UPPER(rut_persona), '.', ''), ' ', '') =
+             REPLACE(REPLACE(UPPER(@rut), '.', ''), ' ', '')`,
     );
   return result.recordset[0] ?? null;
 }
 
+export async function obtenerLicenciaActivaPersona(idPersona: number): Promise<number | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idPersona)
+    .query<{ ID_licencia_conducir: number }>(
+      `SELECT TOP 1 ID_licencia_conducir
+       FROM dbo.LicenciaConducir
+       WHERE ID_persona_licencia_conducir = @id
+         AND activa_licencia = 1
+         AND verificada_licencia = 1
+         AND fecha_vencimiento_licencia >= CAST(GETDATE() AS DATE)
+       ORDER BY ID_licencia_conducir DESC`,
+    );
+  return result.recordset[0]?.ID_licencia_conducir ?? null;
+}
 export async function obtenerInspeccion(
   idInspeccion: number,
 ): Promise<{ id: number; idArriendo: number; tipo: string } | null> {

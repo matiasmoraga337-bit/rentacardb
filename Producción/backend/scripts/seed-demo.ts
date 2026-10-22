@@ -1,5 +1,5 @@
 /**
- * Seed de datos demo de RentaCarDB (S0-S2).
+ * Seed de datos demo de RentaCarDB (S0-S3).
  * Uso: npm run seed   (requiere la BD levantada y el .env configurado)
  *
  * Usuarios:
@@ -437,8 +437,28 @@ async function ensureVehiculo(
     console.log(`OK   vehiculo ${data.patente} (ID ${idVehiculo}).`);
   }
 
-  const tarifas = (await vehiculoRepo.listarTarifas(idVehiculo)) as { nombre: string }[];
-  if (!tarifas.some((t) => t.nombre === 'Tarifa Demo')) {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .input('idSede', sql.Int, idSede)
+    .input('km', sql.Int, data.kilometraje)
+    .query(
+      `IF NOT EXISTS (
+         SELECT 1
+         FROM dbo.Arriendo a
+         INNER JOIN dbo.Reserva r ON r.ID_reserva = a.ID_reserva_arriendo
+         INNER JOIN dbo.EstadoArriendo ea ON ea.ID_estado_arriendo = a.ID_estado_arriendo_arriendo
+         WHERE r.ID_vehiculo_reserva = @id AND ea.nombre_estado_arriendo = 'ACTIVO')
+       UPDATE dbo.Vehiculo
+       SET ID_estado_vehiculo_vehiculo =
+             (SELECT ID_estado_vehiculo FROM dbo.EstadoVehiculo WHERE nombre_estado_vehiculo='DISPONIBLE'),
+           ID_sede_actual_vehiculo = @idSede,
+           kilometraje_vehiculo = @km
+       WHERE ID_vehiculo = @id`,
+    );
+
+  const tarifas = (await vehiculoRepo.listarTarifas(idVehiculo)) as { nombre: string }[];  if (!tarifas.some((t) => t.nombre === 'Tarifa Demo')) {
     await vehiculoRepo.registrarTarifa(idVehiculo, idProveedor, {
       nombre: 'Tarifa Demo',
       fecha_inicio: fechaLocal(),

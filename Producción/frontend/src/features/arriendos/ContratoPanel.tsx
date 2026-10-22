@@ -55,36 +55,47 @@ export function ContratoPanel({
           </>
         )}
 
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={aceptado}
-            disabled={!puedeAceptar}
-            onChange={(event) => setAceptado(event.target.checked)}
-            className="mt-1"
-          />
-          Declaro haber leido y aceptar el contrato de arriendo.
-        </label>
+        {query.isSuccess && !query.data.aceptacion && puedeAceptar && (
+          <>
+            <label className="flex items-start gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={aceptado}
+                onChange={(event) => setAceptado(event.target.checked)}
+                className="mt-1"
+              />
+              Declaro haber leido y aceptar el contrato de arriendo.
+            </label>
 
-        {!puedeAceptar && (
+            {mutation.isError && (
+              <p className="text-sm text-red-600">
+                {mutation.error instanceof Error
+                  ? mutation.error.message
+                  : 'No se pudo aceptar.'}
+              </p>
+            )}
+            {mensaje && <p className="text-sm text-emerald-700">{mensaje}</p>}
+
+            <Button
+              disabled={!aceptado || mutation.isPending || query.isFetching}
+              onClick={() => mutation.mutate()}
+            >
+              {mutation.isPending ? 'Aceptando…' : 'Aceptar contrato'}
+            </Button>
+          </>
+        )}
+
+        {query.isSuccess && !query.data.aceptacion && !puedeAceptar && (
           <p className="text-sm text-amber-700">
             El contrato solo se puede aceptar mientras el arriendo esta activo.
           </p>
         )}
 
-        {mutation.isError && (
-          <p className="text-sm text-red-600">
-            {mutation.error instanceof Error ? mutation.error.message : 'No se pudo aceptar.'}
+        {query.isSuccess && query.data.aceptacion && (
+          <p className="text-sm text-emerald-700">
+            Contrato aceptado. No es necesario aceptarlo nuevamente.
           </p>
         )}
-        {mensaje && <p className="text-sm text-emerald-700">{mensaje}</p>}
-
-        <Button
-          disabled={!puedeAceptar || !aceptado || mutation.isPending}
-          onClick={() => mutation.mutate()}
-        >
-          {mutation.isPending ? 'Aceptando…' : 'Aceptar contrato'}
-        </Button>
       </CardContent>
     </Card>
   );

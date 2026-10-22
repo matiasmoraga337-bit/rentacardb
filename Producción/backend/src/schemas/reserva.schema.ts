@@ -15,8 +15,6 @@ export const crearReservaSchema = z
     fecha_fin: fecha,
     observaciones: z.string().max(500).optional(),
     politica_combustible: z.enum(['LLENO_LLENO', 'MISMO_NIVEL', 'LIBRE']).optional(),
-    km_incluidos_dia: z.number().int().nonnegative().optional(),
-    cargo_km_excedido: z.number().nonnegative().optional(),
     idempotency_key: z.string().min(8).max(100).optional(),
   })
   .refine((data) => data.fecha_fin > data.fecha_inicio, {

@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select';
 import { fetchDisponibilidad, fetchVehiculo } from '@/features/vehiculos/api';
 import { crearReserva, nuevaIdempotencyKey } from './api';
 import { fechaFutura, formatearCLP, formatearFecha } from './format';
+import { CARGO_KM_EXCEDIDO, KM_INCLUIDOS_DIA } from './kmPolicy';
 
 export function CheckoutPage() {
   const { vehiculoId } = useParams();
@@ -27,8 +28,6 @@ export function CheckoutPage() {
     searchParams.get('devolucion') ? Number(searchParams.get('devolucion')) : undefined,
   );
   const [observaciones, setObservaciones] = useState('');
-  const [kmIncluidosDia, setKmIncluidosDia] = useState<number | undefined>();
-  const [cargoKmExcedido, setCargoKmExcedido] = useState<number | undefined>();
   const [idempotencyKey] = useState(() => nuevaIdempotencyKey());
 
   const vehiculoQuery = useQuery({
@@ -79,8 +78,6 @@ export function CheckoutPage() {
           fecha_fin: fechaFin,
           observaciones: observaciones || undefined,
           politica_combustible: 'MISMO_NIVEL',
-          km_incluidos_dia: kmIncluidosDia,
-          cargo_km_excedido: cargoKmExcedido,
         },
         idempotencyKey,
       ),
@@ -171,40 +168,13 @@ export function CheckoutPage() {
                 onChange={(event) => setObservaciones(event.target.value)}
               />
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="kmIncluidos">Km incluidos por dia (opcional)</Label>
-                <Input
-                  id="kmIncluidos"
-                  type="number"
-                  min={0}
-                  value={kmIncluidosDia ?? ''}
-                  onChange={(event) =>
-                    setKmIncluidosDia(
-                      event.target.value === '' ? undefined : Number(event.target.value),
-                    )
-                  }
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="cargoKm">Cargo por km excedido (CLP)</Label>
-                <Input
-                  id="cargoKm"
-                  type="number"
-                  min={0}
-                  value={cargoKmExcedido ?? ''}
-                  onChange={(event) =>
-                    setCargoKmExcedido(
-                      event.target.value === '' ? undefined : Number(event.target.value),
-                    )
-                  }
-                />
-              </div>
+            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+              <p className="font-medium">Politica de kilometraje</p>
+              <p>
+                Incluye {KM_INCLUIDOS_DIA} km por dia. El excedente se cobra a{' '}
+                {formatearCLP(CARGO_KM_EXCEDIDO)} por km al registrar la devolucion.
+              </p>
             </div>
-            <p className="text-xs text-slate-500">
-              Si informas la politica de km, la devolucion calculara automaticamente el cargo
-              por kilometraje excedido.
-            </p>
           </CardContent>
         </Card>
 
