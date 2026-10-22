@@ -18,9 +18,14 @@ export function AppLayout() {
               Catalogo
             </Link>
             {usuario?.roles.includes('CLIENTE') && (
-              <Link to="/reservas" className="text-sm text-slate-600 hover:text-brand">
-                Mis reservas
-              </Link>
+              <>
+                <Link to="/reservas" className="text-sm text-slate-600 hover:text-brand">
+                  Mis reservas
+                </Link>
+                <Link to="/arriendos" className="text-sm text-slate-600 hover:text-brand">
+                  Mis alquileres
+                </Link>
+              </>
             )}
             {(usuario?.roles.includes('PROVEEDOR') ||
               usuario?.roles.includes('OPERADOR') ||
@@ -28,6 +33,9 @@ export function AppLayout() {
               <>
                 <Link to="/proveedor/reservas" className="text-sm text-slate-600 hover:text-brand">
                   Reservas
+                </Link>
+                <Link to="/proveedor/arriendos" className="text-sm text-slate-600 hover:text-brand">
+                  Arriendos
                 </Link>
                 <Link to="/proveedor/vehiculos" className="text-sm text-slate-600 hover:text-brand">
                   Vehiculos

@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select';
 import { fetchDisponibilidad, fetchVehiculo } from '@/features/vehiculos/api';
 import { crearReserva, nuevaIdempotencyKey } from './api';
 import { fechaFutura, formatearCLP, formatearFecha } from './format';
+import { CARGO_KM_EXCEDIDO, KM_INCLUIDOS_DIA } from './kmPolicy';
 
 export function CheckoutPage() {
   const { vehiculoId } = useParams();
@@ -41,8 +42,11 @@ export function CheckoutPage() {
     if (!vehiculo) return;
     const entrega = vehiculo.sedes.filter((sede) => sede.permiteEntrega);
     const devolucion = vehiculo.sedes.filter((sede) => sede.permiteDevolucion);
-    if (idRetiro === undefined && entrega[0]) setIdRetiro(entrega[0].id);
-    if (idDevolucion === undefined && devolucion[0]) setIdDevolucion(devolucion[0].id);
+    const retiroPreferido = entrega.find((sede) => sede.id === vehiculo.idSedeActual) ?? entrega[0];
+    const devolucionPreferida =
+      devolucion.find((sede) => sede.id === vehiculo.idSedeActual) ?? devolucion[0];
+    if (idRetiro === undefined && retiroPreferido) setIdRetiro(retiroPreferido.id);
+    if (idDevolucion === undefined && devolucionPreferida) setIdDevolucion(devolucionPreferida.id);
   }, [vehiculo, idRetiro, idDevolucion]);
 
   const fechasValidas = Boolean(fechaInicio && fechaFin && fechaFin > fechaInicio);
@@ -163,6 +167,13 @@ export function CheckoutPage() {
                 maxLength={500}
                 onChange={(event) => setObservaciones(event.target.value)}
               />
+            </div>
+            <div className="rounded-md border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700">
+              <p className="font-medium">Politica de kilometraje</p>
+              <p>
+                Incluye {KM_INCLUIDOS_DIA} km por dia. El excedente se cobra a{' '}
+                {formatearCLP(CARGO_KM_EXCEDIDO)} por km al registrar la devolucion.
+              </p>
             </div>
           </CardContent>
         </Card>

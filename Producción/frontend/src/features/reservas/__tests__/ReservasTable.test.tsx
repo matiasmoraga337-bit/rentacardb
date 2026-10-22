@@ -7,6 +7,8 @@ import type { Reserva } from '../api';
 const reserva: Reserva = {
   id: 7,
   idCliente: 2,
+  idSedeRetiro: 1,
+  idSedeDevolucion: 1,
   fechaInicio: '2026-11-10',
   fechaFin: '2026-11-14',
   precioDia: 24990,

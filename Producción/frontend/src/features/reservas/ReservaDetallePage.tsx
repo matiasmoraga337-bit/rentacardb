@@ -45,6 +45,13 @@ export function ReservaDetallePage() {
 
   const esPropietario = usuario?.id === reserva.idCliente;
   const puedePagar = esPropietario && reserva.estado === 'PENDIENTE';
+  const puedeIniciar =
+    reserva.estado === 'CONFIRMADA' &&
+    Boolean(
+      usuario?.roles.includes('PROVEEDOR') ||
+        usuario?.roles.includes('OPERADOR') ||
+        usuario?.roles.includes('ADMIN'),
+    );
 
   return (
     <div className="space-y-6">
@@ -62,6 +69,11 @@ export function ReservaDetallePage() {
           {puedePagar && (
             <Link to={`/reservas/${reserva.id}/pagar`}>
               <Button>Pagar reserva</Button>
+            </Link>
+          )}
+          {puedeIniciar && (
+            <Link to={`/proveedor/arriendos/iniciar/${reserva.id}`}>
+              <Button>Iniciar arriendo</Button>
             </Link>
           )}
           <Link to={esPropietario ? '/reservas' : '/proveedor/reservas'}>

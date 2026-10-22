@@ -68,3 +68,17 @@ npm run lint; npm run typecheck; npm test; npm run build
 cd Producción/backend
 npm run smoke:s2
 ```
+
+## 7) Sprint S3 — Arriendos e inspecciones
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/06_arriendos.sql` | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores (22 casos). |
+| Backend (API) | `Producción/backend/tests/arriendos.test.ts` | Autenticación, roles, validación de inicio/devolución/daños/contrato/conductores. |
+| Frontend | `Producción/frontend/src/features/arriendos/__tests__/` | Badge de estado y tabla de arriendos. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Login → reserva con km → pago → inicio → contrato → conductor → devolución → daño. |
+
+```powershell
+cd Producción/backend
+npm run smoke:s3
+```
