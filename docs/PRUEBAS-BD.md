@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **181 PASS / 0 FAIL**
+- **Resultado global:** **183 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -28,11 +28,12 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/12_adjuntos_fotos.sql` | 6 | Fotos de inspeccion y adjuntos de chat con permisos |
 | `sql/tests/13_catalogos.sql` | 8 | CRUD de catalogo simple, modelo, caracteristica y politica |
 | `sql/tests/14_favoritos_busquedas.sql` | 8 | Favoritos y busquedas guardadas con permisos |
+| `sql/tests/15_calificacion.sql` | 2 | Recalculo de promedio de calificacion del vehiculo |
 
 ## 2. Resultados por categoría
 
 ### Esquema (12/12)
-- 83 tablas, 83 SPs, 6 vistas, 3 funciones, 4 triggers.
+- 83 tablas, 84 SPs, 6 vistas, 3 funciones, 4 triggers.
 - 0 procedimientos `sp_` de usuario y 0 con doble prefijo `u_u_`.
 - Triggers, CHECK y FK habilitados; compat 160; `u_sp_ValidarIntegridad` sin errores.
 
@@ -163,6 +164,10 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Guardar busqueda y soft delete.
 - Fechas invertidas rechazadas (`60502`).
 - Eliminar busqueda ajena rechazado (`60503`).
+
+### S4 — Calificacion promedio (2/2)
+- Recalculo del promedio del vehiculo a partir de resenas `CLIENTE_A_VEHICULO`.
+- Arriendo inexistente rechazado (`60600`).
 
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).
