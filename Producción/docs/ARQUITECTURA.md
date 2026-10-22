@@ -66,7 +66,7 @@ src/
 
 | # | Decisión | Motivo |
 |---|---|---|
-| 1 | **mssql + SPs** en vez de ORM | La lógica ya está en 74 SPs; evita duplicar reglas y mantiene integridad |
+| 1 | **mssql + SPs** en vez de ORM | La lógica ya está en 79 SPs; evita duplicar reglas y mantiene integridad |
 | 2 | **Express** (no NestJS) | Curva de aprendizaje menor; suficiente para el alcance |
 | 3 | **JWT stateless** | Simple para SPA; roles en el token + verificación en BD |
 | 4 | **TanStack Query** | Manejo de cache/estados de carga sin boilerplate |
