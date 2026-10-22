@@ -13,11 +13,13 @@ $env:DB_HOST='localhost'
 $env:DB_PORT='14330'
 npm run seed
 $env:API_URL='http://localhost:3000/api'
-npm run smoke:s3
+npm run seed:s4
+npm run smoke:s4
 ```
 
-`smoke:s3` deja un arriendo `FINALIZADO` con cargo por km, daño, cargo extra,
-multa y reseñas. Es la base para los pasos siguientes.
+`seed:s4` deja un arriendo `FINALIZADO` con cargo por km, daño, cargo extra,
+multa, reseñas, disputa, liquidación, favorito, búsqueda, chat con adjunto y foto
+de inspección. `smoke:s4` verifica el flujo completo.
 
 ## 2. Liquidaciones
 
@@ -61,10 +63,13 @@ npm run lint; npm run typecheck; npm test; npm run build
 # Frontend
 cd Producción/frontend
 npm run lint; npm run typecheck; npm test; npm run build
+
+# Smoke S4 (API + BD + seed:s4)
+cd Producción/backend
+npm run smoke:s4
 ```
 
 ## 7. Pendiente / fuera de alcance
 
-- CRUD completo de catálogos (E3.2): hoy `/admin/catalogos` es solo consulta.
 - SMS/PUSH reales: las notificaciones in-app usan `PUSH` y el correo usa Mailpit.
 - Cargos extra y multas solo se permiten sobre arriendos `FINALIZADO`.

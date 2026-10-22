@@ -175,3 +175,16 @@ npm run smoke:s3
 | BD | `sql/tests/14_favoritos_busquedas.sql` | Favoritos idempotentes, permisos, busquedas y soft delete (8 casos). |
 | Backend (API) | `Producción/backend/tests/favoritos.test.ts` | Auth, ids invalidos y formato de fechas. |
 | UI | `FavoritosPage`, `BusquedasPage`, `FavoritoButton`, `GuardarBusqueda` | Corazon, listado, guardar y aplicar busqueda. |
+
+## 18) Sprint S4 — Seed y smoke integral
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| Seed | `Producción/backend/scripts/seed-s4.ts` | Crea/verifica arriendo finalizado, disputa, liquidación, favorito, búsqueda, chat/adjunto y foto. Idempotente. |
+| Smoke | `Producción/backend/scripts/smoke-s4.ts` | Catálogos, favoritos, búsquedas, arriendo, cargos/multas, reseñas, disputa, liquidación, notificaciones, foto y adjunto. |
+
+```powershell
+cd Producción/backend
+npm run seed:s4
+npm run smoke:s4
+```
