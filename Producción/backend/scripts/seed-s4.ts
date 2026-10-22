@@ -42,7 +42,6 @@ interface DisputaDemo {
 
 interface LiquidacionDemo {
   id: number;
-  proveedorId: number;
   periodoInicio: string;
   periodoFin: string;
   estado: string;
@@ -61,6 +60,20 @@ interface MensajeDemo {
   adjuntos: { id: number }[];
 }
 
+async function listarReservasCliente(token: string): Promise<ReservaDemo[]> {
+  const reservas: ReservaDemo[] = [];
+  for (let page = 1; page <= 20; page += 1) {
+    const result = await api<{ data: ReservaDemo[] }>(
+      `/reservas?scope=cliente&page=${page}&pageSize=100`,
+      {},
+      token,
+    );
+    reservas.push(...result.data);
+    if (result.data.length < 100) break;
+  }
+  return reservas;
+}
+
 async function main(): Promise<void> {
   console.log('Seed S4 contra la API...');
   const cliente = await login(CLIENTE_EMAIL, CLIENTE_PASSWORD);
@@ -68,23 +81,28 @@ async function main(): Promise<void> {
   const admin = await login(ADMIN_EMAIL, ADMIN_PASSWORD);
   console.log('PASS login cliente, proveedor y admin');
 
-  const reservas = await api<{ data: ReservaDemo[] }>(
-    '/reservas?scope=cliente&page=1&pageSize=100',
-    {},
-    cliente.token,
-  );
-  let reserva = reservas.data.find(
-    (item) => item.observaciones === 'DEMO-S4' && item.estadoArriendo === 'FINALIZADO',
-  );
+  const reservas = await listarReservasCliente(cliente.token);
+  const demoExistente = reservas.find((item) => item.observaciones === 'DEMO-S4');
+  let reserva =
+    demoExistente?.estadoArriendo === 'FINALIZADO' && demoExistente.arriendoId
+      ? demoExistente
+      : undefined;
 
-  if (!reserva || !reserva.arriendoId) {
+  if (demoExistente && !reserva) {
+    throw new Error(
+      `Existe una reserva DEMO-S4 incompleta (#${demoExistente.id}, estado ${demoExistente.estadoArriendo ?? 'sin arriendo'}). ` +
+        'Completa o limpia ese escenario antes de reejecutar seed:s4.',
+    );
+  }
+
+  if (!reserva) {
     console.log('No hay arriendo DEMO-S4; creando escenario completo...');
     const creado = await construirArriendoFinalizado({
       clienteToken: cliente.token,
       proveedorToken: proveedor.token,
-      adminToken: admin.token,
+      prefijoResena: 'DEMO-S4',
       observaciones: 'DEMO-S4',
-      offsetDias: 700,
+      offsetDias: 300,
     });
     console.log(`OK   arriendo ${creado.arriendoId} FINALIZADO (reserva ${creado.reservaId})`);
     reserva = {
@@ -137,23 +155,44 @@ async function main(): Promise<void> {
     {},
     admin.token,
   );
-  let liquidacion = liquidaciones.data.find(
-    (item) => item.periodoInicio <= fechaLocal(0) && item.periodoFin >= fechaLocal(0),
+  let liquidacion: LiquidacionDemo | undefined = liquidaciones.data.find(
+    (item) =>
+      item.estado !== 'ANULADA' &&
+      item.periodoInicio <= fechaLocal(0) &&
+      item.periodoFin >= fechaLocal(0),
   );
   if (!liquidacion) {
-    liquidacion = await api<LiquidacionDemo>(
-      '/liquidaciones',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          ID_proveedor: arriendo.proveedorId,
-          periodo_inicio: '2020-01-01',
-          periodo_fin: '2030-12-31',
-        }),
-      },
-      admin.token,
-    );
-    console.log(`OK   liquidacion ${liquidacion.id} ${liquidacion.estado}`);
+    try {
+      liquidacion = await api<LiquidacionDemo>(
+        '/liquidaciones',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            ID_proveedor: arriendo.proveedorId,
+            periodo_inicio: '2020-01-01',
+            periodo_fin: '2030-12-31',
+          }),
+        },
+        admin.token,
+      );
+      console.log(`OK   liquidacion ${liquidacion.id} ${liquidacion.estado}`);
+    } catch (error) {
+      if ((error as { code?: string }).code !== 'LIQUIDACION_SOLAPADA') throw error;
+      const existentes = await api<{ data: LiquidacionDemo[] }>(
+        `/liquidaciones?proveedor=${arriendo.proveedorId}&pageSize=50`,
+        {},
+        admin.token,
+      );
+      liquidacion =
+        existentes.data.find(
+          (item) =>
+            item.estado !== 'ANULADA' &&
+            item.periodoInicio <= fechaLocal(0) &&
+            item.periodoFin >= fechaLocal(0),
+        ) ?? existentes.data.find((item) => item.estado !== 'ANULADA');
+      if (!liquidacion) throw error;
+      console.log(`SKIP liquidacion solapada; reutilizando ${liquidacion.id}.`);
+    }
   } else {
     console.log(`SKIP liquidacion ${liquidacion.id} (${liquidacion.estado}).`);
   }
@@ -262,7 +301,7 @@ async function main(): Promise<void> {
   console.log(`  arriendo:    ${arriendo.id}`);
   console.log(`  disputa:     ${disputa.id} (${disputa.estado})`);
   console.log(`  liquidacion: ${liquidacion.id} (${liquidacion.estado})`);
-  console.log(`  conversacion:${conversacion.id}`);
+  console.log(`  conversacion: ${conversacion.id}`);
   console.log(`  vehiculo:    ${arriendo.vehiculoId}`);
   console.log('  Cliente: demo@rentacar.cl / Demo1234!');
   console.log('  Admin:   admin@rentacar.cl / Admin1234!');

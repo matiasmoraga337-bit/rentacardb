@@ -63,7 +63,7 @@ export function rango(offsetDias: number, dias = 4): { inicio: string; fin: stri
   return { inicio: fechaLocal(offsetDias), fin: fechaLocal(offsetDias + dias) };
 }
 
-export async function pngDemo(): Promise<{ buffer: Buffer; blob: Blob; nombre: string }> {
+export async function pngDemo(): Promise<{ blob: Blob; nombre: string }> {
   const buffer = await sharp({
     create: {
       width: 12,
@@ -75,10 +75,16 @@ export async function pngDemo(): Promise<{ buffer: Buffer; blob: Blob; nombre: s
     .png()
     .toBuffer();
   return {
-    buffer,
     blob: new Blob([new Uint8Array(buffer)], { type: 'image/png' }),
     nombre: 'demo-s4.png',
   };
+}
+
+export async function verificarUrl(path: string): Promise<number> {
+  const base = process.env.API_URL ?? 'http://localhost:3000/api';
+  const origin = new URL(base).origin;
+  const res = await fetch(`${origin}${path}`, { method: 'HEAD' });
+  return res.status;
 }
 
 export async function subirArchivos(
@@ -95,7 +101,7 @@ export async function subirArchivos(
 export async function construirArriendoFinalizado(params: {
   clienteToken: string;
   proveedorToken: string;
-  adminToken: string;
+  prefijoResena: string;
   observaciones: string;
   offsetDias: number;
 }): Promise<{
@@ -108,8 +114,10 @@ export async function construirArriendoFinalizado(params: {
   const vehiculos = await api<
     { ID_vehiculo: number; patente_vehiculo: string }[]
   >('/vehiculos/buscar');
-  const vehiculo = vehiculos.find((v) => v.patente_vehiculo === 'DEMA01') ?? vehiculos[0];
-  if (!vehiculo) throw new Error('No hay vehiculos. Ejecuta npm run seed.');
+  const vehiculo = vehiculos.find((v) => v.patente_vehiculo === 'DEMA01');
+  if (!vehiculo) {
+    throw new Error('No se encontro DEMA01. Ejecuta npm run seed y verifica que este publicado.');
+  }
 
   const detalle = await api<{
     kilometraje: number;
@@ -254,7 +262,7 @@ export async function construirArriendoFinalizado(params: {
         ID_arriendo: arriendo.id,
         tipo_resena: 'CLIENTE_A_VEHICULO',
         calificacion: 5,
-        comentario: `Demo S4 vehiculo ${arriendo.id}`,
+        comentario: `${params.prefijoResena} vehiculo ${arriendo.id}`,
       }),
     },
     params.clienteToken,
@@ -267,7 +275,7 @@ export async function construirArriendoFinalizado(params: {
         ID_arriendo: arriendo.id,
         tipo_resena: 'CLIENTE_A_PROVEEDOR',
         calificacion: 5,
-        comentario: `Demo S4 proveedor ${arriendo.id}`,
+        comentario: `${params.prefijoResena} proveedor ${arriendo.id}`,
       }),
     },
     params.clienteToken,
@@ -280,7 +288,7 @@ export async function construirArriendoFinalizado(params: {
         ID_arriendo: arriendo.id,
         tipo_resena: 'PROVEEDOR_A_CLIENTE',
         calificacion: 4,
-        comentario: `Demo S4 cliente ${arriendo.id}`,
+        comentario: `${params.prefijoResena} cliente ${arriendo.id}`,
       }),
     },
     params.proveedorToken,

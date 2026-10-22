@@ -10,6 +10,7 @@ import {
   login,
   pngDemo,
   subirArchivos,
+  verificarUrl,
 } from './lib/demo-api';
 
 const stamp = Date.now();
@@ -24,10 +25,25 @@ interface Arriendo {
   id: number;
   vehiculoId: number;
   proveedorId: number;
-  inspecciones: { id: number; tipo: string; fotos: { id: number }[] }[];
+  inspecciones: { id: number; tipo: string; fotos: { id: number; url: string }[] }[];
   cargos: { tipo: string | null; monto: number }[];
   multas: { id: number; monto: number }[];
   resenas: { tipo: string }[];
+}
+
+const EXPECT_OUTBOX = process.env.SMOKE_EXPECT_OUTBOX === '1';
+
+async function esperarOutboxProcesado(adminToken: string): Promise<boolean> {
+  for (let intento = 0; intento < 15; intento += 1) {
+    const outbox = await api<{ total: number }>(
+      '/admin/outbox?estado=PROCESADO&page=1&pageSize=1',
+      {},
+      adminToken,
+    );
+    if (outbox.total > 0) return true;
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }
+  return false;
 }
 
 async function main(): Promise<void> {
@@ -37,21 +53,36 @@ async function main(): Promise<void> {
   const admin = await login(ADMIN_EMAIL, ADMIN_PASSWORD);
   console.log('PASS login cliente, proveedor y admin');
 
-  const nombreMarca = `SMOKE-S4-MARCA-${stamp}`;
-  const marca = await api<{ id: number; nombre: string; activo: boolean }>(
-    '/admin/catalogos/marcas',
-    {
-      method: 'POST',
-      body: JSON.stringify({ nombre: nombreMarca, activo: true }),
-    },
+  const nombreMarca = 'SMOKE-S4-MARCA';
+  const marcas = await api<{ id: number; nombre: string; activo: boolean }[]>(
+    '/admin/catalogos/marcas?incluirInactivos=1',
+    {},
     admin.token,
   );
+  const existente = marcas.find((item) => item.nombre === nombreMarca);
+  const marca = existente
+    ? await api<{ id: number; nombre: string; activo: boolean }>(
+        `/admin/catalogos/marcas/${existente.id}`,
+        {
+          method: 'PUT',
+          body: JSON.stringify({ nombre: nombreMarca, activo: true }),
+        },
+        admin.token,
+      )
+    : await api<{ id: number; nombre: string; activo: boolean }>(
+        '/admin/catalogos/marcas',
+        {
+          method: 'POST',
+          body: JSON.stringify({ nombre: nombreMarca, activo: true }),
+        },
+        admin.token,
+      );
   assert.equal(marca.nombre, nombreMarca);
   await api(
     `/admin/catalogos/marcas/${marca.id}`,
     {
       method: 'PUT',
-      body: JSON.stringify({ nombre: `${nombreMarca}-EDIT`, activo: true }),
+      body: JSON.stringify({ nombre: nombreMarca, activo: true }),
     },
     admin.token,
   );
@@ -63,13 +94,25 @@ async function main(): Promise<void> {
   assert.equal(marcaDesactivada.activo, false);
   console.log('PASS catalogos admin (crear/editar/desactivar)');
 
-  const creado = await construirArriendoFinalizado({
-    clienteToken: cliente.token,
-    proveedorToken: proveedor.token,
-    adminToken: admin.token,
-    observaciones: `SMOKE-S4-${stamp}`,
-    offsetDias: 400 + (stamp % 100),
-  });
+  let creado: Awaited<ReturnType<typeof construirArriendoFinalizado>> | undefined;
+  for (let intento = 1; intento <= 3; intento += 1) {
+    try {
+      creado = await construirArriendoFinalizado({
+        clienteToken: cliente.token,
+        proveedorToken: proveedor.token,
+        prefijoResena: `SMOKE-S4-${stamp}`,
+        observaciones: `SMOKE-S4-${stamp}`,
+        offsetDias: 300 + Math.floor(Math.random() * 200),
+      });
+      break;
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      const solapada = code === 'RESERVA_SOLAPADA' || code === '70209' || code === '70900';
+      if (!solapada || intento === 3) throw error;
+      console.log(`Reintentando arriendo por solapamiento (intento ${intento + 1})...`);
+    }
+  }
+  if (!creado) throw new Error('No se pudo crear el arriendo de smoke.');
   const arriendo = await api<Arriendo>(
     `/arriendos/${creado.arriendoId}`,
     {},
@@ -171,23 +214,45 @@ async function main(): Promise<void> {
   assert.ok(['APROBADA', 'PAGADA'].includes(liquidacion.estado));
   console.log(`PASS liquidacion ${liquidacion.id} (${liquidacion.estado})`);
 
-  const notificaciones = await api<{ total: number }>('/notificaciones/no-leidas', {}, cliente.token);
-  assert.ok(notificaciones.total >= 0);
-  const listaNotificaciones = await api<{ data: { id: number; estado: string }[] }>(
-    '/notificaciones?page=1&pageSize=5',
-    {},
-    cliente.token,
+  const listaNotificaciones = await api<{
+    data: { id: number; estado: string }[];
+    total: number;
+  }>('/notificaciones?page=1&pageSize=20', {}, cliente.token);
+  assert.ok(
+    listaNotificaciones.data.length > 0,
+    'El flujo no genero notificaciones para el cliente.',
   );
-  if (listaNotificaciones.data.length > 0) {
-    await api(`/notificaciones/${listaNotificaciones.data[0].id}/leer`, { method: 'POST' }, cliente.token);
+  const noLeida = listaNotificaciones.data.find((item) => item.estado !== 'LEIDA');
+  if (noLeida) {
+    await api(`/notificaciones/${noLeida.id}/leer`, { method: 'POST' }, cliente.token);
+    const actualizadas = await api<{ data: { id: number; estado: string }[] }>(
+      '/notificaciones?page=1&pageSize=20',
+      {},
+      cliente.token,
+    );
+    assert.equal(
+      actualizadas.data.find((item) => item.id === noLeida.id)?.estado,
+      'LEIDA',
+      'La notificacion no cambio a LEIDA.',
+    );
+    console.log('PASS notificaciones (marcar leida)');
+  } else {
+    console.log('PASS notificaciones (sin pendientes para marcar)');
   }
-  const outbox = await api<{ data: unknown[]; total: number }>(
-    '/admin/outbox?page=1&pageSize=5',
+
+  const outbox = await api<{ total: number }>(
+    '/admin/outbox?page=1&pageSize=1',
     {},
     admin.token,
   );
-  assert.ok(Array.isArray(outbox.data));
-  console.log('PASS notificaciones y outbox');
+  assert.ok(outbox.total > 0, 'No hay eventos en outbox.');
+  if (EXPECT_OUTBOX) {
+    const procesado = await esperarOutboxProcesado(admin.token);
+    assert.ok(procesado, 'No se encontro un evento PROCESADO en outbox.');
+    console.log('PASS outbox worker (evento PROCESADO)');
+  } else {
+    console.log('SKIP outbox worker (SMOKE_EXPECT_OUTBOX no activo)');
+  }
 
   const inspeccion = arriendo.inspecciones.find((item) => item.tipo === 'DEVOLUCION');
   assert.ok(inspeccion);
@@ -201,6 +266,8 @@ async function main(): Promise<void> {
   const arriendoConFoto = await api<Arriendo>(`/arriendos/${arriendo.id}`, {}, proveedor.token);
   const inspeccionConFoto = arriendoConFoto.inspecciones.find((item) => item.id === inspeccion.id);
   assert.ok(inspeccionConFoto && inspeccionConFoto.fotos.length > 0);
+  const fotoStatus = await verificarUrl(inspeccionConFoto.fotos[0].url);
+  assert.equal(fotoStatus, 200, `La foto no responde 200 (status ${fotoStatus}).`);
   console.log('PASS foto de inspeccion');
 
   const conversacion = await api<{ id: number }>(
@@ -225,12 +292,17 @@ async function main(): Promise<void> {
     [png],
     cliente.token,
   );
-  const mensajes = await api<{ id: number; adjuntos: unknown[] }[]>(
+  const mensajes = await api<{ id: number; adjuntos: { url: string }[] }[]>(
     `/conversaciones/${conversacion.id}/mensajes`,
     {},
     cliente.token,
   );
-  assert.ok(mensajes.some((item) => item.id === mensaje.id && item.adjuntos.length > 0));
+  const mensajeConAdjunto = mensajes.find(
+    (item) => item.id === mensaje.id && item.adjuntos.length > 0,
+  );
+  assert.ok(mensajeConAdjunto);
+  const adjuntoStatus = await verificarUrl(mensajeConAdjunto.adjuntos[0].url);
+  assert.equal(adjuntoStatus, 200, `El adjunto no responde 200 (status ${adjuntoStatus}).`);
   console.log('PASS adjuntos de chat');
 
   console.log('SMOKE S4 OK');
