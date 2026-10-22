@@ -23,6 +23,7 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`RESERVAS-PAGOS.md`](RESERVAS-PAGOS.md) | S2: flujo, endpoints, SQL, idempotencia y seguridad de reservas/pagos. |
 | — | [`ARRIENDOS.md`](ARRIENDOS.md) | S3: arriendos, inspecciones, devolución, contrato y daños. |
 | — | [`CHAT.md`](CHAT.md) | S3: chat cliente-proveedor y reglas de mensajería. |
+| — | [`RESENAS.md`](RESENAS.md) | S3: reseñas de arriendo, reglas y listado público. |
 | — | [`JUSTIFICACION-TRIGGERS-CURSOR.md`](JUSTIFICACION-TRIGGERS-CURSOR.md) | Justificación de los 4 triggers y del cursor de expiración. |
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |

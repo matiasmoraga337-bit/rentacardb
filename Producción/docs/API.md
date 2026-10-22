@@ -120,8 +120,9 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET | `/reportes/liquidaciones` | ADMIN | `u_sp_ReporteLiquidaciones` |
 | POST | `/disputas` | AUTH | `Disputa` |
 | GET | `/disputas` | ADMIN | `Disputa` |
-| POST | `/resenas` | AUTH | `u_sp_CrearResena` |
-| GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` |
+| POST | `/resenas` | AUTH dueño/proveedor | `u_sp_CrearResena`. Body `{ID_arriendo, tipo_resena, calificacion, comentario?}`. Solo arriendo `FINALIZADO`; una reseña por autor y tipo. |
+| GET | `/vehiculos/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_VEHICULO`. |
+| GET | `/proveedores/:id/resenas` | PÚBLICO | `Resena` + `TipoResena`. Devuelve `{total, promedio, resenas[]}` con las reseñas `CLIENTE_A_PROVEEDOR`. |
 | POST | `/conversaciones` | ROL(CLIENTE) | `u_sp_CrearConversacion` |
 | GET | `/conversaciones` | AUTH | `u_sp_ListarConversaciones` |
 | GET | `/conversaciones/:id/mensajes` | AUTH participante | `u_sp_ListarMensajes` |

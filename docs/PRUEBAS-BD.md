@@ -3,7 +3,7 @@
 Resultados de la suite de pruebas ejecutada sobre el script final (`RentacarFinal.sql`)
 en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de demo.
 
-- **Última ejecución:** 21-oct-2026
+- **Última ejecución:** 22-oct-2026
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
@@ -96,6 +96,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Notificación `ARRIENDO_FINALIZADO`.
 - Daño registrado en `DEVOLUCION`.
 - Reseña tras finalizar y duplicado rechazado (`53017`).
+- E13 reutiliza el SP y agrega cobertura de API/UI: tres tipos de reseña y listado público.
 - Devolución duplicada rechazada (`53009`).
 - Inicio de arriendo sin licencia rechazado (`53014`).
 
