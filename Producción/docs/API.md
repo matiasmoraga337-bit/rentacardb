@@ -55,7 +55,12 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | GET/POST | `/vehiculos/:id/documentos` | ROL(PROVEEDOR) | `u_sp_RegistrarDocumentoVehiculo` |
 | GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_VehiculosDisponibles` |
 | GET | `/vehiculos/buscar` | PÚBLICO | `u_sp_BuscarVehiculos` |
-| GET/POST/DELETE | `/favoritos[/:vehiculoId]` | AUTH | `FavoritoVehiculo` |
+| GET | `/favoritos` | AUTH | `FavoritoVehiculo` + datos del vehiculo. |
+| POST | `/favoritos/:vehiculoId` | AUTH | `u_sp_AgregarFavorito` (idempotente). |
+| DELETE | `/favoritos/:vehiculoId` | AUTH | `u_sp_QuitarFavorito`. |
+| GET | `/busquedas` | AUTH | `BusquedaGuardada` activas. |
+| POST | `/busquedas` | AUTH | `u_sp_GuardarBusqueda`. |
+| DELETE | `/busquedas/:id` | AUTH dueño | `u_sp_EliminarBusqueda` (soft delete). |
 
 ## Reservas
 
