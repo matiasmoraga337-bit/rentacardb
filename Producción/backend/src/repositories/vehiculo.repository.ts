@@ -128,6 +128,7 @@ const VEHICULO_DETALLE = `
          v.kilometraje_vehiculo AS kilometraje,
          v.precio_diario_base_vehiculo AS precioDiario,
          v.ID_proveedor_vehiculo AS idProveedor,
+         v.ID_sede_actual_vehiculo AS idSedeActual,
          m.nombre_modelo AS modelo,
          ma.nombre_marca AS marca,
          tv.nombre_tipo_vehiculo AS tipoVehiculo,

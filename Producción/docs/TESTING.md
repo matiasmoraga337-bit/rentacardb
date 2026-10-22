@@ -68,3 +68,52 @@ npm run lint; npm run typecheck; npm test; npm run build
 cd Producción/backend
 npm run smoke:s2
 ```
+
+## 7) Sprint S3 — Arriendos e inspecciones
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/06_arriendos.sql` | Inicio de arriendo, inspección ENTREGA, contrato, conductor, devolución, cargo por km, daño DEVOLUCION, reseña y errores (22 casos). |
+| Backend (API) | `Producción/backend/tests/arriendos.test.ts` | Autenticación, roles, validación de inicio/devolución/daños/contrato/conductores. |
+| Frontend | `Producción/frontend/src/features/arriendos/__tests__/` | Badge de estado y tabla de arriendos. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Login → reserva con km → pago → inicio → contrato → conductor → devolución → daño. |
+
+```powershell
+cd Producción/backend
+npm run smoke:s3
+```
+
+## 8) Sprint S3 — Chat
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/07_chat.sql` | Crear/reutilizar conversación, Unicode, no leídos, permisos, cierre y mensajes tras cierre (10 casos). |
+| Backend (API) | `Producción/backend/tests/chat.test.ts` | Autenticación, roles y validación de mensajes. |
+| Smoke e2e | `Producción/backend/scripts/smoke-chat.ts` | Cliente abre chat, proveedor responde, lectura y cierre. |
+
+```powershell
+cd Producción/backend
+npm run smoke:chat
+```
+
+## 9) Sprint S3 — Resenas
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| BD | `sql/tests/06_arriendos.sql` | Creacion de resena tras finalizar, rechazo antes de finalizar y duplicado. |
+| Backend (API) | `Producción/backend/tests/resenas.test.ts` | Autenticacion, validacion de calificacion, tipo, comentario y listado publico. |
+| Frontend | `Producción/frontend/src/features/resenas/__tests__/ResenaForm.test.tsx` | Seleccion de estrellas y envio de la resena. |
+| Smoke e2e | `Producción/backend/scripts/smoke-s3.ts` | Resenas cliente→vehiculo/proveedor, proveedor→cliente y listado publico. |
+
+```powershell
+cd Producción/backend
+npm run smoke:s3
+```
+
+## 10) Sprint S3 — Paneles
+
+| Capa | Archivo | Qué cubre |
+|---|---|---|
+| Backend (API) | `Producción/backend/tests/admin.test.ts` | Autenticacion y rol ADMIN en `GET /admin/auditoria`. |
+| Frontend | `Producción/frontend/src/features/paneles/__tests__/MetricCard.test.tsx` | Tarjeta de metrica reutilizable. |
+| UI | `/panel`, `/admin/catalogos`, `/admin/auditoria` | Widgets por rol, consulta de catalogos y auditoria paginada. |

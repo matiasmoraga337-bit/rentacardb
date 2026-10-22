@@ -3,6 +3,8 @@ import { apiFetch } from '@/lib/api';
 export interface Reserva {
   id: number;
   idCliente: number;
+  idSedeRetiro: number;
+  idSedeDevolucion: number;
   fechaInicio: string;
   fechaFin: string;
   precioDia: number;

@@ -18,9 +18,14 @@ export function AppLayout() {
               Catalogo
             </Link>
             {usuario?.roles.includes('CLIENTE') && (
-              <Link to="/reservas" className="text-sm text-slate-600 hover:text-brand">
-                Mis reservas
-              </Link>
+              <>
+                <Link to="/reservas" className="text-sm text-slate-600 hover:text-brand">
+                  Mis reservas
+                </Link>
+                <Link to="/arriendos" className="text-sm text-slate-600 hover:text-brand">
+                  Mis alquileres
+                </Link>
+              </>
             )}
             {(usuario?.roles.includes('PROVEEDOR') ||
               usuario?.roles.includes('OPERADOR') ||
@@ -28,6 +33,9 @@ export function AppLayout() {
               <>
                 <Link to="/proveedor/reservas" className="text-sm text-slate-600 hover:text-brand">
                   Reservas
+                </Link>
+                <Link to="/proveedor/arriendos" className="text-sm text-slate-600 hover:text-brand">
+                  Arriendos
                 </Link>
                 <Link to="/proveedor/vehiculos" className="text-sm text-slate-600 hover:text-brand">
                   Vehiculos
@@ -45,10 +53,19 @@ export function AppLayout() {
                 <Link to="/admin/reportes" className="text-sm text-slate-600 hover:text-brand">
                   Reportes
                 </Link>
+                <Link to="/admin/catalogos" className="text-sm text-slate-600 hover:text-brand">
+                  Catalogos
+                </Link>
+                <Link to="/admin/auditoria" className="text-sm text-slate-600 hover:text-brand">
+                  Auditoria
+                </Link>
               </>
             )}
             <Link to="/perfil" className="text-sm text-slate-600 hover:text-brand">
               Mi perfil
+            </Link>
+            <Link to="/chat" className="text-sm text-slate-600 hover:text-brand">
+              Chat
             </Link>
             <span className="hidden text-sm text-slate-600 sm:inline">{usuario?.email}</span>
             <Button variant="outline" size="sm" onClick={logout}>

@@ -1,12 +1,14 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/features/auth/AuthContext';
-import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
+import { crearConversacion } from '@/features/chat/api';
+import { fechaFutura, formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
+import { fetchResenasProveedor, fetchResenasVehiculo } from '@/features/resenas/api';
 import { fetchDisponibilidad, fetchVehiculo } from './api';
 
 export function VehiculoPublicoPage() {
@@ -14,6 +16,7 @@ export function VehiculoPublicoPage() {
   const vehiculoId = Number(id);
   const [searchParams] = useSearchParams();
   const { usuario } = useAuth();
+  const navigate = useNavigate();
   const [fechaInicio, setFechaInicio] = useState(
     searchParams.get('desde') || fechaFutura(7),
   );
@@ -31,6 +34,27 @@ export function VehiculoPublicoPage() {
     queryFn: () => fetchDisponibilidad(vehiculoId, fechaInicio, fechaFin),
     enabled: Boolean(query.data) && fechasValidas,
     retry: false,
+  });
+
+  const resenas = useQuery({
+    queryKey: ['vehiculo-resenas', vehiculoId],
+    queryFn: () => fetchResenasVehiculo(vehiculoId),
+    enabled: Number.isInteger(vehiculoId),
+  });
+
+  const resenasProveedor = useQuery({
+    queryKey: ['proveedor-resenas', query.data?.idProveedor],
+    queryFn: () => fetchResenasProveedor(query.data!.idProveedor),
+    enabled: Boolean(query.data),
+  });
+
+  const contactoMutation = useMutation({
+    mutationFn: () =>
+      crearConversacion({
+        ID_proveedor: query.data!.idProveedor,
+        ID_vehiculo: vehiculoId,
+      }),
+    onSuccess: (conversacion) => navigate(`/chat/${conversacion.id}`),
   });
 
   const checkoutUrl = `/checkout/${vehiculoId}?desde=${fechaInicio}&hasta=${fechaFin}`;
@@ -158,6 +182,22 @@ export function VehiculoPublicoPage() {
                     </Button>
                   </Link>
                 )}
+                {usuario && usuario.roles.includes('CLIENTE') && (
+                  <Button
+                    variant="outline"
+                    disabled={contactoMutation.isPending}
+                    onClick={() => contactoMutation.mutate()}
+                  >
+                    {contactoMutation.isPending ? 'Abriendo chat…' : 'Contactar proveedor'}
+                  </Button>
+                )}
+                {contactoMutation.isError && (
+                  <p className="text-sm text-red-600">
+                    {contactoMutation.error instanceof Error
+                      ? contactoMutation.error.message
+                      : 'No se pudo abrir el chat.'}
+                  </p>
+                )}
                 {usuario && !usuario.roles.includes('CLIENTE') && (
                   <p className="text-sm text-slate-600">
                     Tu cuenta no tiene rol CLIENTE; no puedes crear reservas.
@@ -200,6 +240,60 @@ export function VehiculoPublicoPage() {
                     <li className="text-slate-500">Sin tarifas.</li>
                   )}
                 </ul>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Resenas del vehiculo</CardTitle>
+                <CardDescription>
+                  {resenas.isLoading && 'Cargando resenas…'}
+                  {resenas.isError && 'No se pudieron cargar las resenas.'}
+                  {resenas.data &&
+                    (resenas.data.total > 0
+                      ? `${resenas.data.promedio}/5 · ${resenas.data.total} ${
+                          resenas.data.total === 1 ? 'resena' : 'resenas'
+                        }`
+                      : 'Sin resenas todavia.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {resenas.data?.resenas.map((resena) => (
+                  <div key={resena.id} className="rounded-lg border border-slate-200 p-3 text-sm">
+                    <p className="font-medium">{resena.calificacion}/5</p>
+                    <p className="text-slate-600">{resena.comentario ?? 'Sin comentario.'}</p>
+                    <p className="text-xs text-slate-500">
+                      {resena.autor} · {formatearFechaHora(resena.fecha)}
+                    </p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Resenas del proveedor</CardTitle>
+                <CardDescription>
+                  {resenasProveedor.isLoading && 'Cargando resenas…'}
+                  {resenasProveedor.isError && 'No se pudieron cargar las resenas.'}
+                  {resenasProveedor.data &&
+                    (resenasProveedor.data.total > 0
+                      ? `${resenasProveedor.data.promedio}/5 · ${resenasProveedor.data.total} ${
+                          resenasProveedor.data.total === 1 ? 'resena' : 'resenas'
+                        }`
+                      : 'Sin resenas todavia.')}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {resenasProveedor.data?.resenas.map((resena) => (
+                  <div key={resena.id} className="rounded-lg border border-slate-200 p-3 text-sm">
+                    <p className="font-medium">{resena.calificacion}/5</p>
+                    <p className="text-slate-600">{resena.comentario ?? 'Sin comentario.'}</p>
+                    <p className="text-xs text-slate-500">
+                      {resena.autor} · {formatearFechaHora(resena.fecha)}
+                    </p>
+                  </div>
+                ))}
               </CardContent>
             </Card>
           </>

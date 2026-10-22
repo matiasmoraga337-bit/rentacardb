@@ -240,6 +240,217 @@ export const swaggerSpec = {
         responses: { '200': { description: 'Reserva actualizada' }, '409': { description: 'Transicion no permitida' } },
       },
     },
+    '/arriendos': {
+      get: {
+        summary: 'Listar arriendos segun rol y scope',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'scope', in: 'query', schema: { type: 'string', enum: ['cliente', 'proveedor', 'todos'] } },
+          { name: 'estado', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Arriendos paginados' } },
+      },
+    },
+    '/arriendos/iniciar': {
+      post: {
+        summary: 'Iniciar arriendo desde una reserva confirmada',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_reserva', 'ID_sede_retiro_real', 'kilometraje_inicial', 'combustible_inicial'],
+                properties: {
+                  ID_reserva: { type: 'integer' },
+                  ID_sede_retiro_real: { type: 'integer' },
+                  kilometraje_inicial: { type: 'integer', minimum: 0 },
+                  combustible_inicial: { type: 'number', minimum: 0, maximum: 100 },
+                },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Arriendo ACTIVO' }, '409': { description: 'Licencia o estado invalido' } },
+      },
+    },
+    '/arriendos/{id}': {
+      get: {
+        summary: 'Detalle de arriendo con inspecciones, danos y cargos',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Detalle del arriendo' } },
+      },
+    },
+    '/arriendos/{id}/devolucion': {
+      post: {
+        summary: 'Registrar devolucion y finalizar arriendo',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Arriendo FINALIZADO' }, '409': { description: 'Arriendo no activo' } },
+      },
+    },
+    '/arriendos/{id}/inspecciones/{inspeccionId}/danos': {
+      post: {
+        summary: 'Registrar dano en una inspeccion de devolucion',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'id', in: 'path', required: true, schema: { type: 'integer' } },
+          { name: 'inspeccionId', in: 'path', required: true, schema: { type: 'integer' } },
+        ],
+        responses: { '201': { description: 'Dano registrado' }, '409': { description: 'Inspeccion no es de devolucion' } },
+      },
+    },
+    '/arriendos/{id}/conductores': {
+      post: {
+        summary: 'Agregar conductor adicional por RUT (CLIENTE)',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Conductor registrado' }, '404': { description: 'Persona no encontrada' } },
+      },
+    },
+    '/arriendos/{id}/contrato': {
+      get: {
+        summary: 'Ver contrato generado y aceptacion vigente',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Texto, hash y aceptacion' } },
+      },
+      post: {
+        summary: 'Aceptar contrato de arriendo (CLIENTE)',
+        tags: ['Arriendos'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Contrato aceptado' } },
+      },
+    },
+    '/resenas': {
+      post: {
+        summary: 'Crear una resena de un arriendo finalizado',
+        tags: ['Resenas'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_arriendo', 'tipo_resena', 'calificacion'],
+                properties: {
+                  ID_arriendo: { type: 'integer' },
+                  tipo_resena: {
+                    type: 'string',
+                    enum: ['CLIENTE_A_PROVEEDOR', 'CLIENTE_A_VEHICULO', 'PROVEEDOR_A_CLIENTE'],
+                  },
+                  calificacion: { type: 'integer', minimum: 1, maximum: 5 },
+                  comentario: { type: 'string', maxLength: 1000 },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '201': { description: 'Resena registrada' },
+          '403': { description: 'Autor no corresponde al arriendo' },
+          '409': { description: 'Arriendo no finalizado o resena duplicada' },
+        },
+      },
+    },
+    '/vehiculos/{id}/resenas': {
+      get: {
+        summary: 'Listar resenas publicas de un vehiculo',
+        tags: ['Resenas'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          '200': { description: 'Resenas, total y promedio' },
+          '404': { description: 'Vehiculo no encontrado' },
+        },
+      },
+    },
+    '/proveedores/{id}/resenas': {
+      get: {
+        summary: 'Listar resenas publicas de un proveedor',
+        tags: ['Resenas'],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: {
+          '200': { description: 'Resenas, total y promedio' },
+          '404': { description: 'Proveedor no encontrado' },
+        },
+      },
+    },
+    '/conversaciones': {
+      get: {
+        summary: 'Listar conversaciones del usuario autenticado',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        responses: { '200': { description: 'Conversaciones con no leidos y ultimo mensaje' } },
+      },
+      post: {
+        summary: 'Crear o reutilizar una conversacion (CLIENTE)',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['ID_proveedor'],
+                properties: {
+                  ID_proveedor: { type: 'integer' },
+                  ID_vehiculo: { type: 'integer' },
+                },
+              },
+            },
+          },
+        },
+        responses: { '201': { description: 'Conversacion creada' }, '200': { description: 'Conversacion existente reutilizada' } },
+      },
+    },
+    '/conversaciones/{id}/mensajes': {
+      get: {
+        summary: 'Listar mensajes de una conversacion',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Mensajes' }, '403': { description: 'Sin acceso' } },
+      },
+      post: {
+        summary: 'Enviar un mensaje de texto',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '201': { description: 'Mensaje enviado' }, '409': { description: 'Conversacion cerrada' } },
+      },
+    },
+    '/conversaciones/{id}/leidos': {
+      post: {
+        summary: 'Marcar mensajes como leidos',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Cantidad de mensajes marcados' } },
+      },
+    },
+    '/conversaciones/{id}/cerrar': {
+      post: {
+        summary: 'Cerrar una conversacion',
+        tags: ['Chat'],
+        security: [{ bearerAuth: [] }],
+        parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'integer' } }],
+        responses: { '200': { description: 'Conversacion cerrada' } },
+      },
+    },
     '/pagos': {
       get: {
         summary: 'Listar pagos de una reserva',
@@ -389,6 +600,19 @@ export const swaggerSpec = {
           { name: 'ID_proveedor', in: 'query', schema: { type: 'integer' } },
         ],
         responses: { '200': { description: 'Ingresos por mes' } },
+      },
+    },
+    '/admin/auditoria': {
+      get: {
+        summary: 'Listar eventos de auditoria (ADMIN)',
+        tags: ['Admin'],
+        security: [{ bearerAuth: [] }],
+        parameters: [
+          { name: 'entidad', in: 'query', schema: { type: 'string' } },
+          { name: 'page', in: 'query', schema: { type: 'integer', default: 1 } },
+          { name: 'pageSize', in: 'query', schema: { type: 'integer', default: 20 } },
+        ],
+        responses: { '200': { description: 'Eventos paginados' }, '403': { description: 'Solo ADMIN' } },
       },
     },
     '/admin/reservas/expirar': {

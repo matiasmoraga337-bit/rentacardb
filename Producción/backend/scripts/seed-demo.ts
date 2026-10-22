@@ -1,5 +1,5 @@
 /**
- * Seed de datos demo de RentaCarDB (S0-S2).
+ * Seed de datos demo de RentaCarDB (S0-S3).
  * Uso: npm run seed   (requiere la BD levantada y el .env configurado)
  *
  * Usuarios:
@@ -156,6 +156,107 @@ async function ensureUsuario(user: DemoUser): Promise<number> {
   if (!row) throw new Error(`No se pudo crear el usuario ${user.email}.`);
   console.log(`OK   usuario ${user.email} (ID ${row.ID_usuario}, rol ${user.rol}).`);
   return row.ID_usuario;
+}
+
+async function findClaseLicencia(codigo: string): Promise<number> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('codigo', sql.VarChar(10), codigo)
+    .query<{ ID_clase_licencia: number }>(
+      `SELECT TOP 1 ID_clase_licencia FROM dbo.ClaseLicencia
+       WHERE codigo_clase_licencia = @codigo AND activo_clase_licencia = 1`,
+    );
+  if (!result.recordset[0]?.ID_clase_licencia) {
+    throw new Error(`No existe la clase de licencia ${codigo}.`);
+  }
+  return result.recordset[0].ID_clase_licencia;
+}
+
+async function ensurePersonaExtra(
+  rut: string,
+  nombres: string,
+  apellidoPaterno: string,
+): Promise<number> {
+  const pool = await getPool();
+  const existente = await pool
+    .request()
+    .input('rut', sql.VarChar(12), rut)
+    .query<{ ID_persona: number }>(
+      'SELECT TOP 1 ID_persona FROM dbo.Persona WHERE rut_persona = @rut',
+    );
+  if (existente.recordset[0]?.ID_persona) {
+    console.log(`SKIP persona adicional ${rut} (ID ${existente.recordset[0].ID_persona}).`);
+    return existente.recordset[0].ID_persona;
+  }
+
+  const result = await pool
+    .request()
+    .input('rut', sql.VarChar(12), rut)
+    .input('nombres', sql.NVarChar(80), nombres)
+    .input('apellido_paterno', sql.NVarChar(50), apellidoPaterno)
+    .input('fecha_nacimiento', sql.Date, '1990-01-01')
+    .query<{ ID_persona: number }>(
+      `INSERT INTO dbo.Persona
+         (rut_persona, nombres_persona, apellido_paterno_persona, fecha_nacimiento_persona)
+       OUTPUT inserted.ID_persona
+       VALUES (@rut, @nombres, @apellido_paterno, @fecha_nacimiento)`,
+    );
+  const idPersona = result.recordset[0]?.ID_persona;
+  if (!idPersona) throw new Error(`No se pudo crear la persona ${rut}.`);
+  console.log(`OK   persona adicional ${rut} (ID ${idPersona}).`);
+  return idPersona;
+}
+
+async function ensureLicencia(idPersona: number, numeroLicencia: string): Promise<void> {
+  const pool = await getPool();
+  const vencimiento = fechaLocalAnios(2);
+  const existente = await pool
+    .request()
+    .input('idPersona', sql.Int, idPersona)
+    .query<{ ID_licencia_conducir: number }>(
+      `SELECT TOP 1 ID_licencia_conducir
+       FROM dbo.LicenciaConducir
+       WHERE ID_persona_licencia_conducir = @idPersona AND activa_licencia = 1
+       ORDER BY ID_licencia_conducir DESC`,
+    );
+
+  const idExistente = existente.recordset[0]?.ID_licencia_conducir;
+  if (idExistente) {
+    await pool
+      .request()
+      .input('id', sql.Int, idExistente)
+      .input('vencimiento', sql.Date, vencimiento)
+      .query(
+        `UPDATE dbo.LicenciaConducir
+         SET verificada_licencia = 1, activa_licencia = 1,
+             fecha_vencimiento_licencia = @vencimiento
+         WHERE ID_licencia_conducir = @id`,
+      );
+    console.log(`SKIP licencia persona ${idPersona} (ID ${idExistente}, verificada).`);
+    return;
+  }
+
+  const idClase = await findClaseLicencia('B');
+  const result = await pool
+    .request()
+    .input('ID_persona', sql.Int, idPersona)
+    .input('ID_clase_licencia', sql.Int, idClase)
+    .input('numero_licencia', sql.VarChar(20), numeroLicencia)
+    .input('fecha_emision', sql.Date, fechaLocal(-365))
+    .input('fecha_vencimiento', sql.Date, vencimiento)
+    .input('url_archivo', sql.VarChar(500), null)
+    .execute('u_sp_RegistrarLicenciaConducir');
+  const idLicencia = (result.recordset[0] as { ID_licencia_conducir: number } | undefined)
+    ?.ID_licencia_conducir;
+  if (!idLicencia) throw new Error(`No se pudo crear la licencia de la persona ${idPersona}.`);
+  await pool
+    .request()
+    .input('id', sql.Int, idLicencia)
+    .query(
+      'UPDATE dbo.LicenciaConducir SET verificada_licencia = 1 WHERE ID_licencia_conducir = @id',
+    );
+  console.log(`OK   licencia verificada persona ${idPersona} (ID ${idLicencia}).`);
 }
 
 async function ensureProveedor(idUsuario: number, idAdmin: number): Promise<number> {
@@ -336,8 +437,28 @@ async function ensureVehiculo(
     console.log(`OK   vehiculo ${data.patente} (ID ${idVehiculo}).`);
   }
 
-  const tarifas = (await vehiculoRepo.listarTarifas(idVehiculo)) as { nombre: string }[];
-  if (!tarifas.some((t) => t.nombre === 'Tarifa Demo')) {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .input('idSede', sql.Int, idSede)
+    .input('km', sql.Int, data.kilometraje)
+    .query(
+      `IF NOT EXISTS (
+         SELECT 1
+         FROM dbo.Arriendo a
+         INNER JOIN dbo.Reserva r ON r.ID_reserva = a.ID_reserva_arriendo
+         INNER JOIN dbo.EstadoArriendo ea ON ea.ID_estado_arriendo = a.ID_estado_arriendo_arriendo
+         WHERE r.ID_vehiculo_reserva = @id AND ea.nombre_estado_arriendo = 'ACTIVO')
+       UPDATE dbo.Vehiculo
+       SET ID_estado_vehiculo_vehiculo =
+             (SELECT ID_estado_vehiculo FROM dbo.EstadoVehiculo WHERE nombre_estado_vehiculo='DISPONIBLE'),
+           ID_sede_actual_vehiculo = @idSede,
+           kilometraje_vehiculo = @km
+       WHERE ID_vehiculo = @id`,
+    );
+
+  const tarifas = (await vehiculoRepo.listarTarifas(idVehiculo)) as { nombre: string }[];  if (!tarifas.some((t) => t.nombre === 'Tarifa Demo')) {
     await vehiculoRepo.registrarTarifa(idVehiculo, idProveedor, {
       nombre: 'Tarifa Demo',
       fecha_inicio: fechaLocal(),
@@ -359,6 +480,17 @@ async function main(): Promise<void> {
   const idAdmin = await ensureUsuario(DEMO_USERS[0]);
   const idCliente = await ensureUsuario(DEMO_USERS[1]);
   const idProveedorUsuario = await ensureUsuario(DEMO_USERS[2]);
+
+  const idPersonaCliente = await proveedorRepo.findPersonaIdByUsuario(idCliente);
+  if (!idPersonaCliente) throw new Error('No se encontro la persona del cliente demo.');
+  await ensureLicencia(idPersonaCliente, 'DEMO-CLIENTE');
+
+  const idPersonaConductor = await ensurePersonaExtra(
+    '44444444-4',
+    'Conductor',
+    'Demo Adicional',
+  );
+  await ensureLicencia(idPersonaConductor, 'DEMO-CONDUCTOR');
 
   const idProveedor = await ensureProveedor(idProveedorUsuario, idAdmin);
   const idSedeCentro = await ensureSede(
@@ -389,6 +521,8 @@ async function main(): Promise<void> {
   );
   console.log('  Sedes: Santiago Centro y Providencia.');
   console.log('  Vehiculos: DEMA01 (Toyota Corolla) y DEMB02 (Hyundai Tucson).');
+  console.log('  Licencias: cliente demo y conductor adicional verificadas.');
+  console.log('  Conductor adicional: 44444444-4 (Conductor Demo Adicional).');
 
   await closePool();
 }

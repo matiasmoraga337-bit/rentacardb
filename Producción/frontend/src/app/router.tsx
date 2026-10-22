@@ -1,6 +1,11 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AdminAuditoriaPage } from '@/features/admin/AdminAuditoriaPage';
+import { AdminCatalogosPage } from '@/features/admin/AdminCatalogosPage';
 import { ReporteIngresosPage } from '@/features/admin/ReporteIngresosPage';
+import { ArriendoDetallePage } from '@/features/arriendos/ArriendoDetallePage';
+import { ArriendosProveedorPage, MisArriendosPage } from '@/features/arriendos/ArriendosPage';
+import { IniciarArriendoPage } from '@/features/arriendos/IniciarArriendoPage';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { PerfilPage } from '@/features/auth/PerfilPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
@@ -8,6 +13,7 @@ import { RecuperarPage } from '@/features/auth/RecuperarPage';
 import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
+import { ChatPage } from '@/features/chat/ChatPage';
 import { PagoPage } from '@/features/pagos/PagoPage';
 import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
 import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
@@ -74,12 +80,39 @@ export const router = createBrowserRouter([
         ),
       },
       { path: 'reservas/:id', element: <ReservaDetallePage /> },
+      {
+        path: 'arriendos',
+        element: (
+          <RequireRole roles={['CLIENTE']}>
+            <MisArriendosPage />
+          </RequireRole>
+        ),
+      },
+      { path: 'arriendos/:id', element: <ArriendoDetallePage /> },
+      { path: 'chat', element: <ChatPage /> },
+      { path: 'chat/:id', element: <ChatPage /> },
       { path: 'proveedor/registro', element: <RegistrarProveedorPage /> },
       {
         path: 'proveedor/panel',
         element: (
           <RequireRole roles={['PROVEEDOR', 'OPERADOR', 'ADMIN']}>
             <PanelProveedorPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'proveedor/arriendos/iniciar/:reservaId',
+        element: (
+          <RequireRole roles={['PROVEEDOR', 'OPERADOR', 'ADMIN']}>
+            <IniciarArriendoPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'proveedor/arriendos',
+        element: (
+          <RequireRole roles={['PROVEEDOR', 'OPERADOR', 'ADMIN']}>
+            <ArriendosProveedorPage />
           </RequireRole>
         ),
       },
@@ -128,6 +161,22 @@ export const router = createBrowserRouter([
         element: (
           <RequireRole roles={['ADMIN']}>
             <ReporteIngresosPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/catalogos',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminCatalogosPage />
+          </RequireRole>
+        ),
+      },
+      {
+        path: 'admin/auditoria',
+        element: (
+          <RequireRole roles={['ADMIN']}>
+            <AdminAuditoriaPage />
           </RequireRole>
         ),
       },

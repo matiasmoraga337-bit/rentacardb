@@ -27,6 +27,7 @@ export interface VehiculoDetalle {
   kilometraje: number;
   precioDiario: number;
   idProveedor: number;
+  idSedeActual: number | null;
   modelo: string;
   marca: string;
   tipoVehiculo: string;
