@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { CalendarDays, CheckCircle2, KeyRound, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,23 +34,34 @@ export function PanelCliente() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Panel del cliente</h1>
-        <p className="text-sm text-slate-600">Reservas, pagos y conversaciones recientes.</p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Reservas" value={reservas.data?.total ?? '—'} />
-        <MetricCard title="Confirmadas" value={confirmadas.data?.total ?? '—'} />
-        <MetricCard title="Alquileres" value={arriendos.data?.total ?? '—'} />
-        <MetricCard title="Mensajes sin leer" value={noLeidos} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <MetricCard
+          title="Reservas"
+          value={reservas.data?.total ?? '—'}
+          icon={CalendarDays}
+        />
+        <MetricCard
+          title="Confirmadas"
+          value={confirmadas.data?.total ?? '—'}
+          icon={CheckCircle2}
+        />
+        <MetricCard
+          title="Alquileres"
+          value={arriendos.data?.total ?? '—'}
+          icon={KeyRound}
+        />
+        <MetricCard
+          title="Mensajes sin leer"
+          value={noLeidos}
+          icon={MessageSquare}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Ultimas reservas</CardTitle>
-            <CardDescription>Tus 5 reservas mas recientes.</CardDescription>
+            <CardTitle>Últimas reservas</CardTitle>
+            <CardDescription>Tus 5 reservas más recientes.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {reservas.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
@@ -57,7 +69,7 @@ export function PanelCliente() {
               <p className="text-sm text-red-600">No se pudieron cargar las reservas.</p>
             )}
             {reservas.data?.data.length === 0 && (
-              <p className="text-sm text-slate-500">Aun no tienes reservas.</p>
+              <p className="text-sm text-slate-500">Aún no tienes reservas.</p>
             )}
             {reservas.data?.data.map((reserva) => (
               <Link
@@ -129,11 +141,11 @@ export function PanelCliente() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Accesos rapidos</CardTitle>
+          <CardTitle>Accesos rápidos</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Link to="/catalogo">
-            <Button variant="outline">Buscar vehiculos</Button>
+            <Button variant="outline">Buscar vehículos</Button>
           </Link>
           <Link to="/reservas">
             <Button variant="outline">Mis reservas</Button>
@@ -148,7 +160,7 @@ export function PanelCliente() {
             <Button variant="outline">Favoritos</Button>
           </Link>
           <Link to="/busquedas">
-            <Button variant="outline">Busquedas guardadas</Button>
+            <Button variant="outline">Búsquedas guardadas</Button>
           </Link>
         </CardContent>
       </Card>

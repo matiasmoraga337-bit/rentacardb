@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { assetUrl } from '@/lib/api';
 import { formatearCLP } from '@/features/reservas/format';
 import { fetchFavoritos, quitarFavorito } from './api';
 
@@ -41,7 +42,7 @@ export function FavoritosPage() {
               <div className="flex items-center gap-3">
                 {favorito.fotoUrl ? (
                   <img
-                    src={favorito.fotoUrl}
+                    src={assetUrl(favorito.fotoUrl) ?? favorito.fotoUrl}
                     alt={favorito.patente}
                     className="h-16 w-24 rounded object-cover"
                   />

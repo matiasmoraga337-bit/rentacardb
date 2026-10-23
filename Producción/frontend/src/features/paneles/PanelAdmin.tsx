@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { CalendarDays, Clock3, KeyRound, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,16 +38,27 @@ export function PanelAdmin() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Panel de administracion</h1>
-        <p className="text-sm text-slate-600">Proveedores, plataforma y reportes.</p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Proveedores" value={proveedores.data?.length ?? '—'} />
-        <MetricCard title="Pendientes de aprobacion" value={pendientes.length} />
-        <MetricCard title="Reservas" value={reservas.data?.total ?? '—'} />
-        <MetricCard title="Alquileres" value={arriendos.data?.total ?? '—'} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <MetricCard
+          title="Proveedores"
+          value={proveedores.data?.length ?? '—'}
+          icon={Users}
+        />
+        <MetricCard
+          title="Pendientes de aprobación"
+          value={pendientes.length}
+          icon={Clock3}
+        />
+        <MetricCard
+          title="Reservas"
+          value={reservas.data?.total ?? '—'}
+          icon={CalendarDays}
+        />
+        <MetricCard
+          title="Alquileres"
+          value={arriendos.data?.total ?? '—'}
+          icon={KeyRound}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
@@ -85,7 +97,7 @@ export function PanelAdmin() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Ultimas reservas</CardTitle>
+            <CardTitle>Últimas reservas</CardTitle>
             <CardDescription>Actividad reciente de la plataforma.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
@@ -130,7 +142,7 @@ export function PanelAdmin() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Accesos rapidos</CardTitle>
+          <CardTitle>Accesos rápidos</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
           <Link to="/admin/proveedores">

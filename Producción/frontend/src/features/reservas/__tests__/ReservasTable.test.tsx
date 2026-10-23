@@ -50,12 +50,11 @@ describe('ReservasTable', () => {
     );
 
     expect(screen.getByText('#7')).toBeInTheDocument();
-    expect(screen.getByText('Toyota Corolla')).toBeInTheDocument();
-    expect(screen.getByText('Pendiente')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /ver detalle/i })).toHaveAttribute(
-      'href',
-      '/reservas/7',
-    );
+    expect(screen.getAllByText('Toyota Corolla')).toHaveLength(2);
+    expect(screen.getAllByText('Pendiente')).toHaveLength(2);
+    for (const link of screen.getAllByRole('link', { name: /ver detalle/i })) {
+      expect(link).toHaveAttribute('href', '/reservas/7');
+    }
   });
 
   it('muestra un mensaje cuando no hay reservas', () => {

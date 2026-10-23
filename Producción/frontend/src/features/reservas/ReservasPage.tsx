@@ -32,7 +32,7 @@ export function ReservasPage({ scope }: ReservasPageProps) {
       ? 'Reservas de la plataforma'
       : scope === 'cliente'
         ? 'Mis reservas'
-        : 'Reservas de mis vehiculos';
+        : 'Reservas de mis vehículos';
 
   return (
     <div className="space-y-4">
@@ -44,7 +44,7 @@ export function ReservasPage({ scope }: ReservasPageProps) {
               ? 'Todas las reservas registradas en RentaCarDB.'
               : scope === 'cliente'
                 ? 'Reservas que has solicitado en RentaCarDB.'
-                : 'Reservas asociadas a los vehiculos de tu proveedor.'}
+                : 'Reservas asociadas a los vehículos de tu proveedor.'}
           </p>
         </div>
         {scope === 'cliente' && (
@@ -55,14 +55,14 @@ export function ReservasPage({ scope }: ReservasPageProps) {
       </div>
 
       <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardHeader className="flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Listado</CardTitle>
             <CardDescription>
               {query.data ? `${query.data.total} reserva(s) en total.` : 'Cargando reservas.'}
             </CardDescription>
           </div>
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <Select
               aria-label="Filtrar por estado"
               value={estado}
@@ -96,7 +96,7 @@ export function ReservasPage({ scope }: ReservasPageProps) {
           {query.data && query.data.total > pageSize && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-500">
-                Pagina {page} de {totalPaginas}
+                Página {page} de {totalPaginas}
               </span>
               <div className="flex gap-2">
                 <Button

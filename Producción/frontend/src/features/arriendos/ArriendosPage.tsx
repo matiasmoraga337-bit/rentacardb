@@ -28,7 +28,7 @@ export function ArriendosPage({ scope }: { scope: 'cliente' | 'proveedor' }) {
       ? 'Arriendos de la plataforma'
       : scope === 'cliente'
         ? 'Mis alquileres'
-        : 'Arriendos de mis vehiculos';
+        : 'Arriendos de mis vehículos';
 
   return (
     <div className="space-y-4">
@@ -40,7 +40,7 @@ export function ArriendosPage({ scope }: { scope: 'cliente' | 'proveedor' }) {
               ? 'Todos los arriendos registrados en RentaCarDB.'
               : scope === 'cliente'
                 ? 'Arriendos que has realizado en RentaCarDB.'
-                : 'Arriendos asociados a los vehiculos de tu proveedor.'}
+                : 'Arriendos asociados a los vehículos de tu proveedor.'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -58,14 +58,14 @@ export function ArriendosPage({ scope }: { scope: 'cliente' | 'proveedor' }) {
       </div>
 
       <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardHeader className="flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Listado</CardTitle>
             <CardDescription>
               {query.data ? `${query.data.total} arriendo(s) en total.` : 'Cargando arriendos.'}
             </CardDescription>
           </div>
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <Select
               aria-label="Filtrar por estado"
               value={estado}
@@ -95,7 +95,7 @@ export function ArriendosPage({ scope }: { scope: 'cliente' | 'proveedor' }) {
           {query.data && query.data.total > pageSize && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-500">
-                Pagina {page} de {totalPaginas}
+                Página {page} de {totalPaginas}
               </span>
               <div className="flex gap-2">
                 <Button

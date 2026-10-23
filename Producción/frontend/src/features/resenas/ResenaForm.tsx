@@ -56,8 +56,12 @@ export function ResenaForm({ idArriendo, tipo }: ResenaFormProps) {
             ★
           </button>
         ))}
-        <span className="ml-2 text-xs text-slate-500">
-          {calificacion > 0 ? `${calificacion}/5` : 'Selecciona una calificacion'}
+        <span className="ml-2 text-xs text-slate-500" aria-live="polite" aria-atomic="true">
+          {calificacion > 0 ? (
+            <span className="sr-only">{calificacion} de 5 estrellas</span>
+          ) : (
+            'Selecciona una calificacion'
+          )}
         </span>
       </div>
       <textarea

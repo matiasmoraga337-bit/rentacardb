@@ -148,7 +148,7 @@ export function ChatPage() {
             <p className="text-sm text-slate-500">Selecciona una conversacion del listado.</p>
           ) : (
             <>
-              <div className="max-h-[55vh] space-y-3 overflow-y-auto pr-1">
+              <div className="max-h-[55dvh] space-y-3 overflow-y-auto pr-1">
                 {mensajesQuery.isLoading && <p className="text-sm text-slate-500">Cargando mensajes…</p>}
                 {mensajesQuery.isError && (
                   <p className="text-sm text-red-600">No se pudieron cargar los mensajes.</p>

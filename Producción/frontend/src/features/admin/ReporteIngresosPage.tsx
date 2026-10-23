@@ -34,12 +34,12 @@ export function ReporteIngresosPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex-row items-end justify-between space-y-0">
+        <CardHeader className="flex-col gap-3 space-y-0 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <CardTitle>Ingresos por mes</CardTitle>
             <CardDescription>Datos obtenidos con u_sp_ReporteIngresosMensuales.</CardDescription>
           </div>
-          <div className="w-32 space-y-1">
+          <div className="w-full space-y-1 sm:w-32">
             <Label htmlFor="anio">Año</Label>
             <Input
               id="anio"
@@ -58,38 +58,90 @@ export function ReporteIngresosPage() {
             <p className="text-sm text-slate-500">Sin ingresos registrados para el año.</p>
           )}
           {query.data && query.data.length > 0 && (
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500">
-                  <th className="py-2">Mes</th>
-                  <th className="py-2">Reservas</th>
-                  <th className="py-2">Subtotal</th>
-                  <th className="py-2">Impuestos</th>
-                  <th className="py-2">Total exigible</th>
-                  <th className="py-2">Comisiones</th>
-                  <th className="py-2">Reembolsos</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
                 {query.data.map((row) => (
-                  <tr key={`${row.anio}-${row.mes}`} className="border-b border-slate-100">
-                    <td className="py-2">
-                      {new Date(row.anio, row.mes - 1, 1).toLocaleDateString('es-CL', {
-                        month: 'long',
-                      })}
-                    </td>
-                    <td className="py-2">{row.total_reservas}</td>
-                    <td className="py-2">{formatearCLP(row.subtotal_bruto)}</td>
-                    <td className="py-2">{formatearCLP(row.impuestos)}</td>
-                    <td className="py-2 font-medium">{formatearCLP(row.total_exigible)}</td>
-                    <td className="py-2">{formatearCLP(row.comisiones)}</td>
-                    <td className="py-2">
-                      {formatearCLP(row.total_reembolsos_liquidacion_proveedor)}
-                    </td>
-                  </tr>
+                  <article
+                    key={`${row.anio}-${row.mes}`}
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="font-semibold capitalize text-slate-900">
+                        {new Date(row.anio, row.mes - 1, 1).toLocaleDateString('es-CL', {
+                          month: 'long',
+                        })}
+                      </p>
+                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600">
+                        {row.total_reservas} reservas
+                      </span>
+                    </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <dt className="text-xs text-slate-500">Total exigible</dt>
+                        <dd className="mt-0.5 font-semibold text-brand">
+                          {formatearCLP(row.total_exigible)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-slate-500">Comisiones</dt>
+                        <dd className="mt-0.5">{formatearCLP(row.comisiones)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-slate-500">Subtotal</dt>
+                        <dd className="mt-0.5">{formatearCLP(row.subtotal_bruto)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-slate-500">Impuestos</dt>
+                        <dd className="mt-0.5">{formatearCLP(row.impuestos)}</dd>
+                      </div>
+                      <div className="col-span-2">
+                        <dt className="text-xs text-slate-500">Reembolsos</dt>
+                        <dd className="mt-0.5">
+                          {formatearCLP(row.total_reembolsos_liquidacion_proveedor)}
+                        </dd>
+                      </div>
+                    </dl>
+                  </article>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="w-full min-w-[820px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500">
+                      <th className="py-2 pr-3">Mes</th>
+                      <th className="py-2 pr-3">Reservas</th>
+                      <th className="py-2 pr-3">Subtotal</th>
+                      <th className="py-2 pr-3">Impuestos</th>
+                      <th className="py-2 pr-3">Total exigible</th>
+                      <th className="py-2 pr-3">Comisiones</th>
+                      <th className="py-2">Reembolsos</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {query.data.map((row) => (
+                      <tr key={`${row.anio}-${row.mes}`} className="border-b border-slate-100">
+                        <td className="py-3 pr-3 capitalize">
+                          {new Date(row.anio, row.mes - 1, 1).toLocaleDateString('es-CL', {
+                            month: 'long',
+                          })}
+                        </td>
+                        <td className="py-3 pr-3">{row.total_reservas}</td>
+                        <td className="py-3 pr-3">{formatearCLP(row.subtotal_bruto)}</td>
+                        <td className="py-3 pr-3">{formatearCLP(row.impuestos)}</td>
+                        <td className="py-3 pr-3 font-medium">
+                          {formatearCLP(row.total_exigible)}
+                        </td>
+                        <td className="py-3 pr-3">{formatearCLP(row.comisiones)}</td>
+                        <td className="py-3">
+                          {formatearCLP(row.total_reembolsos_liquidacion_proveedor)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
