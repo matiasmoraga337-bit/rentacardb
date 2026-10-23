@@ -13,6 +13,7 @@
     "test": "jest --passWithNoTests",
     "seed": "tsx scripts/seed-demo.ts",
     "seed:s4": "tsx scripts/seed-s4.ts",
+    "seed:fotos": "tsx scripts/seed-fotos.ts",
     "smoke:s2": "tsx scripts/smoke-s2.ts",
     "smoke:s3": "tsx scripts/smoke-s3.ts",
     "smoke:chat": "tsx scripts/smoke-chat.ts",

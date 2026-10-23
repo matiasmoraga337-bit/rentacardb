@@ -46,6 +46,7 @@ cd Producción/backend
 npm install
 $env:DB_PORT='14330'
 npm run seed
+npm run seed:fotos
 ```
 
 El seed es idempotente. Crea:
@@ -59,6 +60,8 @@ El seed es idempotente. Crea:
 Datos: proveedor `AutoDemo`, sedes `Sede Santiago Centro` y
 `Sede Providencia`, vehículos `DEMA01` (Toyota Corolla) y `DEMB02`
 (Hyundai Tucson), tarifas, documentos verificados y filas `VehiculoSede`.
+`seed:fotos` requiere la API en ejecución y carga fotos de stock (Pexels) para
+los dos vehículos demo; si ya tienen fotos, no duplica.
 
 > Si registras un proveedor desde la UI de S1, cierra sesión y vuelve a
 > iniciar sesión: el JWT conserva los roles con los que fue emitido hasta el
