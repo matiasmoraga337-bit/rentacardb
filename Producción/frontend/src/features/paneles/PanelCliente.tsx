@@ -39,21 +39,25 @@ export function PanelCliente() {
           title="Reservas"
           value={reservas.data?.total ?? '—'}
           icon={CalendarDays}
+          loading={reservas.isLoading}
         />
         <MetricCard
           title="Confirmadas"
           value={confirmadas.data?.total ?? '—'}
           icon={CheckCircle2}
+          loading={confirmadas.isLoading}
         />
         <MetricCard
           title="Alquileres"
           value={arriendos.data?.total ?? '—'}
           icon={KeyRound}
+          loading={arriendos.isLoading}
         />
         <MetricCard
           title="Mensajes sin leer"
           value={noLeidos}
           icon={MessageSquare}
+          loading={chat.isLoading}
         />
       </div>
 

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ArrowRight, Building2, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { RatingStars, formatRating } from '@/components/ui/rating-stars';
+import { Skeleton } from '@/components/ui/skeleton';
 import { FavoritoButton } from '@/features/favoritos/FavoritoButton';
 import { formatearCLP } from '@/features/reservas/format';
 import { assetUrl } from '@/lib/api';
@@ -113,5 +114,28 @@ export function VehiculoCard({ item, desde, hasta }: VehiculoCardProps) {
         <FavoritoButton vehiculoId={item.ID_vehiculo} />
       </div>
     </article>
+  );
+}
+
+export function VehiculoCardSkeleton() {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <Skeleton className="aspect-[4/3] w-full rounded-none" />
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-4/5" />
+          <Skeleton className="h-3 w-2/5" />
+        </div>
+        <Skeleton className="h-4 w-28" />
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-3/5" />
+          <Skeleton className="h-3 w-2/5" />
+        </div>
+        <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3">
+          <Skeleton className="h-7 w-28" />
+          <Skeleton className="h-4 w-12" />
+        </div>
+      </div>
+    </div>
   );
 }

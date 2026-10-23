@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
+import { useToast } from '@/components/ui/toast';
 import { fetchProveedores } from '@/features/proveedores/api';
 import { formatearCLP, formatearFecha } from '@/features/reservas/format';
 import {
@@ -37,6 +39,7 @@ function estadoClass(estado: EstadoLiquidacion): string {
 
 export function AdminLiquidacionesPage() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const proveedores = useQuery({ queryKey: ['admin-proveedores'], queryFn: () => fetchProveedores() });
   const [idProveedor, setIdProveedor] = useState<number | undefined>();
   const [inicio, setInicio] = useState(inicioMes());
@@ -58,17 +61,44 @@ export function AdminLiquidacionesPage() {
         periodo_inicio: inicio,
         periodo_fin: fin,
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación generada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo generar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const aprobarMutation = useMutation({
     mutationFn: (id: number) => aprobarLiquidacion(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación aprobada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo aprobar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const pagarMutation = useMutation({
     mutationFn: (id: number) => pagarLiquidacion(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación pagada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo pagar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const totalPaginas = Math.max(1, Math.ceil((query.data?.total ?? 0) / pageSize));
@@ -134,16 +164,7 @@ export function AdminLiquidacionesPage() {
               </Button>
             </div>
           </div>
-          {crearMutation.isError && (
-            <p className="mt-2 text-sm text-red-600">
-              {crearMutation.error instanceof Error
-                ? crearMutation.error.message
-                : 'No se pudo generar la liquidación.'}
-            </p>
-          )}
-          {crearMutation.isSuccess && (
-            <p className="mt-2 text-sm text-emerald-700">Liquidación generada.</p>
-          )}
+
         </CardContent>
       </Card>
 
@@ -173,7 +194,7 @@ export function AdminLiquidacionesPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {query.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">No se pudieron cargar las liquidaciones.</p>
           )}

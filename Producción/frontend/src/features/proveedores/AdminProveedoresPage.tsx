@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
+import { useToast } from '@/components/ui/toast';
 import { aprobarProveedor, fetchProveedores } from './api';
 
 function estadoClass(estado: string): string {
@@ -13,11 +15,21 @@ function estadoClass(estado: string): string {
 
 export function AdminProveedoresPage() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const query = useQuery({ queryKey: ['admin-proveedores'], queryFn: () => fetchProveedores() });
 
   const aprobarMutation = useMutation({
     mutationFn: (id: number) => aprobarProveedor(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-proveedores'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-proveedores'] });
+      showToast('Proveedor aprobado.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo aprobar el proveedor.',
+        'error',
+      );
+    },
   });
 
   return (
@@ -35,7 +47,7 @@ export function AdminProveedoresPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {query.isLoading && <p className="text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">No se pudieron cargar los proveedores.</p>
           )}

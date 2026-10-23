@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RatingStars, formatRating } from '@/components/ui/rating-stars';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthContext';
 import { crearConversacion } from '@/features/chat/api';
 import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
@@ -81,9 +82,19 @@ export function VehiculoPublicoPage() {
         </Link>
 
         {query.isLoading && (
-          <div className="space-y-4">
-            <div className="h-9 w-72 animate-pulse rounded-lg bg-slate-200" />
-            <div className="aspect-[16/9] animate-pulse rounded-2xl bg-slate-200" />
+          <div className="space-y-4" role="status" aria-label="Cargando vehículo">
+            <span className="sr-only">Cargando vehículo…</span>
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-80 max-w-full" />
+            <Skeleton className="h-4 w-64 max-w-full" />
+            <Skeleton className="aspect-[16/9] max-h-[480px] w-full rounded-2xl" />
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+              <div className="space-y-4">
+                <Skeleton className="h-48 w-full rounded-2xl" />
+                <Skeleton className="h-40 w-full rounded-2xl" />
+              </div>
+              <Skeleton className="h-96 w-full rounded-2xl" />
+            </div>
           </div>
         )}
         {query.isError && <p className="text-sm text-red-600">Vehículo no encontrado.</p>}

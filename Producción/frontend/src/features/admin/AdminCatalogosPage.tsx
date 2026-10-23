@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { useCatalogo } from '@/features/catalogos/hooks';
 import {
   actualizarCatalogo,
@@ -333,7 +334,7 @@ export function AdminCatalogosPage() {
             </div>
           )}
 
-          {query.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && <p className="text-sm text-red-600">No se pudo cargar el catalogo.</p>}
           {query.data && query.data.length === 0 && (
             <p className="text-sm text-slate-500">Sin registros.</p>

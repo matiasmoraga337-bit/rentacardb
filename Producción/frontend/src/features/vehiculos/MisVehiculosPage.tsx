@@ -3,6 +3,7 @@ import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { formatearCLP } from '@/features/reservas/format';
 import { fetchMisVehiculos } from './api';
 
@@ -29,7 +30,7 @@ export function MisVehiculosPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {query.isLoading && <p className="text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">
               No se pudieron cargar los vehículos. ¿Registraste tu proveedor?

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 import { buscarVehiculos, type BusquedaParams } from './api';
 import { CatalogoHero } from './CatalogoHero';
 import { FiltrosCatalogo } from './FiltrosCatalogo';
-import { VehiculoCard } from './VehiculoCard';
+import { VehiculoCard, VehiculoCardSkeleton } from './VehiculoCard';
 import { DataModeToggle } from './__fixtures__/DataModeToggle';
 import { vehiculosFixture } from './__fixtures__/worstCase';
 
@@ -190,6 +190,18 @@ export function CatalogoPage() {
               <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 No se pudo realizar la búsqueda.
               </p>
+            )}
+
+            {!usandoFixture && query.isLoading && (
+              <div
+                className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                aria-busy="true"
+                aria-label="Cargando vehículos"
+              >
+                {Array.from({ length: 6 }, (_, index) => (
+                  <VehiculoCardSkeleton key={index} />
+                ))}
+              </div>
             )}
 
             {itemsPagina.length > 0 && (

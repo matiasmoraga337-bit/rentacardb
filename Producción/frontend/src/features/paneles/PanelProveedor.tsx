@@ -57,21 +57,25 @@ export function PanelProveedor() {
           title="Vehículos"
           value={vehiculos.data?.length ?? '—'}
           icon={Car}
+          loading={vehiculos.isLoading}
         />
         <MetricCard
           title="Reservas confirmadas"
           value={confirmadas.data?.total ?? '—'}
           icon={CalendarCheck}
+          loading={confirmadas.isLoading}
         />
         <MetricCard
           title="Arriendos activos"
           value={arriendos.data?.total ?? '—'}
           icon={KeyRound}
+          loading={arriendos.isLoading}
         />
         <MetricCard
           title="Mensajes sin leer"
           value={noLeidos}
           icon={MessageSquare}
+          loading={chat.isLoading}
         />
       </div>
 

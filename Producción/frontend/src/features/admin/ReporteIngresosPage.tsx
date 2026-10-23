@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { apiFetch } from '@/lib/api';
 import { formatearCLP } from '@/features/reservas/format';
 
@@ -52,7 +53,7 @@ export function ReporteIngresosPage() {
           </div>
         </CardHeader>
         <CardContent>
-          {query.isLoading && <p className="text-slate-500">Cargando reporte…</p>}
+          {query.isLoading && <TableSkeleton rows={6} />}
           {query.isError && <p className="text-sm text-red-600">No se pudo cargar el reporte.</p>}
           {query.data && query.data.length === 0 && (
             <p className="text-sm text-slate-500">Sin ingresos registrados para el año.</p>

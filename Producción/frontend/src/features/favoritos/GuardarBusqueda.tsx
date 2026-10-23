@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useToast } from '@/components/ui/toast';
 import { guardarBusqueda } from './api';
 
 export function GuardarBusqueda({
@@ -16,12 +17,20 @@ export function GuardarBusqueda({
   };
 }) {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [nombre, setNombre] = useState('');
   const mutation = useMutation({
     mutationFn: () => guardarBusqueda({ ...filtros, nombre: nombre.trim() || undefined }),
     onSuccess: () => {
       setNombre('');
       queryClient.invalidateQueries({ queryKey: ['busquedas'] });
+      showToast('Búsqueda guardada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo guardar la búsqueda.',
+        'error',
+      );
     },
   });
 
@@ -44,12 +53,6 @@ export function GuardarBusqueda({
       >
         {mutation.isPending ? 'Guardando…' : 'Guardar busqueda'}
       </Button>
-      {mutation.isError && (
-        <p className="text-sm text-red-600">
-          {mutation.error instanceof Error ? mutation.error.message : 'No se pudo guardar.'}
-        </p>
-      )}
-      {mutation.isSuccess && <p className="text-sm text-emerald-700">Busqueda guardada.</p>}
     </div>
   );
 }

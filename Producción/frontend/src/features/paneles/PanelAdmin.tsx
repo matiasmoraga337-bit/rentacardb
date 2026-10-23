@@ -43,21 +43,25 @@ export function PanelAdmin() {
           title="Proveedores"
           value={proveedores.data?.length ?? '—'}
           icon={Users}
+          loading={proveedores.isLoading}
         />
         <MetricCard
           title="Pendientes de aprobación"
           value={pendientes.length}
           icon={Clock3}
+          loading={proveedores.isLoading}
         />
         <MetricCard
           title="Reservas"
           value={reservas.data?.total ?? '—'}
           icon={CalendarDays}
+          loading={reservas.isLoading}
         />
         <MetricCard
           title="Alquileres"
           value={arriendos.data?.total ?? '—'}
           icon={KeyRound}
+          loading={arriendos.isLoading}
         />
       </div>
 

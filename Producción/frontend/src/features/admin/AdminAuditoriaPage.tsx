@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { Label } from '@/components/ui/label';
 import { formatearFechaHora } from '@/features/reservas/format';
 import { fetchAuditoria } from './api';
@@ -58,7 +59,7 @@ export function AdminAuditoriaPage() {
           </form>
         </CardHeader>
         <CardContent className="space-y-3">
-          {query.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">No se pudo cargar la auditoría.</p>
           )}

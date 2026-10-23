@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { Select } from '@/components/ui/select';
 import { useAuth } from '@/features/auth/AuthContext';
 import { fetchReservas } from './api';
@@ -82,7 +83,7 @@ export function ReservasPage({ scope }: ReservasPageProps) {
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {query.isLoading && <p className="text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">No se pudieron cargar las reservas.</p>
           )}
