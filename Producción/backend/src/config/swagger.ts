@@ -97,6 +97,7 @@ export const swaggerSpec = {
           { name: 'fecha_inicio', in: 'query', schema: { type: 'string', format: 'date' } },
           { name: 'fecha_fin', in: 'query', schema: { type: 'string', format: 'date' } },
           { name: 'ID_comuna', in: 'query', schema: { type: 'integer' } },
+          { name: 'ID_region', in: 'query', schema: { type: 'integer' } },
           { name: 'ID_tipo_vehiculo', in: 'query', schema: { type: 'integer' } },
           { name: 'precio_maximo', in: 'query', schema: { type: 'number' } },
         ],
