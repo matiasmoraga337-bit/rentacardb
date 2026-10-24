@@ -24,7 +24,7 @@ npm run dev               # http://localhost:5173
 
 ## E2E
 
-Playwright usa el Microsoft Edge instalado (`channel: 'msedge'`). Para correr los tests:
+En local Playwright usa el Microsoft Edge instalado (`channel: 'msedge'`); en CI usa Chromium. Para correr los tests:
 
 ```powershell
 npm run test:e2e
