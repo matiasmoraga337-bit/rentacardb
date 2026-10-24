@@ -12,6 +12,7 @@ export function GuardarBusqueda({
     fecha_desde?: string;
     fecha_hasta?: string;
     ID_comuna?: number;
+    ID_region?: number;
     ID_tipo_vehiculo?: number;
     precio_maximo?: number;
   };

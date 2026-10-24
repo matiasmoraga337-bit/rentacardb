@@ -19,6 +19,7 @@ export interface BusquedaGuardada {
   id: number;
   nombre: string | null;
   idComuna: number | null;
+  idRegion: number | null;
   idTipoVehiculo: number | null;
   precioMaximo: number | null;
   fechaDesde: string | null;
@@ -40,6 +41,7 @@ export const fetchBusquedas = (): Promise<BusquedaGuardada[]> =>
 export const guardarBusqueda = (data: {
   nombre?: string;
   ID_comuna?: number;
+  ID_region?: number;
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
   fecha_desde?: string;

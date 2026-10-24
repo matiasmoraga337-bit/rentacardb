@@ -76,7 +76,7 @@ export function VehiculoPublicoPage() {
   return (
     <div className="min-h-[100dvh] bg-slate-50">
       <PublicHeader />
-      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
         <Link to="/catalogo" className="text-sm text-brand hover:underline">
           Volver al catálogo
         </Link>
@@ -133,10 +133,12 @@ export function VehiculoPublicoPage() {
               <FavoritoButton vehiculoId={vehiculoId} />
             </header>
 
-            <VehiculoGaleria vehiculo={query.data} />
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(20rem,0.9fr)] lg:items-start">
+              <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+                <VehiculoGaleria vehiculo={query.data} />
+              </div>
 
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-              <aside className="order-1 space-y-4 lg:order-2 lg:sticky lg:top-24">
+              <aside className="space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
                 <Card className="border-brand/20 shadow-md">
                   <CardHeader>
                     <CardTitle>Reservar</CardTitle>
@@ -277,7 +279,7 @@ export function VehiculoPublicoPage() {
                 </Card>
               </aside>
 
-              <div className="order-2 min-w-0 space-y-6 lg:order-1">
+              <div className="min-w-0 space-y-6 lg:col-start-1 lg:row-start-2">
                 <Card>
                   <CardHeader>
                     <CardTitle>Ficha del vehículo</CardTitle>

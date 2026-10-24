@@ -8,6 +8,7 @@ import { GuardarBusqueda } from '@/features/favoritos/GuardarBusqueda';
 import { cn } from '@/lib/utils';
 import { buscarVehiculos, type BusquedaParams } from './api';
 import { CatalogoHero } from './CatalogoHero';
+import { ExploraPorRegion } from './ExploraPorRegion';
 import { FiltrosCatalogo } from './FiltrosCatalogo';
 import { VehiculoCard, VehiculoCardSkeleton } from './VehiculoCard';
 import { DataModeToggle } from './__fixtures__/DataModeToggle';
@@ -22,6 +23,9 @@ export function CatalogoPage() {
   const [fechaFin, setFechaFin] = useState(searchParams.get('hasta') ?? '');
   const [idComuna, setIdComuna] = useState<number | undefined>(
     searchParams.get('comuna') ? Number(searchParams.get('comuna')) : undefined,
+  );
+  const [idRegion, setIdRegion] = useState<number | undefined>(
+    searchParams.get('region') ? Number(searchParams.get('region')) : undefined,
   );
   const [idTipo, setIdTipo] = useState<number | undefined>(
     searchParams.get('tipo') ? Number(searchParams.get('tipo')) : undefined,
@@ -39,6 +43,7 @@ export function CatalogoPage() {
     fecha_inicio: searchParams.get('desde') || undefined,
     fecha_fin: searchParams.get('hasta') || undefined,
     ID_comuna: searchParams.get('comuna') ? Number(searchParams.get('comuna')) : undefined,
+    ID_region: searchParams.get('region') ? Number(searchParams.get('region')) : undefined,
     ID_tipo_vehiculo: searchParams.get('tipo') ? Number(searchParams.get('tipo')) : undefined,
     precio_maximo: searchParams.get('precio') ? Number(searchParams.get('precio')) : undefined,
   });
@@ -60,6 +65,7 @@ export function CatalogoPage() {
     fecha_desde: filtros.fecha_inicio,
     fecha_hasta: filtros.fecha_fin,
     ID_comuna: filtros.ID_comuna,
+    ID_region: filtros.ID_region,
     ID_tipo_vehiculo: filtros.ID_tipo_vehiculo,
     precio_maximo: filtros.precio_maximo,
   };
@@ -69,6 +75,7 @@ export function CatalogoPage() {
       fecha_inicio: fechaInicio || undefined,
       fecha_fin: fechaFin || undefined,
       ID_comuna: idComuna,
+      ID_region: idRegion,
       ID_tipo_vehiculo: idTipo,
       precio_maximo: precioMax,
     });
@@ -82,6 +89,8 @@ export function CatalogoPage() {
     else next.delete('hasta');
     if (idComuna) next.set('comuna', String(idComuna));
     else next.delete('comuna');
+    if (idRegion) next.set('region', String(idRegion));
+    else next.delete('region');
     if (idTipo) next.set('tipo', String(idTipo));
     else next.delete('tipo');
     if (precioMax) next.set('precio', String(precioMax));
@@ -94,6 +103,7 @@ export function CatalogoPage() {
     setFechaInicio('');
     setFechaFin('');
     setIdComuna(undefined);
+    setIdRegion(undefined);
     setIdTipo(undefined);
     setPrecioMax(undefined);
     setFiltros({});
@@ -102,7 +112,7 @@ export function CatalogoPage() {
     setComunaKey((current) => current + 1);
 
     const next = new URLSearchParams(searchParams);
-    ['desde', 'hasta', 'comuna', 'tipo', 'precio', 'pagina', 'data'].forEach((key) =>
+    ['desde', 'hasta', 'comuna', 'region', 'tipo', 'precio', 'pagina', 'data'].forEach((key) =>
       next.delete(key),
     );
     setSearchParams(next, { replace: true });
@@ -115,6 +125,39 @@ export function CatalogoPage() {
     else next.set('data', value);
     next.delete('pagina');
     setSearchParams(next, { replace: true });
+  };
+
+  const seleccionarRegion = (value: number | undefined): void => {
+    setIdRegion(value);
+    if (value) {
+      setIdComuna(undefined);
+      setComunaKey((current) => current + 1);
+    }
+    setFiltros((current) => ({
+      ...current,
+      ID_region: value,
+      ID_comuna: value ? undefined : current.ID_comuna,
+    }));
+    setPagina(1);
+
+    const next = new URLSearchParams(searchParams);
+    if (value) {
+      next.set('region', String(value));
+      next.delete('comuna');
+    } else {
+      next.delete('region');
+    }
+    next.delete('pagina');
+    setSearchParams(next, { replace: false });
+
+    if (value) {
+      window.requestAnimationFrame(() => {
+        document.getElementById('resultados-catalogo')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      });
+    }
   };
 
   const irAPagina = (value: number): void => {
@@ -135,11 +178,16 @@ export function CatalogoPage() {
         idComuna={idComuna}
         onFechaInicio={setFechaInicio}
         onFechaFin={setFechaFin}
-        onComuna={setIdComuna}
+        onComuna={(value) => {
+          setIdComuna(value);
+          if (value) setIdRegion(undefined);
+        }}
         onBuscar={aplicarFiltros}
       />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
+      <main className="mx-auto max-w-[1440px] px-4 py-8 sm:px-6 lg:py-10">
+        <ExploraPorRegion idRegion={idRegion} onSeleccionar={seleccionarRegion} />
+
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold tracking-tight text-slate-900">
@@ -185,7 +233,7 @@ export function CatalogoPage() {
             </div>
           </aside>
 
-          <section className="min-w-0" aria-label="Resultados del catálogo">
+          <section id="resultados-catalogo" className="min-w-0 scroll-mt-24" aria-label="Resultados del catálogo">
             {!usandoFixture && query.isError && (
               <p className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                 No se pudo realizar la búsqueda.
@@ -194,7 +242,7 @@ export function CatalogoPage() {
 
             {!usandoFixture && query.isLoading && (
               <div
-                className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3"
+                className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
                 aria-busy="true"
                 aria-label="Cargando vehículos"
               >
@@ -205,7 +253,7 @@ export function CatalogoPage() {
             )}
 
             {itemsPagina.length > 0 && (
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {itemsPagina.map((item) => (
                   <VehiculoCard
                     key={item.ID_vehiculo}

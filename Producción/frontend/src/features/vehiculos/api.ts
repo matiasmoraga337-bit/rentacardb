@@ -145,6 +145,7 @@ export interface BusquedaParams {
   fecha_inicio?: string;
   fecha_fin?: string;
   ID_comuna?: number;
+  ID_region?: number;
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
 }

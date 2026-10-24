@@ -45,7 +45,7 @@ export function CatalogoHero({
         aria-hidden="true"
         className="pointer-events-none absolute -top-6 right-0 hidden w-[500px] opacity-80 xl:block"
       />
-      <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+      <div className="relative mx-auto max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-200">
           RentaCarDB
         </p>

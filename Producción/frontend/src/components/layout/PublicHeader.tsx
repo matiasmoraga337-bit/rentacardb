@@ -8,7 +8,7 @@ export function PublicHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/85 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-white/70">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+      <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6">
         <Link to="/catalogo" className="flex min-w-0 items-center gap-2 sm:gap-2.5">
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand text-white shadow-sm sm:h-9 sm:w-9">
             <Car className="h-5 w-5" aria-hidden="true" />
