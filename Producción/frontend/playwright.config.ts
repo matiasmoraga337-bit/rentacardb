@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const isCI = Boolean(process.env.CI);
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: false,
@@ -15,11 +17,10 @@ export default defineConfig({
   },
   projects: [
     {
-      name: 'edge',
-      use: {
-        ...devices['Desktop Edge'],
-        channel: 'msedge',
-      },
+      name: isCI ? 'chromium' : 'edge',
+      use: isCI
+        ? { ...devices['Desktop Chrome'] }
+        : { ...devices['Desktop Edge'], channel: 'msedge' },
     },
   ],
   webServer: {

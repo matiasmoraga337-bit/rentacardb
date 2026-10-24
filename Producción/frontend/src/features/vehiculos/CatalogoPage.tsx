@@ -243,6 +243,7 @@ export function CatalogoPage() {
             {!usandoFixture && query.isLoading && (
               <div
                 className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+                role="status"
                 aria-busy="true"
                 aria-label="Cargando vehículos"
               >

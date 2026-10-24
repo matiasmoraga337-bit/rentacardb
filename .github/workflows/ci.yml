@@ -155,3 +155,92 @@ jobs:
       - name: Limpiar contenedor
         if: always()
         run: docker rm -f rentacardb-db-test
+
+  e2e:
+    name: E2E (Playwright + axe)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      DB_PASSWORD: RentaCar_Dev123!
+      JWT_SECRET: ci-e2e-secret
+      CORS_ORIGIN: http://localhost:5173
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: |
+            Producción/backend/package-lock.json
+            Producción/frontend/package-lock.json
+
+      - name: Instalar backend
+        working-directory: Producción/backend
+        run: npm ci
+
+      - name: Instalar frontend
+        working-directory: Producción/frontend
+        run: npm ci
+
+      - name: Crear .env para Docker Compose
+        run: |
+          cat > .env <<EOF
+          DB_PASSWORD=${DB_PASSWORD}
+          JWT_SECRET=${JWT_SECRET}
+          DB_DATABASE=RentaCarDB
+          CORS_ORIGIN=${CORS_ORIGIN}
+          APP_URL=http://localhost:5173
+          EOF
+
+      - name: Levantar base y API
+        run: docker compose --env-file .env -f Producción/infra/docker-compose.yml up -d --build db mailpit api
+
+      - name: Esperar API
+        run: |
+          for i in $(seq 1 90); do
+            if curl -fsS http://localhost:3000/api/health >/dev/null; then
+              echo "API lista."
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose --env-file .env -f Producción/infra/docker-compose.yml logs api
+          exit 1
+
+      - name: Cargar datos demo
+        working-directory: Producción/backend
+        env:
+          DB_HOST: localhost
+          DB_PORT: 14330
+          DB_USER: sa
+          DB_DATABASE: RentaCarDB
+          DB_ENCRYPT: 'true'
+          DB_TRUST_SERVER_CERTIFICATE: 'true'
+        run: |
+          npm run seed
+          npm run seed:fotos
+
+      - name: Instalar Chromium de Playwright
+        working-directory: Producción/frontend
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar E2E y axe
+        working-directory: Producción/frontend
+        env:
+          CI: 'true'
+        run: npm run test:e2e
+
+      - name: Publicar reporte Playwright
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            Producción/frontend/playwright-report
+            Producción/frontend/test-results
+          if-no-files-found: ignore
+
+      - name: Limpiar stack
+        if: always()
+        run: docker compose --env-file .env -f Producción/infra/docker-compose.yml down -v
