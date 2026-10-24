@@ -145,6 +145,7 @@ export interface BusquedaParams {
   fecha_inicio?: string;
   fecha_fin?: string;
   ID_comuna?: number;
+  ID_region?: number;
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
 }
@@ -164,6 +165,8 @@ export interface BusquedaItem {
   nombre_region: string | null;
   nombre_comercial_proveedor: string;
   dias?: number | null;
+  url_foto_principal?: string | null;
+  url_foto_principal_thumb?: string | null;
 }
 
 export async function buscarVehiculos(params: BusquedaParams): Promise<BusquedaItem[]> {

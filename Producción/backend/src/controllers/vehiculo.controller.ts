@@ -157,6 +157,7 @@ export async function buscar(req: Request, res: Response): Promise<void> {
       fecha_inicio: fechaInicio,
       fecha_fin: fechaFin,
       ID_comuna: parseOptionalNumber(req.query.ID_comuna),
+      ID_region: parseOptionalNumber(req.query.ID_region),
       ID_tipo_vehiculo: parseOptionalNumber(req.query.ID_tipo_vehiculo),
       precio_maximo: parseOptionalNumber(req.query.precio_maximo),
       ID_caracteristica: parseOptionalNumber(req.query.ID_caracteristica),

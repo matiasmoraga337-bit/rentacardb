@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { MapPin } from 'lucide-react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { PublicHeader } from '@/components/layout/PublicHeader';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { RatingStars, formatRating } from '@/components/ui/rating-stars';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthContext';
 import { crearConversacion } from '@/features/chat/api';
-import { fechaFutura, formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
+import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
 import { FavoritoButton } from '@/features/favoritos/FavoritoButton';
 import { fetchResenasProveedor, fetchResenasVehiculo } from '@/features/resenas/api';
 import { fetchDisponibilidad, fetchVehiculo } from './api';
+import { ResenasCard } from './ResenasCard';
+import { VehiculoGaleria } from './VehiculoGaleria';
+import { cn } from '@/lib/utils';
 
 export function VehiculoPublicoPage() {
   const { id } = useParams();
@@ -59,250 +66,321 @@ export function VehiculoPublicoPage() {
   });
 
   const checkoutUrl = `/checkout/${vehiculoId}?desde=${fechaInicio}&hasta=${fechaFin}`;
+  const puedeReservar = Boolean(fechasValidas && disponibilidad.data?.disponible);
+  const ctaClass = cn(
+    buttonVariants({ size: 'lg' }),
+    'w-full',
+    !puedeReservar && 'pointer-events-none opacity-50',
+  );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
-          <Link to="/catalogo" className="text-lg font-semibold text-brand">
-            RentaCarDB
-          </Link>
-          <div className="flex items-center gap-3">
-            <FavoritoButton vehiculoId={vehiculoId} />
-            <Link
-              to={usuario ? '/panel' : '/login'}
-              className="text-sm text-slate-600 hover:text-brand"
-            >
-              {usuario ? 'Mi panel' : 'Iniciar sesion'}
-            </Link>
-          </div>
-        </div>
-      </header>
-      <main className="mx-auto max-w-4xl space-y-6 px-4 py-8">
+    <div className="min-h-[100dvh] bg-slate-50">
+      <PublicHeader />
+      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
         <Link to="/catalogo" className="text-sm text-brand hover:underline">
-          Volver al catalogo
+          Volver al catálogo
         </Link>
 
-        {query.isLoading && <p className="text-slate-500">Cargando…</p>}
-        {query.isError && <p className="text-sm text-red-600">Vehiculo no encontrado.</p>}
+        {query.isLoading && (
+          <div className="space-y-4" role="status" aria-label="Cargando vehículo">
+            <span className="sr-only">Cargando vehículo…</span>
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-10 w-80 max-w-full" />
+            <Skeleton className="h-4 w-64 max-w-full" />
+            <Skeleton className="aspect-[16/9] max-h-[480px] w-full rounded-2xl" />
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+              <div className="space-y-4">
+                <Skeleton className="h-48 w-full rounded-2xl" />
+                <Skeleton className="h-40 w-full rounded-2xl" />
+              </div>
+              <Skeleton className="h-96 w-full rounded-2xl" />
+            </div>
+          </div>
+        )}
+        {query.isError && <p className="text-sm text-red-600">Vehículo no encontrado.</p>}
 
         {query.data && (
           <>
-            <div>
-              <h1 className="text-2xl font-semibold">
-                {query.data.marca} {query.data.modelo} · {query.data.anio}
-              </h1>
-              <p className="text-sm text-slate-600">
-                {query.data.tipoVehiculo} · {query.data.combustible} · {query.data.transmision}
-              </p>
-              <p className="mt-1 text-xl font-semibold text-brand">
-                ${query.data.precioDiario.toLocaleString('es-CL')} / dia
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {query.data.fotos.map((foto) => (
-                <a key={foto.id} href={foto.url} target="_blank" rel="noreferrer">
-                  <img
-                    src={foto.thumbUrl}
-                    alt={`Foto ${foto.id}`}
-                    className="h-28 w-full rounded-md border border-slate-200 object-cover"
-                  />
-                </a>
-              ))}
-              {query.data.fotos.length === 0 && (
-                <p className="text-sm text-slate-500">Sin fotos.</p>
-              )}
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Reservar</CardTitle>
-                <CardDescription>Elige las fechas para cotizar y continuar al checkout.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="space-y-1">
-                    <Label htmlFor="detalleDesde">Desde</Label>
-                    <Input
-                      id="detalleDesde"
-                      type="date"
-                      value={fechaInicio}
-                      onChange={(event) => setFechaInicio(event.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label htmlFor="detalleHasta">Hasta</Label>
-                    <Input
-                      id="detalleHasta"
-                      type="date"
-                      value={fechaFin}
-                      onChange={(event) => setFechaFin(event.target.value)}
-                    />
-                  </div>
-                </div>
-
-                {!fechasValidas && (
-                  <p className="text-sm text-amber-700">Revisa el rango de fechas.</p>
-                )}
-                {disponibilidad.isLoading && (
-                  <p className="text-sm text-slate-500">Calculando disponibilidad…</p>
-                )}
-                {disponibilidad.isError && (
-                  <p className="text-sm text-red-600">
-                    {disponibilidad.error instanceof Error
-                      ? disponibilidad.error.message
-                      : 'No se pudo calcular la disponibilidad.'}
+            <header className="flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand">
+                  {query.data.tipoVehiculo}
+                </p>
+                <h1 className="mt-1 text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+                  {query.data.marca} {query.data.modelo}
+                </h1>
+                <p className="mt-2 text-sm text-slate-600">
+                  {query.data.anio} · {query.data.combustible} · {query.data.transmision} ·{' '}
+                  {query.data.kilometraje.toLocaleString('es-CL')} km
+                </p>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <p className="text-2xl font-bold tracking-tight text-brand">
+                    {formatearCLP(query.data.precioDiario)}
+                    <span className="ml-1 text-sm font-normal text-slate-500">/ día</span>
                   </p>
-                )}
-                {disponibilidad.data && (
-                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm">
-                    <p>
-                      {disponibilidad.data.disponible
-                        ? 'Disponible en las fechas seleccionadas.'
-                        : `No disponible${disponibilidad.data.motivo ? ` (${disponibilidad.data.motivo})` : ''}.`}
-                    </p>
-                    {disponibilidad.data.disponible && (
-                      <p className="mt-1">
-                        {disponibilidad.data.dias} dias · Total{' '}
-                        <strong>{formatearCLP(disponibilidad.data.total)}</strong> (incluye
-                        impuestos)
+                  {resenas.data && resenas.data.total > 0 && resenas.data.promedio !== null && (
+                    <span className="flex items-center gap-2 text-sm text-slate-600">
+                      <RatingStars
+                        value={resenas.data.promedio}
+                        label={`Calificación promedio: ${formatRating(resenas.data.promedio)} de 5`}
+                      />
+                      {formatRating(resenas.data.promedio)} · {resenas.data.total}{' '}
+                      {resenas.data.total === 1 ? 'reseña' : 'reseñas'}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <FavoritoButton vehiculoId={vehiculoId} />
+            </header>
+
+            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(20rem,0.9fr)] lg:items-start">
+              <div className="min-w-0 lg:col-start-1 lg:row-start-1">
+                <VehiculoGaleria vehiculo={query.data} />
+              </div>
+
+              <aside className="space-y-4 lg:sticky lg:top-24 lg:col-start-2 lg:row-span-2 lg:row-start-1">
+                <Card className="border-brand/20 shadow-md">
+                  <CardHeader>
+                    <CardTitle>Reservar</CardTitle>
+                    <CardDescription>
+                      Elige las fechas para cotizar y continuar al checkout.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label htmlFor="detalleDesde">Desde</Label>
+                        <Input
+                          id="detalleDesde"
+                          type="date"
+                          value={fechaInicio}
+                          onChange={(event) => setFechaInicio(event.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label htmlFor="detalleHasta">Hasta</Label>
+                        <Input
+                          id="detalleHasta"
+                          type="date"
+                          value={fechaFin}
+                          onChange={(event) => setFechaFin(event.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {!fechasValidas && (
+                      <p className="text-sm text-amber-700">Revisa el rango de fechas.</p>
+                    )}
+                    {disponibilidad.isLoading && (
+                      <p className="text-sm text-slate-500">Calculando disponibilidad…</p>
+                    )}
+                    {disponibilidad.isError && (
+                      <p className="text-sm text-red-600">
+                        {disponibilidad.error instanceof Error
+                          ? disponibilidad.error.message
+                          : 'No se pudo calcular la disponibilidad.'}
                       </p>
                     )}
-                    <p className="text-xs text-slate-500">
-                      {formatearFecha(fechaInicio)} → {formatearFecha(fechaFin)}
-                    </p>
-                  </div>
-                )}
+                    {disponibilidad.data && (
+                      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
+                        <p className="font-medium">
+                          {disponibilidad.data.disponible
+                            ? 'Disponible en las fechas seleccionadas'
+                            : `No disponible${
+                                disponibilidad.data.motivo
+                                  ? ` (${disponibilidad.data.motivo})`
+                                  : ''
+                              }`}
+                        </p>
+                        {disponibilidad.data.disponible && (
+                          <p className="mt-1 text-slate-600">
+                            {disponibilidad.data.dias}{' '}
+                            {disponibilidad.data.dias === 1 ? 'día' : 'días'} · Total{' '}
+                            <strong className="text-brand">
+                              {formatearCLP(disponibilidad.data.total)}
+                            </strong>{' '}
+                            <span className="text-xs">(incluye impuestos)</span>
+                          </p>
+                        )}
+                        <p className="mt-1 text-xs text-slate-500">
+                          {formatearFecha(fechaInicio)} → {formatearFecha(fechaFin)}
+                        </p>
+                      </div>
+                    )}
 
-                {!usuario && (
-                  <Link to="/login" state={{ from: checkoutUrl }}>
-                    <Button disabled={!fechasValidas || !disponibilidad.data?.disponible}>
-                      Inicia sesion para reservar
-                    </Button>
-                  </Link>
-                )}
-                {usuario && usuario.roles.includes('CLIENTE') && (
-                  <Link to={checkoutUrl}>
-                    <Button disabled={!fechasValidas || !disponibilidad.data?.disponible}>
-                      Continuar al checkout
-                    </Button>
-                  </Link>
-                )}
-                {usuario && usuario.roles.includes('CLIENTE') && (
-                  <Button
-                    variant="outline"
-                    disabled={contactoMutation.isPending}
-                    onClick={() => contactoMutation.mutate()}
-                  >
-                    {contactoMutation.isPending ? 'Abriendo chat…' : 'Contactar proveedor'}
-                  </Button>
-                )}
-                {contactoMutation.isError && (
-                  <p className="text-sm text-red-600">
-                    {contactoMutation.error instanceof Error
-                      ? contactoMutation.error.message
-                      : 'No se pudo abrir el chat.'}
-                  </p>
-                )}
-                {usuario && !usuario.roles.includes('CLIENTE') && (
-                  <p className="text-sm text-slate-600">
-                    Tu cuenta no tiene rol CLIENTE; no puedes crear reservas.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                    {!usuario && (
+                      <Link
+                        to="/login"
+                        state={{ from: checkoutUrl }}
+                        className={ctaClass}
+                        aria-disabled={!puedeReservar}
+                      >
+                        Inicia sesión para reservar
+                      </Link>
+                    )}
+                    {usuario && usuario.roles.includes('CLIENTE') && (
+                      <Link
+                        to={checkoutUrl}
+                        className={ctaClass}
+                        aria-disabled={!puedeReservar}
+                      >
+                        Continuar al checkout
+                      </Link>
+                    )}
+                    {usuario && usuario.roles.includes('CLIENTE') && (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        disabled={contactoMutation.isPending}
+                        onClick={() => contactoMutation.mutate()}
+                      >
+                        {contactoMutation.isPending ? 'Abriendo chat…' : 'Contactar proveedor'}
+                      </Button>
+                    )}
+                    {contactoMutation.isError && (
+                      <p className="text-sm text-red-600">
+                        {contactoMutation.error instanceof Error
+                          ? contactoMutation.error.message
+                          : 'No se pudo abrir el chat.'}
+                      </p>
+                    )}
+                    {usuario && !usuario.roles.includes('CLIENTE') && (
+                      <p className="text-sm text-slate-600">
+                        Tu cuenta no tiene rol CLIENTE; no puedes crear reservas.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Caracteristicas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="flex flex-wrap gap-2 text-sm">
-                  {query.data.caracteristicas.map((c) => (
-                    <li key={c.id} className="rounded-full bg-slate-100 px-3 py-1">
-                      {c.nombre}
-                    </li>
-                  ))}
-                  {query.data.caracteristicas.length === 0 && (
-                    <li className="text-slate-500">Sin caracteristicas informadas.</li>
-                  )}
-                </ul>
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                      <MapPin className="h-4 w-4 text-brand" aria-hidden="true" />
+                      Retiro y devolución
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-sm">
+                    {query.data.sedes.map((sede) => (
+                      <div key={sede.id} className="space-y-1">
+                        <p className="font-medium">{sede.nombre}</p>
+                        <p className="text-slate-600">
+                          {sede.direccion}, {sede.comuna}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {sede.permiteEntrega ? 'Entrega disponible' : 'Sin entrega'} ·{' '}
+                          {sede.permiteDevolucion ? 'Devolución disponible' : 'Sin devolución'}
+                        </p>
+                      </div>
+                    ))}
+                    {query.data.sedes.length === 0 && (
+                      <p className="text-slate-500">Sin sede informada.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </aside>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Tarifas</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-1 text-sm">
-                  {query.data.tarifas.map((t) => (
-                    <li key={t.id}>
-                      {t.nombre}: ${t.precioDia.toLocaleString('es-CL')} / dia ({t.fechaInicio} →{' '}
-                      {t.fechaFin})
-                    </li>
-                  ))}
-                  {query.data.tarifas.length === 0 && (
-                    <li className="text-slate-500">Sin tarifas.</li>
-                  )}
-                </ul>
-              </CardContent>
-            </Card>
+              <div className="min-w-0 space-y-6 lg:col-start-1 lg:row-start-2">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Ficha del vehículo</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-5">
+                    <dl className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
+                      <div>
+                        <dt className="text-slate-500">Año</dt>
+                        <dd className="mt-0.5 font-medium">{query.data.anio}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Kilometraje</dt>
+                        <dd className="mt-0.5 font-medium">
+                          {query.data.kilometraje.toLocaleString('es-CL')} km
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Patente</dt>
+                        <dd className="mt-0.5 font-mono text-xs font-medium">
+                          {query.data.patente}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Tipo</dt>
+                        <dd className="mt-0.5 font-medium">{query.data.tipoVehiculo}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Combustible</dt>
+                        <dd className="mt-0.5 font-medium">{query.data.combustible}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-slate-500">Transmisión</dt>
+                        <dd className="mt-0.5 font-medium">{query.data.transmision}</dd>
+                      </div>
+                    </dl>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Resenas del vehiculo</CardTitle>
-                <CardDescription>
-                  {resenas.isLoading && 'Cargando resenas…'}
-                  {resenas.isError && 'No se pudieron cargar las resenas.'}
-                  {resenas.data &&
-                    (resenas.data.total > 0
-                      ? `${resenas.data.promedio}/5 · ${resenas.data.total} ${
-                          resenas.data.total === 1 ? 'resena' : 'resenas'
-                        }`
-                      : 'Sin resenas todavia.')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {resenas.data?.resenas.map((resena) => (
-                  <div key={resena.id} className="rounded-lg border border-slate-200 p-3 text-sm">
-                    <p className="font-medium">{resena.calificacion}/5</p>
-                    <p className="text-slate-600">{resena.comentario ?? 'Sin comentario.'}</p>
-                    <p className="text-xs text-slate-500">
-                      {resena.autor} · {formatearFechaHora(resena.fecha)}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                    <div>
+                      <p className="text-sm font-medium">Características</p>
+                      <ul className="mt-2 flex flex-wrap gap-2 text-sm">
+                        {query.data.caracteristicas
+                          .filter((caracteristica) => caracteristica.disponible)
+                          .map((caracteristica) => (
+                            <li
+                              key={caracteristica.id}
+                              className="rounded-full bg-slate-100 px-3 py-1 text-slate-700"
+                            >
+                              {caracteristica.nombre}
+                            </li>
+                          ))}
+                        {query.data.caracteristicas.every(
+                          (caracteristica) => !caracteristica.disponible,
+                        ) && <li className="text-slate-500">Sin características informadas.</li>}
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Resenas del proveedor</CardTitle>
-                <CardDescription>
-                  {resenasProveedor.isLoading && 'Cargando resenas…'}
-                  {resenasProveedor.isError && 'No se pudieron cargar las resenas.'}
-                  {resenasProveedor.data &&
-                    (resenasProveedor.data.total > 0
-                      ? `${resenasProveedor.data.promedio}/5 · ${resenasProveedor.data.total} ${
-                          resenasProveedor.data.total === 1 ? 'resena' : 'resenas'
-                        }`
-                      : 'Sin resenas todavia.')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {resenasProveedor.data?.resenas.map((resena) => (
-                  <div key={resena.id} className="rounded-lg border border-slate-200 p-3 text-sm">
-                    <p className="font-medium">{resena.calificacion}/5</p>
-                    <p className="text-slate-600">{resena.comentario ?? 'Sin comentario.'}</p>
-                    <p className="text-xs text-slate-500">
-                      {resena.autor} · {formatearFechaHora(resena.fecha)}
-                    </p>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Tarifas</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-2 text-sm">
+                      {query.data.tarifas
+                        .filter((tarifa) => tarifa.activa)
+                        .map((tarifa) => (
+                          <li
+                            key={tarifa.id}
+                            className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 bg-slate-50/60 px-3 py-2"
+                          >
+                            <span>{tarifa.nombre}</span>
+                            <span className="font-medium text-brand">
+                              {formatearCLP(tarifa.precioDia)} / día
+                            </span>
+                            <span className="w-full text-xs text-slate-500">
+                              {formatearFecha(tarifa.fechaInicio)} →{' '}
+                              {formatearFecha(tarifa.fechaFin)}
+                            </span>
+                          </li>
+                        ))}
+                      {query.data.tarifas.every((tarifa) => !tarifa.activa) && (
+                        <li className="text-slate-500">Sin tarifas vigentes.</li>
+                      )}
+                    </ul>
+                  </CardContent>
+                </Card>
+
+                <ResenasCard
+                  title="Reseñas del vehículo"
+                  data={resenas.data}
+                  isLoading={resenas.isLoading}
+                  isError={resenas.isError}
+                />
+                <ResenasCard
+                  title="Reseñas del proveedor"
+                  data={resenasProveedor.data}
+                  isLoading={resenasProveedor.isLoading}
+                  isError={resenasProveedor.isError}
+                />
+              </div>
+            </div>
           </>
         )}
       </main>

@@ -10,6 +10,7 @@ function enlaceBusqueda(busqueda: BusquedaGuardada): string {
   if (busqueda.fechaDesde) qs.set('desde', busqueda.fechaDesde);
   if (busqueda.fechaHasta) qs.set('hasta', busqueda.fechaHasta);
   if (busqueda.idComuna) qs.set('comuna', String(busqueda.idComuna));
+  if (busqueda.idRegion) qs.set('region', String(busqueda.idRegion));
   if (busqueda.idTipoVehiculo) qs.set('tipo', String(busqueda.idTipoVehiculo));
   if (busqueda.precioMaximo) qs.set('precio', String(busqueda.precioMaximo));
   return `/catalogo?${qs.toString()}`;

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { CalendarCheck, Car, KeyRound, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,7 +38,7 @@ export function PanelProveedor() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Aun no eres proveedor</CardTitle>
+          <CardTitle>Aún no eres proveedor</CardTitle>
           <CardDescription>Registra tu proveedor para acceder al panel.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -51,28 +52,38 @@ export function PanelProveedor() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">
-          Panel del proveedor{proveedor.data ? `: ${proveedor.data.nombreComercial}` : ''}
-        </h1>
-        <p className="text-sm text-slate-600">
-          Vehiculos, reservas y arriendos de tu operacion.
-          {proveedor.data ? ` Estado: ${proveedor.data.estado}.` : ''}
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard title="Vehiculos" value={vehiculos.data?.length ?? '—'} />
-        <MetricCard title="Reservas confirmadas" value={confirmadas.data?.total ?? '—'} />
-        <MetricCard title="Arriendos activos" value={arriendos.data?.total ?? '—'} />
-        <MetricCard title="Mensajes sin leer" value={noLeidos} />
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <MetricCard
+          title="Vehículos"
+          value={vehiculos.data?.length ?? '—'}
+          icon={Car}
+          loading={vehiculos.isLoading}
+        />
+        <MetricCard
+          title="Reservas confirmadas"
+          value={confirmadas.data?.total ?? '—'}
+          icon={CalendarCheck}
+          loading={confirmadas.isLoading}
+        />
+        <MetricCard
+          title="Arriendos activos"
+          value={arriendos.data?.total ?? '—'}
+          icon={KeyRound}
+          loading={arriendos.isLoading}
+        />
+        <MetricCard
+          title="Mensajes sin leer"
+          value={noLeidos}
+          icon={MessageSquare}
+          loading={chat.isLoading}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Ultimas reservas</CardTitle>
-            <CardDescription>Reservas recientes de tus vehiculos.</CardDescription>
+            <CardTitle>Últimas reservas</CardTitle>
+            <CardDescription>Reservas recientes de tus vehículos.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {reservas.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
@@ -111,7 +122,7 @@ export function PanelProveedor() {
         <Card>
           <CardHeader>
             <CardTitle>Arriendos activos</CardTitle>
-            <CardDescription>Vehiculos actualmente en arriendo.</CardDescription>
+            <CardDescription>Vehículos actualmente en arriendo.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {arriendos.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
@@ -150,14 +161,14 @@ export function PanelProveedor() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Accesos rapidos</CardTitle>
+            <CardTitle>Accesos rápidos</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
             <Link to="/proveedor/vehiculos">
-              <Button variant="outline">Mis vehiculos</Button>
+              <Button variant="outline">Mis vehículos</Button>
             </Link>
             <Link to="/proveedor/panel">
-              <Button variant="outline">Configuracion y sedes</Button>
+              <Button variant="outline">Configuración y sedes</Button>
             </Link>
             <Link to="/chat">
               <Button variant="outline">Chat</Button>

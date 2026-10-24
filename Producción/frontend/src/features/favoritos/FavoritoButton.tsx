@@ -1,10 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 import { useAuth } from '@/features/auth/AuthContext';
 import { agregarFavorito, fetchFavoritos, quitarFavorito } from './api';
 
 export function FavoritoButton({ vehiculoId }: { vehiculoId: number }) {
   const { usuario } = useAuth();
+  const { showToast } = useToast();
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['favoritos'],
@@ -16,7 +18,16 @@ export function FavoritoButton({ vehiculoId }: { vehiculoId: number }) {
   const mutation = useMutation({
     mutationFn: () =>
       esFavorito ? quitarFavorito(vehiculoId) : agregarFavorito(vehiculoId),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['favoritos'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['favoritos'] });
+      showToast(esFavorito ? 'Vehículo quitado de favoritos.' : 'Vehículo agregado a favoritos.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo actualizar el favorito.',
+        'error',
+      );
+    },
   });
 
   if (!usuario) return null;

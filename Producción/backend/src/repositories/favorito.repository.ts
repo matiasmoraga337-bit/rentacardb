@@ -21,6 +21,7 @@ export interface BusquedaRow {
   id: number;
   nombre: string | null;
   idComuna: number | null;
+  idRegion: number | null;
   idTipoVehiculo: number | null;
   precioMaximo: number | null;
   fechaDesde: string | null;
@@ -94,6 +95,7 @@ export async function listarBusquedas(idUsuario: number): Promise<BusquedaRow[]>
       `SELECT ID_busqueda AS id,
               nombre_busqueda AS nombre,
               ID_comuna_busqueda AS idComuna,
+              ID_region_busqueda AS idRegion,
               ID_tipo_vehiculo_busqueda AS idTipoVehiculo,
               precio_maximo_busqueda AS precioMaximo,
               CONVERT(char(10), fecha_desde_busqueda, 23) AS fechaDesde,
@@ -116,6 +118,7 @@ export async function crearBusqueda(
     .input('ID_usuario', sql.Int, idUsuario)
     .input('nombre', sql.NVarChar(100), input.nombre ?? null)
     .input('ID_comuna', sql.Int, input.ID_comuna ?? null)
+    .input('ID_region', sql.Int, input.ID_region ?? null)
     .input('ID_tipo_vehiculo', sql.Int, input.ID_tipo_vehiculo ?? null)
     .input('precio_maximo', sql.Decimal(12, 2), input.precio_maximo ?? null)
     .input('fecha_desde', sql.Date, input.fecha_desde ?? null)

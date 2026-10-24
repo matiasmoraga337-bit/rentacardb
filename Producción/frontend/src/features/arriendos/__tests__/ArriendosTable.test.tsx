@@ -42,12 +42,11 @@ describe('ArriendosTable', () => {
     );
 
     expect(screen.getByText('#3')).toBeInTheDocument();
-    expect(screen.getByText('Toyota Corolla')).toBeInTheDocument();
-    expect(screen.getByText('Activo')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /ver detalle/i })).toHaveAttribute(
-      'href',
-      '/arriendos/3',
-    );
+    expect(screen.getAllByText('Toyota Corolla')).toHaveLength(2);
+    expect(screen.getAllByText('Activo')).toHaveLength(2);
+    for (const link of screen.getAllByRole('link', { name: /ver detalle/i })) {
+      expect(link).toHaveAttribute('href', '/arriendos/3');
+    }
   });
 
   it('muestra un mensaje sin arriendos', () => {

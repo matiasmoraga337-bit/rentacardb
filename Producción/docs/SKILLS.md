@@ -1,6 +1,6 @@
-﻿# SKILLS — instaladas y recomendadas
+# SKILLS — instaladas y recomendadas
 
-Skills instaladas **globalmente** (`~\.agents\skills\`) el **2026‑10‑20** para el desarrollo
+Skills instaladas **globalmente** (`~\.agents\skills\`) el **2026‑10‑22** para el desarrollo
 full‑stack. Aquí se documenta qué hace cada una y su comando de reinstalación.
 
 > Recordatorio: las skills son instrucciones en Markdown que se cargan en el contexto del
@@ -18,6 +18,9 @@ full‑stack. Aquí se documenta qué hace cada una y su comando de reinstalaci�
 | `alirezarezvani/claude-skills@senior-frontend` | 1.6K | Buenas prácticas frontend | `npx skills add alirezarezvani/claude-skills@senior-frontend -g -y` |
 | `alirezarezvani/claude-skills@senior-backend` | 1.6K | Buenas prácticas backend | `npx skills add alirezarezvani/claude-skills@senior-backend -g -y` |
 
+| `emilkowalski/skills@break-ui` | 48.7K (repo) | Datos de peor caso y edge cases visuales | Copiado desde commit `2d22863` (global) |
+| `emilkowalski/skills@mobile-native` | 48.7K (repo) | Detalles móviles: touch, safe areas, zoom, hover | Copiado desde commit `2d22863` (global) |
+| `emilkowalski/skills@emil-prototype` | 48.7K (repo) | Variantes de UI con picker (renombrado para evitar colisión) | Copiado desde commit `2d22863` (global) |
 > **Seguridad:** `senior-frontend` y `senior-backend` incluyen scripts Python auxiliares
 > (`scripts/*.py`); `api_load_tester.py` realiza peticiones HTTP. No se ejecutan
 > automáticamente: revisarlos antes de invocarlos. Las demás son solo Markdown.

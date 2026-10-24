@@ -1,6 +1,13 @@
 const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
+const API_ORIGIN = API_URL.startsWith('http') ? new URL(API_URL).origin : '';
 
 const TOKEN_KEY = 'rentacardb_token';
+
+export function assetUrl(path: string | null | undefined): string | null {
+  if (!path) return null;
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${API_ORIGIN}${path.startsWith('/') ? '' : '/'}${path}`;
+}
 
 export class ApiError extends Error {
   constructor(
