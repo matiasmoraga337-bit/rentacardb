@@ -3,12 +3,21 @@ import { login } from './helpers';
 
 test.describe('Catálogo público', () => {
   test('carga vehículos y filtra por región', async ({ page }) => {
+    const mapRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('mapa-chile-regiones-horizontal.svg')) {
+        mapRequests.push(request.url());
+      }
+    });
+
     await page.goto('/catalogo');
 
     await expect(
       page.getByRole('heading', { name: 'Vehículos disponibles' }),
     ).toBeVisible();
     await expect(page.locator('article')).toHaveCount(2);
+    await expect(page.locator('.mapa-chile')).toBeVisible();
+    await expect.poll(() => mapRequests.length).toBeGreaterThan(0);
 
     const region = page.getByLabel('Región', { exact: true });
     await region.selectOption('16');

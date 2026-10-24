@@ -3,11 +3,11 @@
 Resultados de la suite de pruebas ejecutada sobre el script final (`RentacarFinal.sql`)
 en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de demo.
 
-- **Última ejecución:** 22-oct-2026
+- **Última ejecución:** 24-oct-2026
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **183 PASS / 0 FAIL**
+- **Resultado global:** **185 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -27,8 +27,9 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/11_notificaciones_outbox.sql` | 8 | Notificacion leida, permisos y ciclo outbox (procesado/reintento) |
 | `sql/tests/12_adjuntos_fotos.sql` | 6 | Fotos de inspeccion y adjuntos de chat con permisos |
 | `sql/tests/13_catalogos.sql` | 8 | CRUD de catalogo simple, modelo, caracteristica y politica |
-| `sql/tests/14_favoritos_busquedas.sql` | 8 | Favoritos y busquedas guardadas con permisos |
+| `sql/tests/14_favoritos_busquedas.sql` | 9 | Favoritos y busquedas guardadas con permisos |
 | `sql/tests/15_calificacion.sql` | 2 | Recalculo de promedio de calificacion del vehiculo |
+| `sql/tests/16_busqueda_region.sql` | 1 | Busqueda publica filtrada por region |
 
 ## 2. Resultados por categoría
 

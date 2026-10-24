@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ExploraPorRegion } from '../ExploraPorRegion';
 
 vi.mock('../MapaChileRegiones', () => ({
@@ -18,6 +18,10 @@ vi.mock('@/features/catalogos/hooks', () => ({
   }),
 }));
 
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe('ExploraPorRegion', () => {
   it('selecciona una region desde el selector', async () => {
     const onSeleccionar = vi.fn();
@@ -28,5 +32,27 @@ describe('ExploraPorRegion', () => {
     await user.selectOptions(screen.getByLabelText('Región'), '16');
 
     expect(onSeleccionar).toHaveBeenCalledWith(16);
+  });
+
+  it('no monta el mapa en mobile', () => {
+    render(<ExploraPorRegion onSeleccionar={vi.fn()} />);
+
+    expect(screen.queryByTestId('mapa-chile')).not.toBeInTheDocument();
+  });
+
+  it('monta el mapa en desktop', () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: true,
+        media: '(min-width: 1024px)',
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
+
+    render(<ExploraPorRegion onSeleccionar={vi.fn()} />);
+
+    expect(screen.getByTestId('mapa-chile')).toBeInTheDocument();
   });
 });

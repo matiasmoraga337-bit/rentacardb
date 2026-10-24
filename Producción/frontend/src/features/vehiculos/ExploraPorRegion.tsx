@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useRegiones } from '@/features/catalogos/hooks';
+import { useMediaQuery } from '@/lib/useMediaQuery';
 import { MapaChileRegiones } from './MapaChileRegiones';
 
 interface ExploraPorRegionProps {
@@ -12,6 +13,7 @@ interface ExploraPorRegionProps {
 
 export function ExploraPorRegion({ idRegion, onSeleccionar }: ExploraPorRegionProps) {
   const regiones = useRegiones();
+  const muestraMapa = useMediaQuery('(min-width: 1024px)');
 
   return (
     <section
@@ -74,29 +76,31 @@ export function ExploraPorRegion({ idRegion, onSeleccionar }: ExploraPorRegionPr
         <p className="mt-4 text-sm text-red-600">No se pudieron cargar las regiones.</p>
       )}
 
-      <div className="mt-5 hidden lg:block">
-        <div className="relative rounded-xl bg-gradient-to-r from-slate-50 via-white to-slate-50 p-2">
-          <MapaChileRegiones
-            regiones={regiones.data ?? []}
-            seleccionada={idRegion}
-            onSeleccionar={onSeleccionar}
-          />
-          <span className="pointer-events-none absolute left-4 top-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Norte
-          </span>
-          <span className="pointer-events-none absolute bottom-3 right-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-            Sur
-          </span>
+      {muestraMapa && (
+        <div className="mt-5">
+          <div className="relative rounded-xl bg-gradient-to-r from-slate-50 via-white to-slate-50 p-2">
+            <MapaChileRegiones
+              regiones={regiones.data ?? []}
+              seleccionada={idRegion}
+              onSeleccionar={onSeleccionar}
+            />
+            <span className="pointer-events-none absolute left-4 top-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+              Norte
+            </span>
+            <span className="pointer-events-none absolute bottom-3 right-4 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+              Sur
+            </span>
+          </div>
+          <a
+            href="https://commons.wikimedia.org/wiki/File:Mapa_de_Chile_(regiones).svg"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-1 block text-right text-[10px] text-slate-500 hover:text-slate-700"
+          >
+            Mapa: B1mbo / Wikimedia · CC BY-SA 3.0 CL
+          </a>
         </div>
-        <a
-          href="https://commons.wikimedia.org/wiki/File:Mapa_de_Chile_(regiones).svg"
-          target="_blank"
-          rel="noreferrer"
-          className="mt-1 block text-right text-[10px] text-slate-500 hover:text-slate-700"
-        >
-          Mapa: B1mbo / Wikimedia · CC BY-SA 3.0 CL
-        </a>
-      </div>
+      )}
     </section>
   );
 }
