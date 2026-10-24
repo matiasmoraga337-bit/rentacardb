@@ -172,7 +172,7 @@ npm run smoke:s3
 
 | Capa | Archivo | Qué cubre |
 |---|---|---|
-| BD | `sql/tests/14_favoritos_busquedas.sql` | Favoritos idempotentes, permisos, busquedas y soft delete (8 casos). |
+| BD | `sql/tests/14_favoritos_busquedas.sql` | Favoritos idempotentes, permisos, busquedas y soft delete (9 casos). |
 | Backend (API) | `Producción/backend/tests/favoritos.test.ts` | Auth, ids invalidos y formato de fechas. |
 | UI | `FavoritosPage`, `BusquedasPage`, `FavoritoButton`, `GuardarBusqueda` | Corazon, listado, guardar y aplicar busqueda. |
 
@@ -192,7 +192,7 @@ npm run smoke:s4
 
 ## 19) CI — suite SQL
 
-El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-15)**:
+El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-16)**:
 
 - inicia `mcr.microsoft.com/mssql/server:2022-latest`;
 - espera disponibilidad con `sqlcmd`;
@@ -200,4 +200,22 @@ El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-15)
 - publica `sql/tests/results` como artifact;
 - elimina el contenedor incluso si falla.
 
-La suite debe quedar en **183 PASS / 0 FAIL**.
+La suite debe quedar en **185 PASS / 0 FAIL**.
+
+## 20) E2E — Playwright + axe
+
+El job **E2E (Playwright + axe)** levanta SQL Server, API y frontend con Docker
+Compose, carga el seed y ejecuta la suite.
+
+| Proyecto | Viewport | Cobertura |
+|---|---|---|
+| `edge` / `chromium` | Desktop | Catálogo, filtro regional, ficha, galería, login, favoritos, admin y axe. |
+| `mobile-edge` / `mobile-chromium` | Pixel 7 | Sin desborde horizontal, filtros, peor caso, ficha, galería, focus trap y axe móvil. |
+
+```powershell
+cd Producción/frontend
+npm run test:e2e
+```
+
+La suite debe quedar en **15 tests** (10 desktop + 5 móvil). Los reportes se
+publican como artifact del workflow.

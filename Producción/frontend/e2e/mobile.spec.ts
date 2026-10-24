@@ -32,9 +32,18 @@ async function expectNoSeriousViolations(page: Page): Promise<void> {
 
 test.describe('Catálogo móvil', () => {
   test('carga, filtra por región y abre los filtros sin desbordar', async ({ page }) => {
+    const mapRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.url().includes('mapa-chile-regiones-horizontal.svg')) {
+        mapRequests.push(request.url());
+      }
+    });
+
     await page.goto('/catalogo');
     await expect(page.getByRole('heading', { name: 'Vehículos disponibles' })).toBeVisible();
     await expect(page.locator('article')).toHaveCount(2);
+    await expect(page.locator('.mapa-chile')).toHaveCount(0);
+    expect(mapRequests).toEqual([]);
     await expectNoHorizontalOverflow(page);
 
     await page.getByRole('button', { name: 'Filtros' }).click();
