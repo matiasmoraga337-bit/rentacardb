@@ -148,6 +148,8 @@ export interface BusquedaParams {
   ID_region?: number;
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
+  page?: number;
+  pageSize?: number;
 }
 
 export interface BusquedaItem {
@@ -167,6 +169,7 @@ export interface BusquedaItem {
   dias?: number | null;
   url_foto_principal?: string | null;
   url_foto_principal_thumb?: string | null;
+  total_registros?: number;
 }
 
 export async function buscarVehiculos(params: BusquedaParams): Promise<BusquedaItem[]> {

@@ -406,6 +406,8 @@ export interface BusquedaParams {
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
   ID_caracteristica?: number;
+  pagina?: number;
+  tamano_pagina?: number;
 }
 
 export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]> {
@@ -419,6 +421,8 @@ export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]
     .input('ID_tipo_vehiculo', sql.Int, params.ID_tipo_vehiculo ?? null)
     .input('precio_maximo', sql.Decimal(14, 2), params.precio_maximo ?? null)
     .input('ID_caracteristica', sql.Int, params.ID_caracteristica ?? null)
+    .input('pagina', sql.Int, params.pagina ?? null)
+    .input('tamano_pagina', sql.Int, params.tamano_pagina ?? null)
     .execute('u_sp_BuscarVehiculos');
   return result.recordset;
 }

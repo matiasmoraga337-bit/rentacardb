@@ -161,6 +161,8 @@ export async function buscar(req: Request, res: Response): Promise<void> {
       ID_tipo_vehiculo: parseOptionalNumber(req.query.ID_tipo_vehiculo),
       precio_maximo: parseOptionalNumber(req.query.precio_maximo),
       ID_caracteristica: parseOptionalNumber(req.query.ID_caracteristica),
+      pagina: parseOptionalNumber(req.query.page),
+      tamano_pagina: parseOptionalNumber(req.query.pageSize),
     }),
   );
 }
