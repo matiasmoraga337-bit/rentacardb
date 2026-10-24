@@ -13,13 +13,13 @@ Matriz de trazabilidad entre objetos SQL y su uso real en la aplicación.
 | `u_sp_ReporteProveedores` | SP | Pestaña de actividad por proveedor. | `GET /api/reportes/proveedores`. |
 | `u_sp_ReporteTiposProveedor` | SP | Pestaña de proveedores por tipo. | `GET /api/reportes/tipos-proveedor`. |
 | `u_sp_ValidarIntegridad` | SP | Pestaña de salud de datos. | `GET /api/reportes/integridad`. |
+| `u_sp_MarcarNotificacionEnviada` | SP | Worker outbox: marca notificación enviada o fallida. | `outbox.job.ts`, `notificacion.repository.ts`. |
+| `u_sp_PublicarEvento` | SP | Evento `ReservaCreada` al crear una reserva. | `u_sp_CrearReserva`. |
 
 ## Pendientes de integrar
 
 | Objeto | Tipo | Integración planificada |
 |---|---|---|
-| `u_sp_MarcarNotificacionEnviada` | SP | Worker outbox: marcar notificación enviada/fallida. |
-| `u_sp_PublicarEvento` | SP | Reemplazar inserts directos en SP orquestadores. |
 | `vw_MantenimientosActivos` | Vista | Tarjeta de mantenimiento en el detalle del vehículo. |
 | `u_sp_RegistrarMantenimiento` | SP | Inicio de mantenimiento desde el panel proveedor. |
 | `u_sp_FinalizarMantenimiento` | SP | Cierre de mantenimiento y vuelta a disponible. |
