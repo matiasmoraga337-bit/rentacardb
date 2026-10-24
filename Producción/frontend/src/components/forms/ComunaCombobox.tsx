@@ -84,7 +84,7 @@ export function ComunaCombobox({
               seleccionar(resultados[activo].id, resultados[activo].nombre);
             }
           }}
-          className="h-11 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-9 text-base text-slate-900 shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30 sm:text-sm"
+          className="h-11 w-full rounded-lg border border-slate-300 bg-white pl-9 pr-12 text-base text-slate-900 shadow-sm outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/30 sm:text-sm"
         />
         {texto && (
           <button
@@ -96,7 +96,7 @@ export function ComunaCombobox({
               setAbierto(false);
               onChange(undefined);
             }}
-            className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            className="absolute right-1 top-1/2 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
           >
             <X className="h-4 w-4" aria-hidden="true" />
           </button>
