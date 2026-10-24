@@ -27,6 +27,12 @@ test.describe('Accesibilidad automatizada', () => {
     await expectNoSeriousViolations(page);
   });
 
+  test('catálogo worst-case sin violaciones graves', async ({ page }) => {
+    await page.goto('/catalogo?data=worst');
+    await expect(page.getByRole('heading', { name: 'Vehículos disponibles' })).toBeVisible();
+    await expectNoSeriousViolations(page);
+  });
+
   test('login sin violaciones graves', async ({ page }) => {
     await page.goto('/login');
     await expect(page.getByRole('heading', { name: 'Inicia sesión' })).toBeVisible();
