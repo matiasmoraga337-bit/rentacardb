@@ -71,3 +71,17 @@ export type ActualizarVehiculoInput = z.infer<typeof actualizarVehiculoSchema>;
 export type TarifaCreateInput = z.infer<typeof tarifaCreateSchema>;
 export type TarifaUpdateInput = z.infer<typeof tarifaUpdateSchema>;
 export type DocumentoCreateInput = z.infer<typeof documentoCreateSchema>;
+export const mantenimientoCreateSchema = z.object({
+  ID_tipo_mantenimiento: z.number().int().positive(),
+  kilometraje: z.number().int().nonnegative(),
+  descripcion: z.string().max(500).optional(),
+  taller: z.string().max(150).optional(),
+  costo: z.number().nonnegative().optional(),
+});
+
+export const mantenimientoFinalizarSchema = z.object({
+  costo_final: z.number().nonnegative().optional(),
+});
+
+export type MantenimientoCreateInput = z.infer<typeof mantenimientoCreateSchema>;
+export type MantenimientoFinalizarInput = z.infer<typeof mantenimientoFinalizarSchema>;

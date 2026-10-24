@@ -6,6 +6,8 @@ import { documentUpload, imageUpload } from '../middlewares/upload';
 import { validate } from '../middlewares/validate';
 import {
   actualizarVehiculoSchema,
+  mantenimientoCreateSchema,
+  mantenimientoFinalizarSchema,
   registrarVehiculoSchema,
   tarifaCreateSchema,
   tarifaUpdateSchema,
@@ -76,6 +78,24 @@ router.get(
   '/:id/documentos',
   authenticate,
   asyncHandler(vehiculoController.listarDocumentos),
+);
+
+router.get(
+  '/:id/mantenimientos',
+  authenticate,
+  asyncHandler(vehiculoController.listarMantenimientos),
+);
+router.post(
+  '/:id/mantenimientos',
+  authenticate,
+  validate(mantenimientoCreateSchema),
+  asyncHandler(vehiculoController.registrarMantenimiento),
+);
+router.post(
+  '/:id/mantenimientos/:mantenimientoId/finalizar',
+  authenticate,
+  validate(mantenimientoFinalizarSchema),
+  asyncHandler(vehiculoController.finalizarMantenimiento),
 );
 
 export default router;

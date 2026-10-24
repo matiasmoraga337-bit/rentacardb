@@ -2,6 +2,8 @@ import * as repo from '../repositories/vehiculo.repository';
 import {
   type ActualizarVehiculoInput,
   type DocumentoCreateInput,
+  type MantenimientoCreateInput,
+  type MantenimientoFinalizarInput,
   type RegistrarVehiculoInput,
   type TarifaCreateInput,
   type TarifaUpdateInput,
@@ -225,6 +227,58 @@ export async function subirDocumento(
 export async function listarDocumentos(idUsuario: number, idVehiculo: number): Promise<unknown[]> {
   await assertVehiculo(idUsuario, idVehiculo);
   return repo.listarDocumentos(idVehiculo);
+}
+
+export async function listarMantenimientos(
+  idUsuario: number,
+  idVehiculo: number,
+): Promise<{ activos: repo.MantenimientoRow[]; historial: repo.MantenimientoRow[] }> {
+  await assertVehiculo(idUsuario, idVehiculo);
+  return repo.listarMantenimientos(idVehiculo);
+}
+
+export async function registrarMantenimiento(
+  idUsuario: number,
+  idVehiculo: number,
+  input: MantenimientoCreateInput,
+): Promise<unknown> {
+  await assertVehiculo(idUsuario, idVehiculo);
+  const vehiculo = (await repo.obtenerVehiculo(idVehiculo)) as
+    | { estadoVehiculo?: string }
+    | null;
+  if (vehiculo?.estadoVehiculo === 'ARRENDADO') {
+    throw new AppError(
+      409,
+      'VEHICULO_ARRENDADO',
+      'No se puede iniciar mantenimiento de un vehiculo arrendado.',
+    );
+  }
+  return repo.registrarMantenimiento({
+    ID_vehiculo: idVehiculo,
+    ID_tipo_mantenimiento: input.ID_tipo_mantenimiento,
+    kilometraje: input.kilometraje,
+    descripcion: input.descripcion ?? null,
+    taller: input.taller ?? null,
+    costo: input.costo ?? null,
+    ID_usuario_operador: idUsuario,
+  });
+}
+
+export async function finalizarMantenimiento(
+  idUsuario: number,
+  idVehiculo: number,
+  idMantenimiento: number,
+  input: MantenimientoFinalizarInput,
+): Promise<unknown> {
+  const idProveedor = await assertVehiculo(idUsuario, idVehiculo);
+  if (!(await repo.mantenimientoPerteneceAProveedor(idMantenimiento, idProveedor))) {
+    throw new AppError(403, 'FORBIDDEN', 'El mantenimiento no pertenece al vehiculo.');
+  }
+  return repo.finalizarMantenimiento(
+    idMantenimiento,
+    input.costo_final ?? null,
+    idUsuario,
+  );
 }
 
 export async function buscar(params: repo.BusquedaParams): Promise<unknown[]> {

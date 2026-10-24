@@ -15,14 +15,14 @@ Matriz de trazabilidad entre objetos SQL y su uso real en la aplicación.
 | `u_sp_ValidarIntegridad` | SP | Pestaña de salud de datos. | `GET /api/reportes/integridad`. |
 | `u_sp_MarcarNotificacionEnviada` | SP | Worker outbox: marca notificación enviada o fallida. | `outbox.job.ts`, `notificacion.repository.ts`. |
 | `u_sp_PublicarEvento` | SP | Evento `ReservaCreada` al crear una reserva. | `u_sp_CrearReserva`. |
+| `vw_MantenimientosActivos` | Vista | Mantenimiento activo en el detalle del vehículo. | `GET /api/vehiculos/:id/mantenimientos`. |
+| `u_sp_RegistrarMantenimiento` | SP | Inicio de mantenimiento desde el detalle del vehículo. | `POST /api/vehiculos/:id/mantenimientos`. |
+| `u_sp_FinalizarMantenimiento` | SP | Cierre de mantenimiento y vuelta a disponible. | `POST /api/vehiculos/:id/mantenimientos/:id/finalizar`. |
 
 ## Pendientes de integrar
 
 | Objeto | Tipo | Integración planificada |
 |---|---|---|
-| `vw_MantenimientosActivos` | Vista | Tarjeta de mantenimiento en el detalle del vehículo. |
-| `u_sp_RegistrarMantenimiento` | SP | Inicio de mantenimiento desde el panel proveedor. |
-| `u_sp_FinalizarMantenimiento` | SP | Cierre de mantenimiento y vuelta a disponible. |
 | `u_sp_RegistrarLicenciaConducir` | SP | Registro de licencia en el perfil del cliente. |
 | `u_sp_LiberarDeposito` | SP | Liberación automática al cancelar/finalizar la reserva. |
 

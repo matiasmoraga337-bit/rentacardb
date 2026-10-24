@@ -115,6 +115,13 @@ const SQL_ERROR_MAP: Record<number, { status: number; code: string }> = {
   53016: { status: 500, code: 'CONFIGURACION_INCOMPLETA' },
   53017: { status: 500, code: 'CONFIGURACION_INCOMPLETA' },
 
+  60020: { status: 400, code: 'MANTENIMIENTO_INVALIDO' },
+  60021: { status: 404, code: 'VEHICULO_NO_ENCONTRADO' },
+  60022: { status: 400, code: 'COSTO_INVALIDO' },
+  60023: { status: 400, code: 'TIPO_MANTENIMIENTO_INVALIDO' },
+  60024: { status: 409, code: 'MANTENIMIENTO_ACTIVO' },
+  60030: { status: 409, code: 'MANTENIMIENTO_NO_ACTIVO' },
+  60031: { status: 400, code: 'COSTO_INVALIDO' },
   60060: { status: 404, code: 'INSPECCION_NO_ENCONTRADA' },
   60061: { status: 400, code: 'SEVERIDAD_INVALIDA' },
   60062: { status: 400, code: 'MONTO_INVALIDO' },

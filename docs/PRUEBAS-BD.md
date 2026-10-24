@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **195 PASS / 0 FAIL**
+- **Resultado global:** **199 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -32,6 +32,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/16_busqueda_region.sql` | 1 | Busqueda publica filtrada por region |
 | `sql/tests/17_integracion_objetos.sql` | 7 | Vistas de panel y reportes SQL integrados |
 | `sql/tests/18_outbox_objetos.sql` | 3 | Publicar evento y marcar notificacion enviada |
+| `sql/tests/19_mantenimiento.sql` | 4 | Registro, vista activa, duplicado y finalizacion de mantenimiento |
 
 ## 2. Resultados por categoría
 

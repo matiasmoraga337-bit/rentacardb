@@ -1,6 +1,8 @@
 import { type Request, type Response } from 'express';
 import {
   type ActualizarVehiculoInput,
+  type MantenimientoCreateInput,
+  type MantenimientoFinalizarInput,
   type RegistrarVehiculoInput,
   type TarifaCreateInput,
   type TarifaUpdateInput,
@@ -121,6 +123,33 @@ export async function subirDocumento(req: Request, res: Response): Promise<void>
   }
   const result = await vehiculoService.subirDocumento(req.user!.id, id, req.file, parsed.data);
   res.status(201).json(result);
+}
+
+export async function listarMantenimientos(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res.status(200).json(await vehiculoService.listarMantenimientos(req.user!.id, id));
+}
+
+export async function registrarMantenimiento(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  const result = await vehiculoService.registrarMantenimiento(
+    req.user!.id,
+    id,
+    req.body as MantenimientoCreateInput,
+  );
+  res.status(201).json(result);
+}
+
+export async function finalizarMantenimiento(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  const idMantenimiento = parseId(req.params.mantenimientoId, 'mantenimientoId');
+  const result = await vehiculoService.finalizarMantenimiento(
+    req.user!.id,
+    id,
+    idMantenimiento,
+    req.body as MantenimientoFinalizarInput,
+  );
+  res.status(200).json(result);
 }
 
 export async function listarDocumentos(req: Request, res: Response): Promise<void> {
