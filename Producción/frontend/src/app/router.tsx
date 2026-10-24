@@ -1,40 +1,153 @@
+import { lazy } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { AdminAuditoriaPage } from '@/features/admin/AdminAuditoriaPage';
-import { AdminCatalogosPage } from '@/features/admin/AdminCatalogosPage';
-import { AdminOutboxPage } from '@/features/admin/AdminOutboxPage';
-import { ReporteIngresosPage } from '@/features/admin/ReporteIngresosPage';
-import { ArriendoDetallePage } from '@/features/arriendos/ArriendoDetallePage';
-import { ArriendosProveedorPage, MisArriendosPage } from '@/features/arriendos/ArriendosPage';
-import { IniciarArriendoPage } from '@/features/arriendos/IniciarArriendoPage';
 import { LoginPage } from '@/features/auth/LoginPage';
-import { PerfilPage } from '@/features/auth/PerfilPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RecuperarPage } from '@/features/auth/RecuperarPage';
 import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
-import { ChatPage } from '@/features/chat/ChatPage';
-import { BusquedasPage } from '@/features/favoritos/BusquedasPage';
-import { FavoritosPage } from '@/features/favoritos/FavoritosPage';
-import { AdminDisputasPage, DisputasPage } from '@/features/disputas/DisputasPage';
-import { AdminLiquidacionesPage } from '@/features/liquidaciones/AdminLiquidacionesPage';
-import { ProveedorLiquidacionesPage } from '@/features/liquidaciones/ProveedorLiquidacionesPage';
-import { NotificacionesPage } from '@/features/notificaciones/NotificacionesPage';
-import { PagoPage } from '@/features/pagos/PagoPage';
-import { WebPayConfirmPage } from '@/features/pagos/WebPayConfirmPage';
-import { AdminProveedoresPage } from '@/features/proveedores/AdminProveedoresPage';
-import { PanelProveedorPage } from '@/features/proveedores/PanelProveedorPage';
-import { RegistrarProveedorPage } from '@/features/proveedores/RegistrarProveedorPage';
-import { CheckoutPage } from '@/features/reservas/CheckoutPage';
-import { MisReservasPage, ReservasProveedorPage } from '@/features/reservas/ReservasPage';
-import { ReservaDetallePage } from '@/features/reservas/ReservaDetallePage';
-import { MisVehiculosPage } from '@/features/vehiculos/MisVehiculosPage';
 import { CatalogoPage } from '@/features/vehiculos/CatalogoPage';
-import { VehiculoDetallePage } from '@/features/vehiculos/VehiculoDetallePage';
-import { VehiculoFormPage } from '@/features/vehiculos/VehiculoFormPage';
 import { VehiculoPublicoPage } from '@/features/vehiculos/VehiculoPublicoPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+
+const AdminAuditoriaPage = lazy(() =>
+  import('@/features/admin/AdminAuditoriaPage').then((mod) => ({
+    default: mod.AdminAuditoriaPage,
+  })),
+);
+const AdminCatalogosPage = lazy(() =>
+  import('@/features/admin/AdminCatalogosPage').then((mod) => ({
+    default: mod.AdminCatalogosPage,
+  })),
+);
+const AdminOutboxPage = lazy(() =>
+  import('@/features/admin/AdminOutboxPage').then((mod) => ({
+    default: mod.AdminOutboxPage,
+  })),
+);
+const ReporteIngresosPage = lazy(() =>
+  import('@/features/admin/ReporteIngresosPage').then((mod) => ({
+    default: mod.ReporteIngresosPage,
+  })),
+);
+const ArriendoDetallePage = lazy(() =>
+  import('@/features/arriendos/ArriendoDetallePage').then((mod) => ({
+    default: mod.ArriendoDetallePage,
+  })),
+);
+const ArriendosProveedorPage = lazy(() =>
+  import('@/features/arriendos/ArriendosPage').then((mod) => ({
+    default: mod.ArriendosProveedorPage,
+  })),
+);
+const MisArriendosPage = lazy(() =>
+  import('@/features/arriendos/ArriendosPage').then((mod) => ({
+    default: mod.MisArriendosPage,
+  })),
+);
+const IniciarArriendoPage = lazy(() =>
+  import('@/features/arriendos/IniciarArriendoPage').then((mod) => ({
+    default: mod.IniciarArriendoPage,
+  })),
+);
+const PerfilPage = lazy(() =>
+  import('@/features/auth/PerfilPage').then((mod) => ({ default: mod.PerfilPage })),
+);
+const ChatPage = lazy(() =>
+  import('@/features/chat/ChatPage').then((mod) => ({ default: mod.ChatPage })),
+);
+const BusquedasPage = lazy(() =>
+  import('@/features/favoritos/BusquedasPage').then((mod) => ({
+    default: mod.BusquedasPage,
+  })),
+);
+const FavoritosPage = lazy(() =>
+  import('@/features/favoritos/FavoritosPage').then((mod) => ({
+    default: mod.FavoritosPage,
+  })),
+);
+const AdminDisputasPage = lazy(() =>
+  import('@/features/disputas/DisputasPage').then((mod) => ({
+    default: mod.AdminDisputasPage,
+  })),
+);
+const DisputasPage = lazy(() =>
+  import('@/features/disputas/DisputasPage').then((mod) => ({ default: mod.DisputasPage })),
+);
+const AdminLiquidacionesPage = lazy(() =>
+  import('@/features/liquidaciones/AdminLiquidacionesPage').then((mod) => ({
+    default: mod.AdminLiquidacionesPage,
+  })),
+);
+const ProveedorLiquidacionesPage = lazy(() =>
+  import('@/features/liquidaciones/ProveedorLiquidacionesPage').then((mod) => ({
+    default: mod.ProveedorLiquidacionesPage,
+  })),
+);
+const NotificacionesPage = lazy(() =>
+  import('@/features/notificaciones/NotificacionesPage').then((mod) => ({
+    default: mod.NotificacionesPage,
+  })),
+);
+const PagoPage = lazy(() =>
+  import('@/features/pagos/PagoPage').then((mod) => ({ default: mod.PagoPage })),
+);
+const WebPayConfirmPage = lazy(() =>
+  import('@/features/pagos/WebPayConfirmPage').then((mod) => ({
+    default: mod.WebPayConfirmPage,
+  })),
+);
+const AdminProveedoresPage = lazy(() =>
+  import('@/features/proveedores/AdminProveedoresPage').then((mod) => ({
+    default: mod.AdminProveedoresPage,
+  })),
+);
+const PanelProveedorPage = lazy(() =>
+  import('@/features/proveedores/PanelProveedorPage').then((mod) => ({
+    default: mod.PanelProveedorPage,
+  })),
+);
+const RegistrarProveedorPage = lazy(() =>
+  import('@/features/proveedores/RegistrarProveedorPage').then((mod) => ({
+    default: mod.RegistrarProveedorPage,
+  })),
+);
+const CheckoutPage = lazy(() =>
+  import('@/features/reservas/CheckoutPage').then((mod) => ({
+    default: mod.CheckoutPage,
+  })),
+);
+const MisReservasPage = lazy(() =>
+  import('@/features/reservas/ReservasPage').then((mod) => ({
+    default: mod.MisReservasPage,
+  })),
+);
+const ReservasProveedorPage = lazy(() =>
+  import('@/features/reservas/ReservasPage').then((mod) => ({
+    default: mod.ReservasProveedorPage,
+  })),
+);
+const ReservaDetallePage = lazy(() =>
+  import('@/features/reservas/ReservaDetallePage').then((mod) => ({
+    default: mod.ReservaDetallePage,
+  })),
+);
+const MisVehiculosPage = lazy(() =>
+  import('@/features/vehiculos/MisVehiculosPage').then((mod) => ({
+    default: mod.MisVehiculosPage,
+  })),
+);
+const VehiculoDetallePage = lazy(() =>
+  import('@/features/vehiculos/VehiculoDetallePage').then((mod) => ({
+    default: mod.VehiculoDetallePage,
+  })),
+);
+const VehiculoFormPage = lazy(() =>
+  import('@/features/vehiculos/VehiculoFormPage').then((mod) => ({
+    default: mod.VehiculoFormPage,
+  })),
+);
 
 const prototypeRoutes: RouteObject[] = import.meta.env.DEV
   ? [
@@ -47,6 +160,7 @@ const prototypeRoutes: RouteObject[] = import.meta.env.DEV
       },
     ]
   : [];
+
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path: '/recuperar', element: <RecuperarPage /> },

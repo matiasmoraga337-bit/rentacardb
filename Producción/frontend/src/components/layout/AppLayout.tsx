@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import {
   Bell,
   Building2,
@@ -321,7 +321,19 @@ export function AppLayout() {
           id="contenido"
           className="mx-auto max-w-7xl px-4 py-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] sm:px-6 sm:py-8"
         >
-          <Outlet />
+          <Suspense
+            fallback={
+              <div
+                className="rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500"
+                role="status"
+                aria-live="polite"
+              >
+                Cargando…
+              </div>
+            }
+          >
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 
