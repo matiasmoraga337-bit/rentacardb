@@ -1,7 +1,14 @@
 import { type Request, type Response } from 'express';
+import * as adminRepo from '../repositories/admin.repository';
 import * as auditoriaRepo from '../repositories/auditoria.repository';
 import * as outboxRepo from '../repositories/outbox.repository';
 import { AppError } from '../utils/AppError';
+
+function parseLimit(value: unknown): number {
+  const limit = Number(value);
+  if (!Number.isInteger(limit) || limit <= 0) return 10;
+  return Math.min(limit, 100);
+}
 
 export async function auditoria(req: Request, res: Response): Promise<void> {
   const entidad = typeof req.query.entidad === 'string' ? req.query.entidad.trim() : undefined;
@@ -34,4 +41,18 @@ export async function reintentarOutbox(req: Request, res: Response): Promise<voi
     throw error;
   }
   res.status(200).json({ message: 'Evento reenviado a PENDIENTE.' });
+}
+
+export async function vehiculosPublicados(req: Request, res: Response): Promise<void> {
+  res.status(200).json(
+    await adminRepo.listarVehiculosPublicados(parseLimit(req.query.limit)),
+  );
+}
+
+export async function pagosPendientes(req: Request, res: Response): Promise<void> {
+  res.status(200).json(await adminRepo.listarPagosPendientes(parseLimit(req.query.limit)));
+}
+
+export async function documentosVencidos(_req: Request, res: Response): Promise<void> {
+  res.status(200).json(await adminRepo.listarDocumentosVencidos());
 }

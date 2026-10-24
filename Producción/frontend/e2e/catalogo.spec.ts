@@ -85,4 +85,27 @@ test.describe('Administración', () => {
     await expect(page.getByRole('heading', { name: 'Proveedores' })).toBeVisible();
     await expect(page.getByRole('cell', { name: 'AutoDemo' })).toBeVisible();
   });
+
+  test('muestra reportes SQL y alertas del panel', async ({ page }) => {
+    await login(page, 'admin@rentacar.cl', 'Admin1234!');
+
+    await page.goto('/admin/reportes');
+    await expect(page.getByRole('heading', { name: 'Reportes' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Liquidaciones' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Liquidaciones por proveedor' }),
+    ).toBeVisible();
+    await page.getByRole('tab', { name: 'Integridad' }).click();
+    await expect(page.getByRole('heading', { name: 'Salud de datos' })).toBeVisible();
+
+    await page.goto('/panel');
+    await expect(page.getByText('Pagos pendientes').first()).toBeVisible();
+    await expect(page.getByText('Vehículos publicados').first()).toBeVisible();
+  });
+
+  test('muestra documentos por vencer al proveedor', async ({ page }) => {
+    await login(page, 'proveedor@rentacar.cl', 'Proveedor1234!');
+    await page.goto('/panel');
+    await expect(page.getByText('Documentos por vencer')).toBeVisible();
+  });
 });

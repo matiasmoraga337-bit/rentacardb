@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { CalendarCheck, Car, KeyRound, MessageSquare } from 'lucide-react';
+import { CalendarCheck, Car, FileWarning, KeyRound, MessageSquare } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,7 @@ import { fetchReservas } from '@/features/reservas/api';
 import { EstadoReservaBadge } from '@/features/reservas/EstadoReservaBadge';
 import { formatearCLP, formatearFecha } from '@/features/reservas/format';
 import { fetchMisVehiculos } from '@/features/vehiculos/api';
-import { fetchMio } from '@/features/proveedores/api';
+import { fetchDocumentosVencidos, fetchMio } from '@/features/proveedores/api';
 import { MetricCard } from './MetricCard';
 
 export function PanelProveedor() {
@@ -31,8 +31,13 @@ export function PanelProveedor() {
       fetchArriendos({ scope: 'proveedor', estado: 'ACTIVO', page: 1, pageSize: 5 }),
   });
   const chat = useQuery({ queryKey: ['panel-proveedor-chat'], queryFn: fetchConversaciones });
+  const documentos = useQuery({
+    queryKey: ['panel-proveedor-documentos-vencidos'],
+    queryFn: fetchDocumentosVencidos,
+  });
 
   const noLeidos = chat.data?.reduce((total, conversacion) => total + conversacion.noLeidos, 0) ?? 0;
+  const documentosPorVencer = documentos.data?.total ?? 0;
 
   if (proveedor.isError) {
     return (
@@ -191,6 +196,50 @@ export function PanelProveedor() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileWarning className="h-4 w-4 text-amber-600" aria-hidden="true" />
+            Documentos por vencer
+          </CardTitle>
+          <CardDescription>
+            {documentosPorVencer === 0
+              ? 'No hay documentos que venzan en los próximos 30 días.'
+              : `${documentosPorVencer} documento(s) vencen en los próximos 30 días.`}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {documentos.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {documentos.isError && (
+            <p className="text-sm text-red-600">No se pudieron cargar los documentos.</p>
+          )}
+          {documentos.data?.rows.map((documento) => (
+            <div
+              key={documento.id}
+              className="flex items-center justify-between rounded-lg border border-slate-200 p-3 text-sm"
+            >
+              <div>
+                <p className="font-medium">
+                  {documento.patente} · {documento.tipo}
+                </p>
+                <p className="text-slate-500">Vence {formatearFecha(documento.vence)}</p>
+              </div>
+              <span
+                className={
+                  documento.diasParaVencer <= 0
+                    ? 'text-xs font-medium text-red-700'
+                    : 'text-xs font-medium text-amber-700'
+                }
+              >
+                {documento.diasParaVencer <= 0
+                  ? 'Vencido'
+                  : `${documento.diasParaVencer} día(s)`}
+              </span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
