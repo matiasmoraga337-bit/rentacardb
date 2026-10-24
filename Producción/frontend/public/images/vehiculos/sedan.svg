@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustracion de sedan">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="1" stop-color="#0e7490"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.15" r="0.8">
+      <stop offset="0" stop-color="#67e8f9" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#67e8f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#glow)"/>
+  <path d="M0 450 L160 340 L300 430 L430 300 L590 440 L800 350 L800 600 L0 600 Z" fill="#155e75" opacity="0.45"/>
+  <path d="M0 500 C220 462 580 462 800 500 L800 600 L0 600 Z" fill="#020617" opacity="0.55"/>
+  <path d="M0 505 C220 468 580 468 800 505" fill="none" stroke="#67e8f9" stroke-opacity="0.3" stroke-width="4"/>
+  <ellipse cx="400" cy="470" rx="310" ry="28" fill="#020617" opacity="0.3"/>
+  <g>
+    <path d="M116 402 L206 326 L478 312 L568 380 L666 390 C692 394 708 410 708 432 L708 442 C708 452 700 458 688 458 L120 458 C104 458 94 448 94 432 L94 418 C94 406 102 400 116 402 Z" fill="url(#car)"/>
+    <path d="M218 336 L352 330 L352 376 L178 376 Z" fill="#0e7490" opacity="0.92"/>
+    <path d="M368 328 L466 324 L536 376 L368 376 Z" fill="#0e7490" opacity="0.92"/>
+    <path d="M116 402 L666 402" stroke="#94a3b8" stroke-width="3" opacity="0.7"/>
+    <rect x="104" y="416" width="58" height="14" rx="7" fill="#fef3c7"/>
+    <rect x="636" y="416" width="58" height="14" rx="7" fill="#fca5a5"/>
+    <circle cx="236" cy="458" r="50" fill="#0f172a"/>
+    <circle cx="236" cy="458" r="26" fill="#94a3b8"/>
+    <circle cx="570" cy="458" r="50" fill="#0f172a"/>
+    <circle cx="570" cy="458" r="26" fill="#94a3b8"/>
+    <path d="M310 410 L450 410" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

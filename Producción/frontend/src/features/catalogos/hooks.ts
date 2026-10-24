@@ -29,6 +29,16 @@ export function useComunas(idProvincia?: number) {
   });
 }
 
+export function useBuscarComunas(q: string) {
+  const term = q.trim();
+  return useQuery({
+    queryKey: ['comunas-busqueda', term],
+    queryFn: () => api.buscarComunas(term),
+    enabled: term.length >= 2,
+    staleTime: HORA,
+  });
+}
+
 export function useCatalogo(tipo: string, marca?: number) {
   return useQuery({
     queryKey: ['catalogo', tipo, marca ?? null],

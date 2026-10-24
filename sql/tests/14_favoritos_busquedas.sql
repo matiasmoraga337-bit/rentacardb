@@ -10,6 +10,7 @@ DECLARE @idCliente INT = (SELECT ID_usuario FROM Usuario WHERE email_usuario='qa
 DECLARE @idAdmin INT = (SELECT ID_usuario FROM Usuario WHERE email_usuario='qa.admin@rentacar.cl');
 DECLARE @idVeh INT = (SELECT ID_vehiculo FROM Vehiculo WHERE patente_vehiculo='QAAB12');
 DECLARE @idBusqueda INT;
+DECLARE @idBusquedaRegion INT;
 
 BEGIN TRY
     EXEC dbo.u_sp_AgregarFavorito @ID_usuario=@idCliente, @ID_vehiculo=@idVeh;
@@ -66,6 +67,19 @@ BEGIN TRY
 END TRY
 BEGIN CATCH
     INSERT #R VALUES ('Guardar busqueda', 'OK', 'FAIL', ERROR_MESSAGE());
+END CATCH;
+
+BEGIN TRY
+    EXEC dbo.u_sp_GuardarBusqueda @ID_usuario=@idCliente, @nombre=N'QA Region S4',
+        @ID_region=16, @ID_tipo_vehiculo=NULL, @precio_maximo=50000;
+    SET @idBusquedaRegion = (SELECT TOP 1 ID_busqueda FROM BusquedaGuardada WHERE ID_usuario_busqueda=@idCliente ORDER BY ID_busqueda DESC);
+    IF EXISTS (SELECT 1 FROM BusquedaGuardada WHERE ID_busqueda=@idBusquedaRegion AND ID_region_busqueda=16)
+        INSERT #R VALUES ('Guardar busqueda con region', 'OK', 'PASS', '');
+    ELSE
+        INSERT #R VALUES ('Guardar busqueda con region', 'OK', 'FAIL', 'no guardo region');
+END TRY
+BEGIN CATCH
+    INSERT #R VALUES ('Guardar busqueda con region', 'OK', 'FAIL', ERROR_MESSAGE());
 END CATCH;
 
 BEGIN TRY

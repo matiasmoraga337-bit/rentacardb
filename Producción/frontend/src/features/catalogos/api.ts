@@ -14,6 +14,9 @@ export const fetchProvincias = (idRegion: number): Promise<CatalogoItem[]> =>
 export const fetchComunas = (idProvincia: number): Promise<CatalogoItem[]> =>
   apiFetch<CatalogoItem[]>(`/provincias/${idProvincia}/comunas`);
 
+export const buscarComunas = (q: string): Promise<CatalogoItem[]> =>
+  apiFetch<CatalogoItem[]>(`/comunas?q=${encodeURIComponent(q)}`);
+
 export const fetchCatalogo = (tipo: string, marca?: number): Promise<CatalogoItem[]> =>
   apiFetch<CatalogoItem[]>(`/catalogos/${tipo}${marca ? `?marca=${marca}` : ''}`);
 

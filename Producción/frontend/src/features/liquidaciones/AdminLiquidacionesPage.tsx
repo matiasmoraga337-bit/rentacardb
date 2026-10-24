@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
+import { useToast } from '@/components/ui/toast';
 import { fetchProveedores } from '@/features/proveedores/api';
 import { formatearCLP, formatearFecha } from '@/features/reservas/format';
 import {
@@ -28,8 +30,16 @@ const inicioMes = (): string => {
   return `${local.getFullYear()}-${String(local.getMonth() + 1).padStart(2, '0')}-01`;
 };
 
+function estadoClass(estado: EstadoLiquidacion): string {
+  if (estado === 'PAGADA') return 'bg-emerald-100 text-emerald-800';
+  if (estado === 'APROBADA') return 'bg-sky-100 text-sky-800';
+  if (estado === 'CALCULADA') return 'bg-amber-100 text-amber-800';
+  return 'bg-slate-100 text-slate-600';
+}
+
 export function AdminLiquidacionesPage() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const proveedores = useQuery({ queryKey: ['admin-proveedores'], queryFn: () => fetchProveedores() });
   const [idProveedor, setIdProveedor] = useState<number | undefined>();
   const [inicio, setInicio] = useState(inicioMes());
@@ -51,17 +61,44 @@ export function AdminLiquidacionesPage() {
         periodo_inicio: inicio,
         periodo_fin: fin,
       }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación generada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo generar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const aprobarMutation = useMutation({
     mutationFn: (id: number) => aprobarLiquidacion(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación aprobada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo aprobar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const pagarMutation = useMutation({
     mutationFn: (id: number) => pagarLiquidacion(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['liquidaciones'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['liquidaciones'] });
+      showToast('Liquidación pagada.');
+    },
+    onError: (error) => {
+      showToast(
+        error instanceof Error ? error.message : 'No se pudo pagar la liquidación.',
+        'error',
+      );
+    },
   });
 
   const totalPaginas = Math.max(1, Math.ceil((query.data?.total ?? 0) / pageSize));
@@ -77,7 +114,7 @@ export function AdminLiquidacionesPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Generar liquidacion</CardTitle>
+          <CardTitle>Generar liquidación</CardTitle>
           <CardDescription>Calcula desde los movimientos financieros del periodo.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -127,28 +164,19 @@ export function AdminLiquidacionesPage() {
               </Button>
             </div>
           </div>
-          {crearMutation.isError && (
-            <p className="mt-2 text-sm text-red-600">
-              {crearMutation.error instanceof Error
-                ? crearMutation.error.message
-                : 'No se pudo generar la liquidacion.'}
-            </p>
-          )}
-          {crearMutation.isSuccess && (
-            <p className="mt-2 text-sm text-emerald-700">Liquidacion generada.</p>
-          )}
+
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="flex-row items-center justify-between space-y-0">
+        <CardHeader className="flex-col gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Listado</CardTitle>
             <CardDescription>
-              {query.data ? `${query.data.total} liquidacion(es).` : 'Cargando…'}
+              {query.data ? `${query.data.total} liquidación(es).` : 'Cargando…'}
             </CardDescription>
           </div>
-          <div className="w-48">
+          <div className="w-full sm:w-48">
             <Select
               aria-label="Filtrar por estado"
               value={estado}
@@ -166,7 +194,7 @@ export function AdminLiquidacionesPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {query.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && (
             <p className="text-sm text-red-600">No se pudieron cargar las liquidaciones.</p>
           )}
@@ -174,59 +202,132 @@ export function AdminLiquidacionesPage() {
             <p className="text-sm text-slate-500">Sin liquidaciones registradas.</p>
           )}
           {query.data?.data.length ? (
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500">
-                  <th className="py-2">Proveedor</th>
-                  <th className="py-2">Periodo</th>
-                  <th className="py-2">Bruto</th>
-                  <th className="py-2">Comision</th>
-                  <th className="py-2">Neto</th>
-                  <th className="py-2">Estado</th>
-                  <th className="py-2" />
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
                 {query.data.data.map((liquidacion) => (
-                  <tr key={liquidacion.id} className="border-b border-slate-100">
-                    <td className="py-2">{liquidacion.proveedor}</td>
-                    <td className="py-2">
-                      {formatearFecha(liquidacion.periodoInicio)} →{' '}
-                      {formatearFecha(liquidacion.periodoFin)}
-                    </td>
-                    <td className="py-2">{formatearCLP(liquidacion.totalBruto)}</td>
-                    <td className="py-2">{formatearCLP(liquidacion.totalComision)}</td>
-                    <td className="py-2 font-medium">{formatearCLP(liquidacion.totalNeto)}</td>
-                    <td className="py-2">{liquidacion.estado}</td>
-                    <td className="space-x-2 py-2 text-right">
-                      {liquidacion.estado === 'CALCULADA' && (
-                        <Button
-                          size="sm"
-                          disabled={aprobarMutation.isPending}
-                          onClick={() => aprobarMutation.mutate(liquidacion.id)}
-                        >
-                          Aprobar
-                        </Button>
-                      )}
-                      {liquidacion.estado === 'APROBADA' && (
-                        <Button
-                          size="sm"
-                          disabled={pagarMutation.isPending}
-                          onClick={() => pagarMutation.mutate(liquidacion.id)}
-                        >
-                          Pagar
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
+                  <article
+                    key={liquidacion.id}
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-slate-900">
+                          {liquidacion.proveedor}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          {formatearFecha(liquidacion.periodoInicio)} →{' '}
+                          {formatearFecha(liquidacion.periodoFin)}
+                        </p>
+                      </div>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${estadoClass(liquidacion.estado)}`}
+                      >
+                        {liquidacion.estado}
+                      </span>
+                    </div>
+                    <dl className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                      <div>
+                        <dt className="text-xs text-slate-500">Bruto</dt>
+                        <dd className="mt-0.5">{formatearCLP(liquidacion.totalBruto)}</dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs text-slate-500">Comisión</dt>
+                        <dd className="mt-0.5">{formatearCLP(liquidacion.totalComision)}</dd>
+                      </div>
+                      <div className="col-span-2">
+                        <dt className="text-xs text-slate-500">Neto</dt>
+                        <dd className="mt-0.5 text-base font-semibold text-brand">
+                          {formatearCLP(liquidacion.totalNeto)}
+                        </dd>
+                      </div>
+                    </dl>
+                    {(liquidacion.estado === 'CALCULADA' ||
+                      liquidacion.estado === 'APROBADA') && (
+                      <Button
+                        size="sm"
+                        className="mt-3 w-full"
+                        disabled={
+                          liquidacion.estado === 'CALCULADA'
+                            ? aprobarMutation.isPending
+                            : pagarMutation.isPending
+                        }
+                        onClick={() =>
+                          liquidacion.estado === 'CALCULADA'
+                            ? aprobarMutation.mutate(liquidacion.id)
+                            : pagarMutation.mutate(liquidacion.id)
+                        }
+                      >
+                        {liquidacion.estado === 'CALCULADA' ? 'Aprobar' : 'Pagar'}
+                      </Button>
+                    )}
+                  </article>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="w-full min-w-[760px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500">
+                      <th className="py-2 pr-3">Proveedor</th>
+                      <th className="py-2 pr-3">Periodo</th>
+                      <th className="py-2 pr-3">Bruto</th>
+                      <th className="py-2 pr-3">Comisión</th>
+                      <th className="py-2 pr-3">Neto</th>
+                      <th className="py-2 pr-3">Estado</th>
+                      <th className="py-2" />
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {query.data.data.map((liquidacion) => (
+                      <tr key={liquidacion.id} className="border-b border-slate-100">
+                        <td className="py-3 pr-3">{liquidacion.proveedor}</td>
+                        <td className="py-3 pr-3">
+                          {formatearFecha(liquidacion.periodoInicio)} →{' '}
+                          {formatearFecha(liquidacion.periodoFin)}
+                        </td>
+                        <td className="py-3 pr-3">{formatearCLP(liquidacion.totalBruto)}</td>
+                        <td className="py-3 pr-3">{formatearCLP(liquidacion.totalComision)}</td>
+                        <td className="py-3 pr-3 font-medium">
+                          {formatearCLP(liquidacion.totalNeto)}
+                        </td>
+                        <td className="py-3 pr-3">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${estadoClass(liquidacion.estado)}`}
+                          >
+                            {liquidacion.estado}
+                          </span>
+                        </td>
+                        <td className="space-x-2 py-3 text-right">
+                          {liquidacion.estado === 'CALCULADA' && (
+                            <Button
+                              size="sm"
+                              disabled={aprobarMutation.isPending}
+                              onClick={() => aprobarMutation.mutate(liquidacion.id)}
+                            >
+                              Aprobar
+                            </Button>
+                          )}
+                          {liquidacion.estado === 'APROBADA' && (
+                            <Button
+                              size="sm"
+                              disabled={pagarMutation.isPending}
+                              onClick={() => pagarMutation.mutate(liquidacion.id)}
+                            >
+                              Pagar
+                            </Button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           ) : null}
           {query.data && query.data.total > pageSize && (
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-500">
-                Pagina {page} de {totalPaginas}
+                Página {page} de {totalPaginas}
               </span>
               <div className="flex gap-2">
                 <Button

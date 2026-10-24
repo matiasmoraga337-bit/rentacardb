@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { TableSkeleton } from '@/components/ui/table-skeleton';
 import { useCatalogo } from '@/features/catalogos/hooks';
 import {
   actualizarCatalogo,
@@ -158,14 +159,14 @@ export function AdminCatalogosPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex-row items-end justify-between space-y-0">
+        <CardHeader className="flex-col gap-3 space-y-0 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <CardTitle>{etiqueta}</CardTitle>
             <CardDescription>
               {query.data ? `${query.data.length} registro(s).` : 'Cargando…'}
             </CardDescription>
           </div>
-          <div className="flex items-end gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <label className="flex items-center gap-2 pb-2 text-sm">
               <input
                 type="checkbox"
@@ -174,7 +175,7 @@ export function AdminCatalogosPage() {
               />
               Incluir inactivos
             </label>
-            <div className="w-64">
+            <div className="w-full sm:w-64">
               <Select
                 aria-label="Seleccionar catalogo"
                 value={tipo}
@@ -333,31 +334,37 @@ export function AdminCatalogosPage() {
             </div>
           )}
 
-          {query.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {query.isLoading && <TableSkeleton />}
           {query.isError && <p className="text-sm text-red-600">No se pudo cargar el catalogo.</p>}
           {query.data && query.data.length === 0 && (
             <p className="text-sm text-slate-500">Sin registros.</p>
           )}
           {query.data && query.data.length > 0 && (
-            <table className="w-full text-left text-sm">
-              <thead>
-                <tr className="border-b border-slate-200 text-slate-500">
-                  <th className="py-2">ID</th>
-                  <th className="py-2">Nombre</th>
-                  <th className="py-2">Detalle</th>
-                  <th className="py-2">Estado</th>
-                  {editable && <th className="py-2" />}
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              <div className="grid gap-3 sm:grid-cols-2 lg:hidden">
                 {query.data.map((item) => (
-                  <tr key={item.id} className="border-b border-slate-100">
-                    <td className="py-2">{item.id}</td>
-                    <td className="py-2">{item.nombre}</td>
-                    <td className="py-2 text-slate-600">{detalle(item)}</td>
-                    <td className="py-2">{item.activo ? 'Activo' : 'Inactivo'}</td>
+                  <article
+                    key={item.id}
+                    className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate font-semibold text-slate-900">{item.nombre}</p>
+                        <p className="text-xs text-slate-500">ID #{item.id}</p>
+                      </div>
+                      <span
+                        className={
+                          item.activo
+                            ? 'rounded-full bg-emerald-100 px-2.5 py-1 text-[11px] font-medium text-emerald-800'
+                            : 'rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-medium text-slate-600'
+                        }
+                      >
+                        {item.activo ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-600">{detalle(item)}</p>
                     {editable && (
-                      <td className="space-x-2 py-2 text-right">
+                      <div className="mt-3 flex gap-2">
                         <Button size="sm" variant="outline" onClick={() => cargar(item)}>
                           Editar
                         </Button>
@@ -371,12 +378,63 @@ export function AdminCatalogosPage() {
                             Desactivar
                           </Button>
                         )}
-                      </td>
+                      </div>
                     )}
-                  </tr>
+                  </article>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="w-full min-w-[720px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200 text-slate-500">
+                      <th className="py-2 pr-3">ID</th>
+                      <th className="py-2 pr-3">Nombre</th>
+                      <th className="py-2 pr-3">Detalle</th>
+                      <th className="py-2 pr-3">Estado</th>
+                      {editable && <th className="py-2" />}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {query.data.map((item) => (
+                      <tr key={item.id} className="border-b border-slate-100">
+                        <td className="py-2 pr-3">{item.id}</td>
+                        <td className="py-2 pr-3">{item.nombre}</td>
+                        <td className="py-2 pr-3 text-slate-600">{detalle(item)}</td>
+                        <td className="py-2 pr-3">
+                          <span
+                            className={
+                              item.activo
+                                ? 'rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800'
+                                : 'rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600'
+                            }
+                          >
+                            {item.activo ? 'Activo' : 'Inactivo'}
+                          </span>
+                        </td>
+                        {editable && (
+                          <td className="space-x-2 py-2 text-right">
+                            <Button size="sm" variant="outline" onClick={() => cargar(item)}>
+                              Editar
+                            </Button>
+                            {item.activo && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={desactivarMutation.isPending}
+                                onClick={() => desactivarMutation.mutate(item.id)}
+                              >
+                                Desactivar
+                              </Button>
+                            )}
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

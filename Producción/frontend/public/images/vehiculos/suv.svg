@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustracion de SUV">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#134e4a"/>
+      <stop offset="1" stop-color="#0d9488"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.1" r="0.9">
+      <stop offset="0" stop-color="#99f6e4" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#99f6e4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#glow)"/>
+  <path d="M0 430 L130 300 L230 390 L330 280 L480 430 Z" fill="#115e59" opacity="0.5"/>
+  <path d="M0 470 L180 360 L310 450 L470 330 L620 470 L800 390 L800 600 L0 600 Z" fill="#0f766e" opacity="0.45"/>
+  <path d="M0 490 C210 455 590 455 800 490 L800 600 L0 600 Z" fill="#042f2e" opacity="0.55"/>
+  <path d="M0 500 C210 465 590 465 800 500" fill="none" stroke="#5eead4" stroke-opacity="0.35" stroke-width="4"/>
+  <ellipse cx="400" cy="470" rx="300" ry="30" fill="#020617" opacity="0.25"/>
+  <g>
+    <path d="M146 374 L214 300 L520 300 L604 374 L668 382 C690 385 704 400 704 420 L704 438 C704 450 694 458 682 458 L132 458 C116 458 104 446 104 430 L104 404 C104 386 120 374 146 374 Z" fill="url(#car)"/>
+    <path d="M232 316 L470 316 L470 368 L190 368 Z" fill="#0f766e" opacity="0.9"/>
+    <path d="M486 316 L512 316 L590 368 L486 368 Z" fill="#0f766e" opacity="0.9"/>
+    <path d="M150 376 L518 376 L590 376" fill="none" stroke="#94a3b8" stroke-width="3" opacity="0.7"/>
+    <rect x="118" y="400" width="54" height="16" rx="8" fill="#fef3c7"/>
+    <rect x="632" y="400" width="58" height="16" rx="8" fill="#fca5a5"/>
+    <circle cx="246" cy="458" r="54" fill="#0f172a"/>
+    <circle cx="246" cy="458" r="28" fill="#94a3b8"/>
+    <circle cx="574" cy="458" r="54" fill="#0f172a"/>
+    <circle cx="574" cy="458" r="28" fill="#94a3b8"/>
+    <path d="M310 400 L400 400" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round"/>
+    <path d="M430 400 L470 400" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>
