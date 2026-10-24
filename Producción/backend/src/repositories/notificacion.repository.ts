@@ -95,9 +95,9 @@ export async function crearNotificacion(params: {
   destinatario: string;
   asunto: string;
   cuerpo: string;
-}): Promise<void> {
+}): Promise<number | null> {
   const pool = await getPool();
-  await pool
+  const result = await pool
     .request()
     .input('ID_usuario', sql.Int, params.idUsuario)
     .input('tipo', sql.VarChar(50), params.tipo)
@@ -105,7 +105,22 @@ export async function crearNotificacion(params: {
     .input('destinatario', sql.VarChar(150), params.destinatario)
     .input('asunto', sql.NVarChar(200), params.asunto)
     .input('cuerpo', sql.NVarChar(sql.MAX), params.cuerpo)
-    .execute('u_sp_RegistrarNotificacion');
+    .execute<{ ID_notificacion: number }>('u_sp_RegistrarNotificacion');
+  return result.recordset[0]?.ID_notificacion ?? null;
+}
+
+export async function marcarEnviada(
+  idNotificacion: number,
+  enviada: boolean,
+  error?: string,
+): Promise<void> {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('ID_notificacion', sql.BigInt, idNotificacion)
+    .input('enviada', sql.Bit, enviada)
+    .input('error', sql.NVarChar(500), error ?? null)
+    .execute('u_sp_MarcarNotificacionEnviada');
 }
 
 export async function existeNotificacionReciente(

@@ -70,6 +70,7 @@ async function procesarEvento(evento: outboxRepo.OutboxEventoRow): Promise<void>
   }
 
   const { asunto, cuerpo } = mensajeEvento(evento);
+  let idNotificacion: number | null = null;
 
   if (evento.tipoEvento !== 'MensajeEnviado') {
     const existe = await notificacionRepo.existeNotificacionReciente(
@@ -78,7 +79,7 @@ async function procesarEvento(evento: outboxRepo.OutboxEventoRow): Promise<void>
       cuerpo,
     );
     if (!existe) {
-      await notificacionRepo.crearNotificacion({
+      idNotificacion = await notificacionRepo.crearNotificacion({
         idUsuario: destinatario.idUsuario,
         tipo: evento.tipoEvento,
         canal: 'PUSH',
@@ -89,12 +90,29 @@ async function procesarEvento(evento: outboxRepo.OutboxEventoRow): Promise<void>
     }
   }
 
-  await sendMail({
-    to: destinatario.email,
-    subject: asunto,
-    html: `<p>Hola ${destinatario.nombre},</p><p>${cuerpo}</p><p>RentaCarDB</p>`,
-    text: cuerpo,
-  });
+  try {
+    await sendMail({
+      to: destinatario.email,
+      subject: asunto,
+      html: `<p>Hola ${destinatario.nombre},</p><p>${cuerpo}</p><p>RentaCarDB</p>`,
+      text: cuerpo,
+    });
+    if (idNotificacion) {
+      await notificacionRepo.marcarEnviada(idNotificacion, true);
+    }
+  } catch (error) {
+    if (idNotificacion) {
+      await notificacionRepo
+        .marcarEnviada(idNotificacion, false, (error as Error).message.slice(0, 500))
+        .catch((markError: unknown) =>
+          console.error(
+            `No se pudo marcar la notificacion ${idNotificacion} como fallida:`,
+            (markError as Error).message,
+          ),
+        );
+    }
+    throw error;
+  }
 }
 
 async function tick(): Promise<void> {
