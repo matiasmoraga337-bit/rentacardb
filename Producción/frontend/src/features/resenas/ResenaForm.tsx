@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/components/ui/toast';
 import { crearResena, type TipoResena } from './api';
 
 export const ETIQUETAS_RESENA: Record<TipoResena, string> = {
@@ -16,6 +17,7 @@ interface ResenaFormProps {
 
 export function ResenaForm({ idArriendo, tipo }: ResenaFormProps) {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const [calificacion, setCalificacion] = useState(0);
   const [comentario, setComentario] = useState('');
 
@@ -31,6 +33,7 @@ export function ResenaForm({ idArriendo, tipo }: ResenaFormProps) {
       setCalificacion(0);
       setComentario('');
       void queryClient.invalidateQueries({ queryKey: ['arriendo', idArriendo] });
+      showToast('Reseña enviada.');
     },
   });
 
@@ -56,8 +59,12 @@ export function ResenaForm({ idArriendo, tipo }: ResenaFormProps) {
             ★
           </button>
         ))}
-        <span className="ml-2 text-xs text-slate-500">
-          {calificacion > 0 ? `${calificacion}/5` : 'Selecciona una calificacion'}
+        <span className="ml-2 text-xs text-slate-500" aria-live="polite" aria-atomic="true">
+          {calificacion > 0 ? (
+            <span className="sr-only">{calificacion} de 5 estrellas</span>
+          ) : (
+            'Selecciona una calificacion'
+          )}
         </span>
       </div>
       <textarea

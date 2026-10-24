@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/components/ui/toast';
 import { actualizarPerfil, fetchPerfil } from './api';
 
 const schema = z.object({
@@ -20,6 +21,7 @@ type FormData = z.infer<typeof schema>;
 
 export function PerfilPage() {
   const queryClient = useQueryClient();
+  const { showToast } = useToast();
   const { data, isLoading } = useQuery({ queryKey: ['perfil'], queryFn: fetchPerfil });
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
@@ -48,6 +50,7 @@ export function PerfilPage() {
       await actualizarPerfil(form);
       await queryClient.invalidateQueries({ queryKey: ['perfil'] });
       setMensaje('Perfil actualizado.');
+      showToast('Perfil actualizado.');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'No se pudo actualizar el perfil.');
     }

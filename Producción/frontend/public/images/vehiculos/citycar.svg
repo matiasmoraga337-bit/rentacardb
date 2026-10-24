@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Ilustracion de auto compacto">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#78350f"/>
+      <stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="car" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff7ed"/>
+      <stop offset="1" stop-color="#fed7aa"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.2" r="0.8">
+      <stop offset="0" stop-color="#fde68a" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fde68a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <rect width="800" height="600" fill="url(#glow)"/>
+  <path d="M0 440 L140 330 L260 420 L400 300 L540 420 L680 340 L800 430 L800 600 L0 600 Z" fill="#0f766e" opacity="0.45"/>
+  <path d="M0 495 C220 460 580 460 800 495 L800 600 L0 600 Z" fill="#3b1d0a" opacity="0.5"/>
+  <path d="M0 500 C220 465 580 465 800 500" fill="none" stroke="#fcd34d" stroke-opacity="0.35" stroke-width="4"/>
+  <ellipse cx="400" cy="470" rx="270" ry="26" fill="#1c0a02" opacity="0.3"/>
+  <g>
+    <path d="M198 400 L262 332 L490 332 L564 392 L650 398 C674 402 686 416 686 434 L686 444 C686 452 678 458 668 458 L164 458 C150 458 140 448 140 434 L140 420 C140 408 150 400 164 400 Z" fill="url(#car)"/>
+    <path d="M272 342 L360 342 L360 382 L230 382 Z" fill="#0f766e" opacity="0.9"/>
+    <path d="M376 342 L480 342 L534 382 L376 382 Z" fill="#0f766e" opacity="0.9"/>
+    <path d="M198 400 L650 400" stroke="#b45309" stroke-width="3" opacity="0.4"/>
+    <rect x="150" y="414" width="52" height="14" rx="7" fill="#fef3c7"/>
+    <rect x="624" y="414" width="52" height="14" rx="7" fill="#fca5a5"/>
+    <circle cx="280" cy="458" r="48" fill="#0f172a"/>
+    <circle cx="280" cy="458" r="24" fill="#fbbf24"/>
+    <circle cx="556" cy="458" r="48" fill="#0f172a"/>
+    <circle cx="556" cy="458" r="24" fill="#fbbf24"/>
+    <path d="M350 412 L430 412" stroke="#fff7ed" stroke-width="4" stroke-linecap="round"/>
+  </g>
+</svg>

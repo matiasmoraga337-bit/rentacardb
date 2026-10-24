@@ -9,3 +9,73 @@
 body {
   @apply bg-slate-50 text-slate-900 antialiased;
 }
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+body,
+#root {
+  min-height: 100dvh;
+}
+
+button,
+a,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+button,
+[role='button'] {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+button:not(:disabled):active {
+  transform: scale(0.98);
+}
+
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+.mapa-chile svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mapa-chile .mapa-region,
+.mapa-chile .mapa-region path {
+  fill: #0f766e !important;
+  stroke: #ffffff !important;
+  stroke-width: 1.4;
+  cursor: pointer;
+  transition: fill 150ms ease-out;
+}
+
+.mapa-chile .mapa-region:hover,
+.mapa-chile .mapa-region:hover path {
+  fill: #14b8a6 !important;
+}
+
+.mapa-chile .mapa-region.is-selected,
+.mapa-chile .mapa-region.is-selected path {
+  fill: #f59e0b !important;
+}

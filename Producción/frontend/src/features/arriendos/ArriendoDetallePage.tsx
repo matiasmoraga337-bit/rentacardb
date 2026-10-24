@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { RatingStars } from '@/components/ui/rating-stars';
 import { useAuth } from '@/features/auth/AuthContext';
 import { DisputaForm } from '@/features/disputas/DisputaForm';
 import { formatearCLP, formatearFecha, formatearFechaHora } from '@/features/reservas/format';
@@ -293,9 +294,10 @@ export function ArriendoDetallePage() {
           )}
           {arriendo.resenas.map((resena) => (
             <div key={resena.id} className="rounded-lg border border-slate-200 p-3 text-sm">
-              <p className="font-medium">
-                {resena.calificacion}/5 · {resena.tipo}
-              </p>
+              <div className="mb-1 flex flex-wrap items-center gap-2">
+                <RatingStars value={resena.calificacion} />
+                <p className="font-medium">{resena.tipo}</p>
+              </div>
               <p className="text-slate-600">{resena.comentario ?? 'Sin comentario.'}</p>
               <p className="text-xs text-slate-500">
                 {resena.autor} · {formatearFechaHora(resena.fecha)}

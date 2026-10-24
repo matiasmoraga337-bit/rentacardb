@@ -402,6 +402,7 @@ export interface BusquedaParams {
   fecha_inicio?: string;
   fecha_fin?: string;
   ID_comuna?: number;
+  ID_region?: number;
   ID_tipo_vehiculo?: number;
   precio_maximo?: number;
   ID_caracteristica?: number;
@@ -414,6 +415,7 @@ export async function buscarVehiculos(params: BusquedaParams): Promise<unknown[]
     .input('fecha_inicio', sql.Date, params.fecha_inicio ?? null)
     .input('fecha_fin', sql.Date, params.fecha_fin ?? null)
     .input('ID_comuna', sql.Int, params.ID_comuna ?? null)
+    .input('ID_region', sql.Int, params.ID_region ?? null)
     .input('ID_tipo_vehiculo', sql.Int, params.ID_tipo_vehiculo ?? null)
     .input('precio_maximo', sql.Decimal(14, 2), params.precio_maximo ?? null)
     .input('ID_caracteristica', sql.Int, params.ID_caracteristica ?? null)

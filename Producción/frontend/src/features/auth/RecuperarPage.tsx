@@ -31,7 +31,7 @@ export function RecuperarPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
+    <div className="flex min-h-[100dvh] items-center justify-center bg-slate-100 px-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Recuperar contrasena</CardTitle>
