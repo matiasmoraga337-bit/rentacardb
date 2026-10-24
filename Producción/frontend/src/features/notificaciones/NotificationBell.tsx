@@ -14,7 +14,7 @@ export function NotificationBell() {
   return (
     <Link
       to="/notificaciones"
-      className="relative inline-flex items-center text-slate-600 hover:text-brand"
+      className="relative grid h-10 w-10 place-items-center rounded-full text-slate-600 hover:bg-slate-100 hover:text-brand"
       aria-label={total > 0 ? `Notificaciones: ${total} sin leer` : 'Notificaciones'}
     >
       <Bell className="h-5 w-5" />
