@@ -76,7 +76,7 @@ export function VehiculoPublicoPage() {
   return (
     <div className="min-h-[100dvh] bg-slate-50">
       <PublicHeader />
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
+      <main id="contenido" className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6">
         <Link to="/catalogo" className="text-sm text-brand hover:underline">
           Volver al catálogo
         </Link>

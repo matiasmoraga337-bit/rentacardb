@@ -43,9 +43,9 @@ export function FavoritoButton({ vehiculoId }: { vehiculoId: number }) {
         event.stopPropagation();
         mutation.mutate();
       }}
-      className="rounded-full bg-white/90 p-1.5 text-slate-500 shadow-sm hover:text-red-500"
+      className="grid h-10 w-10 place-items-center rounded-full bg-white/90 text-slate-500 shadow-sm hover:text-red-500"
     >
-      <Heart className={`h-4 w-4 ${esFavorito ? 'fill-red-500 text-red-500' : ''}`} />
+      <Heart className={`h-5 w-5 ${esFavorito ? 'fill-red-500 text-red-500' : ''}`} />
     </button>
   );
 }

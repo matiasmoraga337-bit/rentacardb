@@ -109,7 +109,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 type="button"
                 aria-label="Cerrar notificación"
                 onClick={() => dismiss(toast.id)}
-                className="grid h-6 w-6 shrink-0 place-items-center rounded-full opacity-60 hover:bg-black/5 hover:opacity-100"
+                className="grid h-9 w-9 shrink-0 place-items-center rounded-full opacity-60 hover:bg-black/5 hover:opacity-100"
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>

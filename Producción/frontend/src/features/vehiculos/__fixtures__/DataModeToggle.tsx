@@ -16,7 +16,7 @@ export function DataModeToggle({
   return (
     <nav
       aria-label="Datos de prueba"
-      className="fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-1 rounded-full border border-slate-300 bg-white/95 p-1 text-xs shadow-lg backdrop-blur"
+      className="fixed bottom-3 right-3 z-50 flex max-w-[calc(100vw-1.5rem)] items-center gap-1 overflow-x-auto rounded-full border border-slate-300 bg-white/95 p-1 text-xs shadow-lg backdrop-blur"
     >
       {MODES.map((mode) => (
         <button

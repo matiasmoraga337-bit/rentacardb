@@ -20,6 +20,18 @@ npm run dev               # http://localhost:5173
 | `npm run lint` | ESLint. |
 | `npm run typecheck` | Chequeo de tipos. |
 | `npm test` | Vitest + Testing Library. |
+| `npm run test:e2e` | Playwright E2E (requiere API, BD y seed). |
+
+## E2E
+
+En local Playwright usa el Microsoft Edge instalado (`channel: 'msedge'`); en CI usa Chromium. Para correr los tests:
+
+```powershell
+npm run test:e2e
+```
+
+Requiere la API, la base de datos y el seed demo levantados. La configuración reutiliza
+Vite en http://localhost:5173 si ya está corriendo.
 
 ## Estructura (S0)
 

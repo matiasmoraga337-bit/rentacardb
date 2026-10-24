@@ -92,7 +92,7 @@ export function ExploraPorRegion({ idRegion, onSeleccionar }: ExploraPorRegionPr
           href="https://commons.wikimedia.org/wiki/File:Mapa_de_Chile_(regiones).svg"
           target="_blank"
           rel="noreferrer"
-          className="mt-1 block text-right text-[10px] text-slate-400 hover:text-slate-600"
+          className="mt-1 block text-right text-[10px] text-slate-500 hover:text-slate-700"
         >
           Mapa: B1mbo / Wikimedia · CC BY-SA 3.0 CL
         </a>
