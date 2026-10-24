@@ -44,6 +44,27 @@ router.delete(
 );
 
 router.get(
+  '/vehiculos-publicados',
+  authenticate,
+  authorize('ADMIN'),
+  asyncHandler(adminController.vehiculosPublicados),
+);
+
+router.get(
+  '/pagos-pendientes',
+  authenticate,
+  authorize('ADMIN'),
+  asyncHandler(adminController.pagosPendientes),
+);
+
+router.get(
+  '/documentos-vencidos',
+  authenticate,
+  authorize('ADMIN'),
+  asyncHandler(adminController.documentosVencidos),
+);
+
+router.get(
   '/outbox',
   authenticate,
   authorize('ADMIN'),

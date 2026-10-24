@@ -21,6 +21,11 @@ router.post(
   asyncHandler(proveedorController.registrar),
 );
 router.get('/mio', authenticate, asyncHandler(proveedorController.mio));
+router.get(
+  '/documentos-vencidos',
+  authenticate,
+  asyncHandler(proveedorController.documentosVencidos),
+);
 router.get('/:id/resenas', asyncHandler(resenaController.listarProveedor));
 router.get('/', authenticate, authorize('ADMIN'), asyncHandler(proveedorController.listar));
 router.get('/:id', authenticate, asyncHandler(proveedorController.obtener));

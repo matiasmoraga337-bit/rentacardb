@@ -5,6 +5,7 @@ import {
   type SedeCreateInput,
   type SedeUpdateInput,
 } from '../schemas/proveedor.schema';
+import * as adminRepo from '../repositories/admin.repository';
 import * as proveedorService from '../services/proveedor.service';
 import { AppError } from '../utils/AppError';
 
@@ -82,4 +83,8 @@ export async function eliminarSede(req: Request, res: Response): Promise<void> {
   const idSede = parseId(req.params.sedeId, 'sedeId');
   await proveedorService.eliminarSede(id, idSede, req.user!.id);
   res.status(204).send();
+}
+
+export async function documentosVencidos(req: Request, res: Response): Promise<void> {
+  res.status(200).json(await adminRepo.listarDocumentosVencidosProveedor(req.user!.id));
 }
