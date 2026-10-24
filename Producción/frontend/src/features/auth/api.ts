@@ -82,3 +82,31 @@ export async function actualizarPerfil(data: PerfilUpdate): Promise<Perfil> {
     body: JSON.stringify(data),
   });
 }
+export interface Licencia {
+  id: number;
+  personaId: number;
+  clase: string;
+  numero: string;
+  fechaEmision: string;
+  fechaVencimiento: string;
+  urlArchivo: string | null;
+  verificada: boolean;
+  activa: boolean;
+  fechaRegistro: string;
+}
+
+export interface LicenciaInput {
+  ID_clase_licencia: number;
+  numero_licencia: string;
+  fecha_emision: string;
+  fecha_vencimiento: string;
+}
+
+export const fetchLicencia = (): Promise<Licencia | null> =>
+  apiFetch<Licencia | null>('/usuarios/perfil/licencia');
+
+export const registrarLicencia = (data: LicenciaInput): Promise<Licencia> =>
+  apiFetch<Licencia>('/usuarios/perfil/licencia', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });

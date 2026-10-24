@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { CalendarDays, Clock3, KeyRound, Users } from 'lucide-react';
+import { CalendarDays, Car, Clock3, CreditCard, KeyRound, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { fetchPagosPendientes, fetchVehiculosPublicados } from '@/features/admin/api';
 import { apiFetch } from '@/lib/api';
 import { fetchArriendos } from '@/features/arriendos/api';
 import { fetchProveedores } from '@/features/proveedores/api';
@@ -31,6 +32,15 @@ export function PanelAdmin() {
   const ingresos = useQuery({
     queryKey: ['panel-admin-ingresos', anio],
     queryFn: () => apiFetch<IngresoMes[]>(`/reportes/ingresos?anio=${anio}`),
+  });
+
+  const pagosPendientes = useQuery({
+    queryKey: ['panel-admin-pagos-pendientes'],
+    queryFn: () => fetchPagosPendientes(5),
+  });
+  const publicados = useQuery({
+    queryKey: ['panel-admin-vehiculos-publicados'],
+    queryFn: () => fetchVehiculosPublicados(5),
   });
 
   const pendientes = proveedores.data?.filter((proveedor) => proveedor.estado === 'PENDIENTE') ?? [];
@@ -62,6 +72,18 @@ export function PanelAdmin() {
           value={arriendos.data?.total ?? '—'}
           icon={KeyRound}
           loading={arriendos.isLoading}
+        />
+        <MetricCard
+          title="Pagos pendientes"
+          value={pagosPendientes.data?.total ?? '—'}
+          icon={CreditCard}
+          loading={pagosPendientes.isLoading}
+        />
+        <MetricCard
+          title="Vehículos publicados"
+          value={publicados.data?.total ?? '—'}
+          icon={Car}
+          loading={publicados.isLoading}
         />
       </div>
 
@@ -129,6 +151,72 @@ export function PanelAdmin() {
                 </div>
                 <EstadoReservaBadge estado={reserva.estado} />
               </Link>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Pagos pendientes</CardTitle>
+            <CardDescription>Pagos registrados sin confirmar.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {pagosPendientes.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+            {pagosPendientes.isError && (
+              <p className="text-sm text-red-600">No se pudieron cargar los pagos.</p>
+            )}
+            {pagosPendientes.data?.rows.length === 0 && (
+              <p className="text-sm text-slate-500">Sin pagos pendientes.</p>
+            )}
+            {pagosPendientes.data?.rows.map((pago) => (
+              <div
+                key={pago.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 p-3 text-sm"
+              >
+                <div>
+                  <p className="font-medium">
+                    Reserva #{pago.reservaId} · {pago.metodo}
+                  </p>
+                  <p className="text-slate-500">
+                    {formatearCLP(pago.monto)} · {formatearFecha(pago.fecha)}
+                  </p>
+                </div>
+                <span className="text-xs text-amber-700">{pago.estado}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Vehículos publicados</CardTitle>
+            <CardDescription>Flota visible en el catálogo.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {publicados.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+            {publicados.isError && (
+              <p className="text-sm text-red-600">No se pudieron cargar los vehículos.</p>
+            )}
+            {publicados.data?.rows.length === 0 && (
+              <p className="text-sm text-slate-500">Sin vehículos publicados.</p>
+            )}
+            {publicados.data?.rows.map((vehiculo) => (
+              <div
+                key={vehiculo.id}
+                className="flex items-center justify-between rounded-lg border border-slate-200 p-3 text-sm"
+              >
+                <div>
+                  <p className="font-medium">
+                    {vehiculo.marca} {vehiculo.modelo} · {vehiculo.patente}
+                  </p>
+                  <p className="text-slate-500">
+                    {vehiculo.proveedor} · {vehiculo.comuna ?? 'Sin comuna'}
+                  </p>
+                </div>
+                <span className="text-xs text-slate-500">{vehiculo.region}</span>
+              </div>
             ))}
           </CardContent>
         </Card>

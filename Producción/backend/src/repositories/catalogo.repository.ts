@@ -83,6 +83,18 @@ const CATALOGOS: Record<string, CatalogoDef> = {
     extra: 'obligatorio_tipo_documento',
   },
   'tipos-proveedor': { table: 'TipoProveedor', id: 'ID_tipo_proveedor', nombre: 'nombre_tipo_proveedor' },
+  'tipos-mantenimiento': {
+    table: 'TipoMantenimiento',
+    id: 'ID_tipo_mantenimiento',
+    nombre: 'nombre_tipo_mantenimiento',
+    activo: 'activo_tipo_mantenimiento',
+  },
+  'clases-licencia': {
+    table: 'ClaseLicencia',
+    id: 'ID_clase_licencia',
+    nombre: 'codigo_clase_licencia',
+    activo: 'activo_clase_licencia',
+  },
   'politicas-cancelacion': {
     table: 'PoliticaCancelacion',
     id: 'ID_politica_cancelacion',

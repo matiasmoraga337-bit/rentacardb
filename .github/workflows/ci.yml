@@ -113,7 +113,7 @@ jobs:
         run: npm run build --if-present
 
   sql:
-    name: SQL Server (suite 00-16)
+    name: SQL Server (suite 00-21)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -244,3 +244,4 @@ jobs:
       - name: Limpiar stack
         if: always()
         run: docker compose --env-file .env -f Producción/infra/docker-compose.yml down -v
+

@@ -75,3 +75,16 @@ export const crearSede = (id: number, data: SedeData): Promise<unknown> =>
 
 export const eliminarSede = (id: number, sedeId: number): Promise<void> =>
   apiFetch<void>(`/proveedores/${id}/sedes/${sedeId}`, { method: 'DELETE' });
+export interface DocumentoVencido {
+  id: number;
+  vehiculoId: number;
+  patente: string;
+  tipo: string;
+  vence: string;
+  diasParaVencer: number;
+}
+
+export const fetchDocumentosVencidos = (): Promise<{
+  total: number;
+  rows: DocumentoVencido[];
+}> => apiFetch<{ total: number; rows: DocumentoVencido[] }>('/proveedores/documentos-vencidos');
