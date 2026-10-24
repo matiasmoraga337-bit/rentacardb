@@ -74,7 +74,7 @@ export function VehiculoCard({ item, desde, hasta }: VehiculoCardProps) {
                 </span>
               </>
             ) : (
-              <span className="text-xs text-slate-400">Sin reseñas</span>
+              <span className="text-xs text-slate-500">Sin reseñas</span>
             )}
           </div>
 
