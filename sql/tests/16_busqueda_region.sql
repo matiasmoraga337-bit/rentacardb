@@ -29,7 +29,8 @@ CREATE TABLE #Busqueda (
     nombre_region NVARCHAR(100),
     nombre_comercial_proveedor NVARCHAR(150),
     url_foto_principal VARCHAR(500),
-    url_foto_principal_thumb VARCHAR(500)
+    url_foto_principal_thumb VARCHAR(500),
+    total_registros INT
 );
 
 BEGIN TRY
