@@ -26,6 +26,9 @@ Estados soportados en S2: `PENDIENTE`, `CONFIRMADA`, `CANCELADA`, `EXPIRADA`.
 | Método | Ruta | Acceso | Objeto SQL |
 |---|---|---|---|
 | GET | `/vehiculos/buscar` | Público | `u_sp_BuscarVehiculos` + `vw_VehiculosDisponibles` |
+
+`/vehiculos/buscar` acepta `page` y `pageSize` (máximo 100). Cada fila incluye
+`total_registros` para calcular el total de páginas.
 | GET | `/vehiculos/:id/disponibilidad` | Público | `vw_VehiculosDisponibles`, `fn_PrecioAplicable`, `ConfiguracionGlobal`, `ConfiguracionProveedor` |
 | GET | `/vehiculos/:id` | Público | `Vehiculo` + `VehiculoSede` + `SedeProveedor` |
 | GET | `/reservas` | AUTH | `vw_ReservasDetalle` + `Reserva` |

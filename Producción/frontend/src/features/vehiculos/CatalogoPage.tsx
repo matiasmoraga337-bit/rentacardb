@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Button } from '@/components/ui/button';
@@ -49,17 +49,29 @@ export function CatalogoPage() {
   });
 
   const query = useQuery({
-    queryKey: ['busqueda', filtros],
-    queryFn: () => buscarVehiculos(filtros),
+    queryKey: ['busqueda', filtros, pagina],
+    queryFn: () => buscarVehiculos({ ...filtros, page: pagina, pageSize: PAGE_SIZE }),
   });
 
   const usandoFixture = import.meta.env.DEV && dataMode !== 'demo';
-  const items = usandoFixture ? vehiculosFixture(dataMode) : (query.data ?? []);
-  const totalPaginas = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+  const fixtureItems = usandoFixture ? vehiculosFixture(dataMode) : [];
+  const items = usandoFixture ? fixtureItems : (query.data ?? []);
+  const total = usandoFixture ? fixtureItems.length : (query.data?.[0]?.total_registros ?? 0);
+  const totalPaginas = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const paginaActual = Math.min(pagina, totalPaginas);
-  const itemsPagina = items.slice((paginaActual - 1) * PAGE_SIZE, paginaActual * PAGE_SIZE);
+  const itemsPagina = usandoFixture
+    ? items.slice((paginaActual - 1) * PAGE_SIZE, paginaActual * PAGE_SIZE)
+    : items;
   const showEmpty =
-    items.length === 0 && (usandoFixture || (!query.isLoading && !query.isError));
+    itemsPagina.length === 0 && (usandoFixture || (!query.isLoading && !query.isError));
+
+  useEffect(() => {
+    if (usandoFixture || query.isLoading || query.isError || pagina <= 1 || total > 0) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete('pagina');
+    setSearchParams(next, { replace: true });
+    setPagina(1);
+  }, [usandoFixture, query.isLoading, query.isError, pagina, total, searchParams, setSearchParams]);
 
   const filtrosGuardados = {
     fecha_desde: filtros.fecha_inicio,
@@ -196,7 +208,7 @@ export function CatalogoPage() {
             <p className="mt-1 text-sm text-slate-500">
               {query.isLoading && !usandoFixture
                 ? 'Buscando disponibilidad…'
-                : `${items.length} ${items.length === 1 ? 'vehículo' : 'vehículos'} para tu búsqueda`}
+                : `${total} ${total === 1 ? 'vehículo' : 'vehículos'} para tu búsqueda`}
             </p>
           </div>
           <Button
@@ -278,7 +290,7 @@ export function CatalogoPage() {
               </div>
             )}
 
-            {items.length > PAGE_SIZE && (
+            {total > PAGE_SIZE && (
               <nav
                 className="mt-8 flex items-center justify-between gap-3 border-t border-slate-200 pt-5"
                 aria-label="Paginación del catálogo"

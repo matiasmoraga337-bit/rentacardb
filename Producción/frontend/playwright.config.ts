@@ -18,9 +18,17 @@ export default defineConfig({
   projects: [
     {
       name: isCI ? 'chromium' : 'edge',
+      testIgnore: /mobile\.spec\.ts/,
       use: isCI
         ? { ...devices['Desktop Chrome'] }
         : { ...devices['Desktop Edge'], channel: 'msedge' },
+    },
+    {
+      name: isCI ? 'mobile-chromium' : 'mobile-edge',
+      testMatch: /mobile\.spec\.ts/,
+      use: isCI
+        ? { ...devices['Pixel 7'] }
+        : { ...devices['Pixel 7'], channel: 'msedge' },
     },
   ],
   webServer: {

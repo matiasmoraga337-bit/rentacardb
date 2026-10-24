@@ -32,15 +32,16 @@ Los datos entran por el boundary del catálogo (`vehiculosFixture`), no editando
 
 ## Estado de correcciones
 
-- Corregidos: #1 paginación cliente (12 por página), #2 proveedor largo,
+- Corregidos: #1 paginación server-side (12 por página), #2 proveedor largo,
   #3 modelo/marca, #4 precio, #5 comuna/región, #6 estado vacío con limpieza de
   filtros, #7 `dir="auto"` para texto RTL, #8 patente visible.
-- La paginación server-side sigue pendiente para cuando el catálogo crezca.
+- El modo fixture `many` conserva paginación cliente sobre los 1.000 registros
+  simulados.
 
 ## Part 2 — Decisions for you
 
-1. **1.000 resultados:** ¿paginar la API, virtualizar la grilla o limitar el demo a 60?
-   - Recomendado: paginar la API; el demo `many` puede mostrar 60 con aviso.
+1. **1.000 resultados:** resuelto paginando la API en páginas de 12; el modo
+   `many` conserva el corte cliente solo como fixture de estrés.
 2. **Proveedor largo:** ¿truncar en la tarjeta con `title` o mostrar dos líneas?
    - Recomendado: dos líneas máximo y nombre completo en el detalle.
 3. **Modelo largo:** ¿`line-clamp-2` o altura fija de tarjeta?
