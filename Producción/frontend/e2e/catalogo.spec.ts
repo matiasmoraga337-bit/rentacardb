@@ -63,6 +63,12 @@ test.describe('Autenticación', () => {
     await login(page, 'demo@rentacar.cl', 'Demo1234!');
     await expect(page.getByRole('heading', { name: 'Hola, Cliente' })).toBeVisible();
   });
+
+  test('el cliente ve su licencia en el perfil', async ({ page }) => {
+    await login(page, 'demo@rentacar.cl', 'Demo1234!');
+    await page.goto('/perfil');
+    await expect(page.getByRole('heading', { name: 'Licencia de conducir' })).toBeVisible();
+  });
 });
 
 test.describe('Favoritos y feedback', () => {
@@ -84,5 +90,37 @@ test.describe('Administración', () => {
 
     await expect(page.getByRole('heading', { name: 'Proveedores' })).toBeVisible();
     await expect(page.getByRole('cell', { name: 'AutoDemo' })).toBeVisible();
+  });
+
+  test('muestra reportes SQL y alertas del panel', async ({ page }) => {
+    await login(page, 'admin@rentacar.cl', 'Admin1234!');
+
+    await page.goto('/admin/reportes');
+    await expect(page.getByRole('heading', { name: 'Reportes' })).toBeVisible();
+    await page.getByRole('tab', { name: 'Liquidaciones' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Liquidaciones por proveedor' }),
+    ).toBeVisible();
+    await page.getByRole('tab', { name: 'Integridad' }).click();
+    await expect(page.getByRole('heading', { name: 'Salud de datos' })).toBeVisible();
+
+    await page.goto('/panel');
+    await expect(page.getByText('Pagos pendientes').first()).toBeVisible();
+    await expect(page.getByText('Vehículos publicados').first()).toBeVisible();
+  });
+
+  test('muestra documentos por vencer al proveedor', async ({ page }) => {
+    await login(page, 'proveedor@rentacar.cl', 'Proveedor1234!');
+    await page.goto('/panel');
+    await expect(page.getByText('Documentos por vencer')).toBeVisible();
+  });
+
+  test('muestra la tarjeta de mantenimiento del vehiculo', async ({ page }) => {
+    await login(page, 'proveedor@rentacar.cl', 'Proveedor1234!');
+    await page.goto('/proveedor/vehiculos/1');
+    await expect(page.getByRole('heading', { name: 'Mantenimiento' })).toBeVisible();
+    await expect(
+      page.getByText('Mantenimiento activo e historial del vehiculo.'),
+    ).toBeVisible();
   });
 });

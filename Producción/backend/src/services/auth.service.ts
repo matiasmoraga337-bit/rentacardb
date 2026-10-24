@@ -3,6 +3,7 @@ import { buildAppLink, sendMail } from '../config/mailer';
 import * as repo from '../repositories/auth.repository';
 import {
   type LoginInput,
+  type LicenciaInput,
   type PerfilInput,
   type RegistroInput,
 } from '../schemas/auth.schema';
@@ -135,6 +136,25 @@ export async function actualizarPerfil(id: number, data: PerfilInput): Promise<r
     throw new AppError(404, 'USUARIO_NO_ENCONTRADO', 'Usuario no encontrado.');
   }
   return row;
+}
+
+export async function obtenerLicencia(id: number): Promise<repo.LicenciaRow | null> {
+  const row = await repo.findUserById(id);
+  if (!row) {
+    throw new AppError(404, 'USUARIO_NO_ENCONTRADO', 'Usuario no encontrado.');
+  }
+  return repo.obtenerLicencia(row.ID_persona_usuario);
+}
+
+export async function registrarLicencia(
+  id: number,
+  input: LicenciaInput,
+): Promise<repo.LicenciaRow | null> {
+  const row = await repo.findUserById(id);
+  if (!row) {
+    throw new AppError(404, 'USUARIO_NO_ENCONTRADO', 'Usuario no encontrado.');
+  }
+  return repo.registrarLicencia(row.ID_persona_usuario, input);
 }
 
 export async function rolesDeUsuario(id: number): Promise<string[]> {

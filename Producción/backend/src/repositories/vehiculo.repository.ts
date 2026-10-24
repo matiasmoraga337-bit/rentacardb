@@ -398,6 +398,126 @@ export async function listarDocumentos(idVehiculo: number): Promise<unknown[]> {
   return result.recordset;
 }
 
+export interface MantenimientoRow {
+  id: number;
+  patente: string;
+  tipo: string;
+  descripcion: string | null;
+  taller: string | null;
+  kilometraje: number | null;
+  costo: number | null;
+  fechaInicio: string;
+  fechaFin: string | null;
+  activo: boolean;
+}
+
+export async function listarMantenimientos(
+  idVehiculo: number,
+): Promise<{ activos: MantenimientoRow[]; historial: MantenimientoRow[] }> {
+  const pool = await getPool();
+  const activosResult = await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .query<MantenimientoRow>(
+      `SELECT ID_mantenimiento AS id,
+              patente_vehiculo AS patente,
+              nombre_tipo_mantenimiento AS tipo,
+              CAST(NULL AS NVARCHAR(500)) AS descripcion,
+              taller_mantenimiento AS taller,
+              CAST(NULL AS INT) AS kilometraje,
+              costo_mantenimiento AS costo,
+              fecha_inicio_mantenimiento AS fechaInicio,
+              CAST(NULL AS DATETIME2(0)) AS fechaFin,
+              CAST(1 AS BIT) AS activo
+       FROM dbo.vw_MantenimientosActivos
+       WHERE ID_vehiculo = @id
+       ORDER BY fecha_inicio_mantenimiento DESC`,
+    );
+  const historialResult = await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .query<MantenimientoRow>(
+      `SELECT m.ID_mantenimiento AS id,
+              v.patente_vehiculo AS patente,
+              tm.nombre_tipo_mantenimiento AS tipo,
+              m.descripcion_mantenimiento AS descripcion,
+              m.taller_mantenimiento AS taller,
+              m.kilometraje_mantenimiento AS kilometraje,
+              m.costo_mantenimiento AS costo,
+              m.fecha_inicio_mantenimiento AS fechaInicio,
+              m.fecha_fin_mantenimiento AS fechaFin,
+              m.activo_mantenimiento AS activo
+       FROM dbo.Mantenimiento m
+       INNER JOIN dbo.Vehiculo v ON v.ID_vehiculo = m.ID_vehiculo_mantenimiento
+       INNER JOIN dbo.TipoMantenimiento tm
+         ON tm.ID_tipo_mantenimiento = m.ID_tipo_mantenimiento_mantenimiento
+       WHERE m.ID_vehiculo_mantenimiento = @id
+       ORDER BY m.fecha_inicio_mantenimiento DESC, m.ID_mantenimiento DESC`,
+    );
+  return { activos: activosResult.recordset, historial: historialResult.recordset };
+}
+
+export interface RegistrarMantenimientoParams {
+  ID_vehiculo: number;
+  ID_tipo_mantenimiento: number;
+  kilometraje: number;
+  descripcion?: string | null;
+  taller?: string | null;
+  costo?: number | null;
+  ID_usuario_operador: number;
+}
+
+export async function registrarMantenimiento(
+  params: RegistrarMantenimientoParams,
+): Promise<unknown> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_vehiculo', sql.Int, params.ID_vehiculo)
+    .input('ID_tipo_mantenimiento', sql.Int, params.ID_tipo_mantenimiento)
+    .input('kilometraje', sql.Int, params.kilometraje)
+    .input('descripcion', sql.NVarChar(500), params.descripcion ?? null)
+    .input('taller', sql.NVarChar(150), params.taller ?? null)
+    .input('costo', sql.Decimal(12, 2), params.costo ?? null)
+    .input('ID_usuario_operador', sql.Int, params.ID_usuario_operador)
+    .execute('u_sp_RegistrarMantenimiento');
+  return result.recordset[0] ?? null;
+}
+
+export async function finalizarMantenimiento(
+  idMantenimiento: number,
+  costoFinal: number | null,
+  idUsuarioOperador: number,
+): Promise<unknown> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_mantenimiento', sql.Int, idMantenimiento)
+    .input('costo_final', sql.Decimal(12, 2), costoFinal)
+    .input('ID_usuario_operador', sql.Int, idUsuarioOperador)
+    .execute('u_sp_FinalizarMantenimiento');
+  return result.recordset[0] ?? null;
+}
+
+export async function mantenimientoPerteneceAProveedor(
+  idMantenimiento: number,
+  idProveedor: number,
+): Promise<boolean> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('idMantenimiento', sql.Int, idMantenimiento)
+    .input('idProveedor', sql.Int, idProveedor)
+    .query<{ ok: number }>(
+      `SELECT TOP 1 1 AS ok
+       FROM dbo.Mantenimiento m
+       INNER JOIN dbo.Vehiculo v ON v.ID_vehiculo = m.ID_vehiculo_mantenimiento
+       WHERE m.ID_mantenimiento = @idMantenimiento
+         AND v.ID_proveedor_vehiculo = @idProveedor`,
+    );
+  return result.recordset.length > 0;
+}
+
 export interface BusquedaParams {
   fecha_inicio?: string;
   fecha_fin?: string;

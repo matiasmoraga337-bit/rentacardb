@@ -5,13 +5,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select } from '@/components/ui/select';
 import { useCatalogo } from '@/features/catalogos/hooks';
+import { formatearCLP, formatearFecha } from '@/features/reservas/format';
 import {
   agregarCaracteristica,
   crearTarifa,
   eliminarTarifa,
+  fetchMantenimientos,
   fetchVehiculo,
+  finalizarMantenimiento,
   publicarVehiculo,
+  registrarMantenimiento,
   quitarCaracteristica,
   subirFotos,
 } from './api';
@@ -26,12 +31,25 @@ export function VehiculoDetallePage() {
     enabled: Number.isInteger(vehiculoId),
   });
   const caracteristicas = useCatalogo('caracteristicas');
+  const tiposMantenimiento = useCatalogo('tipos-mantenimiento');
+  const mantenimientos = useQuery({
+    queryKey: ['mantenimientos', vehiculoId],
+    queryFn: () => fetchMantenimientos(vehiculoId),
+    enabled: Number.isInteger(vehiculoId),
+  });
 
   const [nombreTarifa, setNombreTarifa] = useState('Tarifa base');
   const [fechaInicio, setFechaInicio] = useState('2026-01-01');
   const [fechaFin, setFechaFin] = useState('2026-12-31');
   const [precio, setPrecio] = useState(30000);
   const [error, setError] = useState('');
+  const [idTipoMantenimiento, setIdTipoMantenimiento] = useState<number | undefined>();
+  const [kmMantenimiento, setKmMantenimiento] = useState<number | undefined>();
+  const [tallerMantenimiento, setTallerMantenimiento] = useState('');
+  const [descripcionMantenimiento, setDescripcionMantenimiento] = useState('');
+  const [costoMantenimiento, setCostoMantenimiento] = useState<number | undefined>();
+  const [costoFinal, setCostoFinal] = useState<number | undefined>();
+  const [errorMantenimiento, setErrorMantenimiento] = useState('');
 
   const invalidar = (): void => {
     queryClient.invalidateQueries({ queryKey: ['vehiculo', vehiculoId] });
@@ -63,6 +81,48 @@ export function VehiculoDetallePage() {
         ? agregarCaracteristica(vehiculoId, idCar, true)
         : quitarCaracteristica(vehiculoId, idCar),
     onSuccess: invalidar,
+  });
+
+  const invalidarMantenimientos = (): void => {
+    queryClient.invalidateQueries({ queryKey: ['mantenimientos', vehiculoId] });
+    queryClient.invalidateQueries({ queryKey: ['panel-proveedor-vehiculos'] });
+    invalidar();
+  };
+
+  const registrarMantenimientoMutation = useMutation({
+    mutationFn: () =>
+      registrarMantenimiento(vehiculoId, {
+        ID_tipo_mantenimiento: idTipoMantenimiento as number,
+        kilometraje: kmMantenimiento ?? query.data!.kilometraje,
+        descripcion: descripcionMantenimiento || undefined,
+        taller: tallerMantenimiento || undefined,
+        costo: costoMantenimiento,
+      }),
+    onSuccess: () => {
+      setErrorMantenimiento('');
+      setDescripcionMantenimiento('');
+      setTallerMantenimiento('');
+      setCostoMantenimiento(undefined);
+      invalidarMantenimientos();
+    },
+    onError: (err) =>
+      setErrorMantenimiento(
+        err instanceof Error ? err.message : 'No se pudo registrar el mantenimiento.',
+      ),
+  });
+
+  const finalizarMantenimientoMutation = useMutation({
+    mutationFn: (idMantenimiento: number) =>
+      finalizarMantenimiento(vehiculoId, idMantenimiento, costoFinal),
+    onSuccess: () => {
+      setErrorMantenimiento('');
+      setCostoFinal(undefined);
+      invalidarMantenimientos();
+    },
+    onError: (err) =>
+      setErrorMantenimiento(
+        err instanceof Error ? err.message : 'No se pudo finalizar el mantenimiento.',
+      ),
   });
 
   if (query.isLoading) return <p className="text-slate-500">Cargando vehiculo…</p>;
@@ -213,6 +273,175 @@ export function VehiculoDetallePage() {
             </div>
             {error && <p className="sm:col-span-4 text-sm text-red-600">{error}</p>}
           </form>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Mantenimiento</CardTitle>
+          <CardDescription>
+            Mantenimiento activo e historial del vehiculo.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {mantenimientos.isLoading && <p className="text-sm text-slate-500">Cargando…</p>}
+          {mantenimientos.isError && (
+            <p className="text-sm text-red-600">No se pudo cargar el mantenimiento.</p>
+          )}
+
+          {mantenimientos.data?.activos.length === 0 && vehiculo.estadoVehiculo === 'ARRENDADO' && (
+            <p className="rounded-md bg-amber-50 p-3 text-sm text-amber-700">
+              El vehiculo esta arrendado; no se puede iniciar mantenimiento.
+            </p>
+          )}
+
+          {mantenimientos.data?.activos.map((mantenimiento) => (
+            <div
+              key={mantenimiento.id}
+              className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm"
+            >
+              <p className="font-medium">
+                {mantenimiento.tipo} · desde {formatearFecha(mantenimiento.fechaInicio)}
+              </p>
+              <p className="mt-1 text-slate-600">
+                {mantenimiento.taller || 'Sin taller'} ·{' '}
+                {mantenimiento.costo !== null
+                  ? formatearCLP(mantenimiento.costo)
+                  : 'Costo pendiente'}
+              </p>
+              <div className="mt-3 flex flex-wrap items-end gap-2">
+                <div className="space-y-1">
+                  <Label htmlFor={`costoFinal-${mantenimiento.id}`}>Costo final</Label>
+                  <Input
+                    id={`costoFinal-${mantenimiento.id}`}
+                    type="number"
+                    min={0}
+                    placeholder="Opcional"
+                    value={costoFinal ?? ''}
+                    onChange={(event) =>
+                      setCostoFinal(event.target.value ? Number(event.target.value) : undefined)
+                    }
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => finalizarMantenimientoMutation.mutate(mantenimiento.id)}
+                  disabled={finalizarMantenimientoMutation.isPending}
+                >
+                  Finalizar mantenimiento
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          {mantenimientos.data?.activos.length === 0 && vehiculo.estadoVehiculo !== 'ARRENDADO' && (
+            <form
+              className="grid gap-3 rounded-lg border border-slate-200 p-4 sm:grid-cols-2"
+              onSubmit={(event) => {
+                event.preventDefault();
+                setErrorMantenimiento('');
+                if (!idTipoMantenimiento) {
+                  setErrorMantenimiento('Selecciona un tipo de mantenimiento.');
+                  return;
+                }
+                registrarMantenimientoMutation.mutate();
+              }}
+            >
+              <div className="space-y-1">
+                <Label htmlFor="tipoMantenimiento">Tipo</Label>
+                <Select
+                  id="tipoMantenimiento"
+                  value={idTipoMantenimiento ?? ''}
+                  onChange={(event) =>
+                    setIdTipoMantenimiento(
+                      event.target.value ? Number(event.target.value) : undefined,
+                    )
+                  }
+                >
+                  <option value="">Selecciona un tipo</option>
+                  {tiposMantenimiento.data?.map((tipo) => (
+                    <option key={tipo.id} value={tipo.id}>
+                      {tipo.nombre}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="kmMantenimiento">Kilometraje</Label>
+                <Input
+                  id="kmMantenimiento"
+                  type="number"
+                  min={0}
+                  value={kmMantenimiento ?? vehiculo.kilometraje}
+                  onChange={(event) =>
+                    setKmMantenimiento(event.target.value ? Number(event.target.value) : undefined)
+                  }
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="tallerMantenimiento">Taller</Label>
+                <Input
+                  id="tallerMantenimiento"
+                  value={tallerMantenimiento}
+                  onChange={(event) => setTallerMantenimiento(event.target.value)}
+                />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="costoMantenimiento">Costo estimado</Label>
+                <Input
+                  id="costoMantenimiento"
+                  type="number"
+                  min={0}
+                  value={costoMantenimiento ?? ''}
+                  onChange={(event) =>
+                    setCostoMantenimiento(
+                      event.target.value ? Number(event.target.value) : undefined,
+                    )
+                  }
+                />
+              </div>
+              <div className="space-y-1 sm:col-span-2">
+                <Label htmlFor="descripcionMantenimiento">Descripcion</Label>
+                <Input
+                  id="descripcionMantenimiento"
+                  value={descripcionMantenimiento}
+                  onChange={(event) => setDescripcionMantenimiento(event.target.value)}
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <Button type="submit" disabled={registrarMantenimientoMutation.isPending}>
+                  Registrar mantenimiento
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {errorMantenimiento && (
+            <p className="rounded-md bg-red-50 p-2 text-sm text-red-700">{errorMantenimiento}</p>
+          )}
+
+          {mantenimientos.data && mantenimientos.data.historial.length > 0 && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-slate-700">Historial</p>
+              <ul className="divide-y divide-slate-100 text-sm">
+                {mantenimientos.data.historial.map((mantenimiento) => (
+                  <li key={mantenimiento.id} className="flex flex-wrap justify-between gap-2 py-2">
+                    <span>
+                      {mantenimiento.tipo} · {formatearFecha(mantenimiento.fechaInicio)}
+                      {mantenimiento.fechaFin
+                        ? ` → ${formatearFecha(mantenimiento.fechaFin)}`
+                        : ' · activo'}
+                    </span>
+                    <span className="text-slate-500">
+                      {mantenimiento.costo !== null
+                        ? formatearCLP(mantenimiento.costo)
+                        : 'Sin costo'}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </CardContent>
       </Card>
 

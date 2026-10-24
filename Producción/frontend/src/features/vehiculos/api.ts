@@ -180,3 +180,50 @@ export async function buscarVehiculos(params: BusquedaParams): Promise<BusquedaI
   const suffix = qs.toString() ? `?${qs.toString()}` : '';
   return apiFetch<BusquedaItem[]>(`/vehiculos/buscar${suffix}`);
 }
+export interface Mantenimiento {
+  id: number;
+  patente: string;
+  tipo: string;
+  descripcion: string | null;
+  taller: string | null;
+  kilometraje: number | null;
+  costo: number | null;
+  fechaInicio: string;
+  fechaFin: string | null;
+  activo: boolean;
+}
+
+export interface MantenimientosVehiculo {
+  activos: Mantenimiento[];
+  historial: Mantenimiento[];
+}
+
+export interface MantenimientoCreateData {
+  ID_tipo_mantenimiento: number;
+  kilometraje: number;
+  descripcion?: string;
+  taller?: string;
+  costo?: number;
+}
+
+export const fetchMantenimientos = (id: number): Promise<MantenimientosVehiculo> =>
+  apiFetch<MantenimientosVehiculo>(`/vehiculos/${id}/mantenimientos`);
+
+export const registrarMantenimiento = (
+  id: number,
+  data: MantenimientoCreateData,
+): Promise<Mantenimiento> =>
+  apiFetch<Mantenimiento>(`/vehiculos/${id}/mantenimientos`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const finalizarMantenimiento = (
+  id: number,
+  idMantenimiento: number,
+  costoFinal?: number,
+): Promise<Mantenimiento> =>
+  apiFetch<Mantenimiento>(`/vehiculos/${id}/mantenimientos/${idMantenimiento}/finalizar`, {
+    method: 'POST',
+    body: JSON.stringify({ costo_final: costoFinal }),
+  });

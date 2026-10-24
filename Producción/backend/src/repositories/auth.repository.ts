@@ -32,6 +32,7 @@ export interface RegistrarUsuarioRow {
 
 export interface UsuarioRow {
   ID_usuario: number;
+  ID_persona_usuario: number;
   rut_persona: string;
   nombres_persona: string;
   apellido_paterno_persona: string | null;
@@ -96,6 +97,7 @@ export async function findUserById(id: number): Promise<UsuarioRow | null> {  co
     .query<UsuarioRow>(
       `
       SELECT u.ID_usuario,
+             u.ID_persona_usuario,
              p.rut_persona,
              p.nombres_persona,
              p.apellido_paterno_persona,
@@ -113,6 +115,70 @@ export async function findUserById(id: number): Promise<UsuarioRow | null> {  co
       `,
     );
   return result.recordset[0] ?? null;
+}
+
+export interface LicenciaRow {
+  id: number;
+  personaId: number;
+  clase: string;
+  numero: string;
+  fechaEmision: string;
+  fechaVencimiento: string;
+  urlArchivo: string | null;
+  verificada: boolean;
+  activa: boolean;
+  fechaRegistro: string;
+}
+
+export async function obtenerLicencia(idPersona: number): Promise<LicenciaRow | null> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('idPersona', sql.Int, idPersona)
+    .query<LicenciaRow>(
+      `SELECT l.ID_licencia_conducir AS id,
+              l.ID_persona_licencia_conducir AS personaId,
+              c.codigo_clase_licencia AS clase,
+              l.numero_licencia AS numero,
+              l.fecha_emision_licencia AS fechaEmision,
+              l.fecha_vencimiento_licencia AS fechaVencimiento,
+              l.url_archivo_licencia AS urlArchivo,
+              l.verificada_licencia AS verificada,
+              l.activa_licencia AS activa,
+              l.fecha_registro_licencia AS fechaRegistro
+       FROM dbo.LicenciaConducir l
+       INNER JOIN dbo.ClaseLicencia c
+         ON c.ID_clase_licencia = l.ID_clase_licencia_licencia_conducir
+       WHERE l.ID_persona_licencia_conducir = @idPersona
+         AND l.activa_licencia = 1
+       ORDER BY l.fecha_registro_licencia DESC, l.ID_licencia_conducir DESC`,
+    );
+  return result.recordset[0] ?? null;
+}
+
+export interface RegistrarLicenciaInput {
+  ID_clase_licencia: number;
+  numero_licencia: string;
+  fecha_emision: string;
+  fecha_vencimiento: string;
+  url_archivo?: string | null;
+}
+
+export async function registrarLicencia(
+  idPersona: number,
+  input: RegistrarLicenciaInput,
+): Promise<LicenciaRow | null> {
+  const pool = await getPool();
+  await pool
+    .request()
+    .input('ID_persona', sql.Int, idPersona)
+    .input('ID_clase_licencia', sql.Int, input.ID_clase_licencia)
+    .input('numero_licencia', sql.VarChar(20), input.numero_licencia)
+    .input('fecha_emision', sql.Date, input.fecha_emision)
+    .input('fecha_vencimiento', sql.Date, input.fecha_vencimiento)
+    .input('url_archivo', sql.VarChar(500), input.url_archivo ?? null)
+    .execute('u_sp_RegistrarLicenciaConducir');
+  return obtenerLicencia(idPersona);
 }
 
 export async function verificarEmail(
