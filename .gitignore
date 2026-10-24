@@ -30,8 +30,11 @@ uploads-*/
 Producción/infra/data/
 infra/data/
 
-# Cobertura de tests
+# Cobertura y artefactos de tests
 coverage/
+test-results/
+playwright-report/
+blob-report/
 
 # Editores y sistema operativo
 .vscode/
