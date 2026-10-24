@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Bell,
   Building2,
@@ -180,7 +180,7 @@ function SidebarContent({
                       onClick={onNavigate}
                       className={({ isActive }) =>
                         cn(
-                          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                          'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2',
                           isActive
                             ? 'bg-brand text-white shadow-sm'
                             : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
@@ -222,6 +222,7 @@ export function AppLayout() {
   const { usuario, logout } = useAuth();
   const location = useLocation();
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const menuRef = useRef<HTMLElement>(null);
   const grupos = crearGrupos(usuario?.roles ?? []);
   const email = usuario?.email ?? '';
   const roles = usuario?.roles ?? [];
@@ -234,16 +235,43 @@ export function AppLayout() {
     if (!menuAbierto) return;
 
     const previousOverflow = document.body.style.overflow;
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     document.body.style.overflow = 'hidden';
 
+    const root = menuRef.current;
+    const focusables = root
+      ? Array.from(
+          root.querySelectorAll<HTMLElement>(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+          ),
+        ).filter((element) => element.offsetParent !== null)
+      : [];
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const closeButton = root?.querySelector<HTMLElement>('button[aria-label="Cerrar menu"]');
+    (closeButton ?? first)?.focus();
+
     const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.key === 'Escape') setMenuAbierto(false);
+      if (event.key === 'Escape') {
+        setMenuAbierto(false);
+        return;
+      }
+      if (event.key !== 'Tab' || !first || !last) return;
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener('keydown', onKeyDown);
 
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', onKeyDown);
+      previouslyFocused?.focus();
     };
   }, [menuAbierto]);
 
@@ -306,6 +334,7 @@ export function AppLayout() {
             onClick={() => setMenuAbierto(false)}
           />
           <aside
+            ref={menuRef}
             id="menu-lateral"
             role="dialog"
             aria-modal="true"
