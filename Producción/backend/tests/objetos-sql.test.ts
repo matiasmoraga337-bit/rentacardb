@@ -50,3 +50,14 @@ describe('Mantenimiento de vehiculos', () => {
     expect(res.status).toBe(401);
   });
 });
+describe('Licencia de conducir', () => {
+  it('exige autenticacion para consultar', async () => {
+    const res = await request(app).get('/api/usuarios/perfil/licencia');
+    expect(res.status).toBe(401);
+  });
+
+  it('exige autenticacion para registrar', async () => {
+    const res = await request(app).post('/api/usuarios/perfil/licencia').send({});
+    expect(res.status).toBe(401);
+  });
+});

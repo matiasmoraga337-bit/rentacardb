@@ -89,6 +89,12 @@ const CATALOGOS: Record<string, CatalogoDef> = {
     nombre: 'nombre_tipo_mantenimiento',
     activo: 'activo_tipo_mantenimiento',
   },
+  'clases-licencia': {
+    table: 'ClaseLicencia',
+    id: 'ID_clase_licencia',
+    nombre: 'codigo_clase_licencia',
+    activo: 'activo_clase_licencia',
+  },
   'politicas-cancelacion': {
     table: 'PoliticaCancelacion',
     id: 'ID_politica_cancelacion',

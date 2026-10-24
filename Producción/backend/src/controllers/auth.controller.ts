@@ -1,6 +1,7 @@
 import { type Request, type Response } from 'express';
 import { isNonProduction } from '../config/mailer';
 import {
+  type LicenciaInput,
   type LoginInput,
   type PerfilInput,
   type RecuperarInput,
@@ -86,6 +87,16 @@ export async function actualizarPerfil(req: Request, res: Response): Promise<voi
     email: row.email_usuario,
     emailConfirmado: row.email_confirmado_usuario,
   });
+}
+
+export async function licencia(req: Request, res: Response): Promise<void> {
+  res.status(200).json(await authService.obtenerLicencia(req.user!.id));
+}
+
+export async function registrarLicencia(req: Request, res: Response): Promise<void> {
+  res
+    .status(201)
+    .json(await authService.registrarLicencia(req.user!.id, req.body as LicenciaInput));
 }
 
 export async function roles(req: Request, res: Response): Promise<void> {

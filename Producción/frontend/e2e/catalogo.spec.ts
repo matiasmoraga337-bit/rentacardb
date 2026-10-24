@@ -63,6 +63,12 @@ test.describe('Autenticación', () => {
     await login(page, 'demo@rentacar.cl', 'Demo1234!');
     await expect(page.getByRole('heading', { name: 'Hola, Cliente' })).toBeVisible();
   });
+
+  test('el cliente ve su licencia en el perfil', async ({ page }) => {
+    await login(page, 'demo@rentacar.cl', 'Demo1234!');
+    await page.goto('/perfil');
+    await expect(page.getByRole('heading', { name: 'Licencia de conducir' })).toBeVisible();
+  });
 });
 
 test.describe('Favoritos y feedback', () => {
