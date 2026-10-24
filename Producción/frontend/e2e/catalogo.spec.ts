@@ -108,4 +108,13 @@ test.describe('Administración', () => {
     await page.goto('/panel');
     await expect(page.getByText('Documentos por vencer')).toBeVisible();
   });
+
+  test('muestra la tarjeta de mantenimiento del vehiculo', async ({ page }) => {
+    await login(page, 'proveedor@rentacar.cl', 'Proveedor1234!');
+    await page.goto('/proveedor/vehiculos/1');
+    await expect(page.getByRole('heading', { name: 'Mantenimiento' })).toBeVisible();
+    await expect(
+      page.getByText('Mantenimiento activo e historial del vehiculo.'),
+    ).toBeVisible();
+  });
 });

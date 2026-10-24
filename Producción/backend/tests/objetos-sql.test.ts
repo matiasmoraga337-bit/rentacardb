@@ -32,3 +32,21 @@ describe('Objetos SQL integrados', () => {
     expect(res.status).toBe(401);
   });
 });
+describe('Mantenimiento de vehiculos', () => {
+  it('exige autenticacion para listar', async () => {
+    const res = await request(app).get('/api/vehiculos/1/mantenimientos');
+    expect(res.status).toBe(401);
+  });
+
+  it('exige autenticacion para registrar', async () => {
+    const res = await request(app).post('/api/vehiculos/1/mantenimientos').send({});
+    expect(res.status).toBe(401);
+  });
+
+  it('exige autenticacion para finalizar', async () => {
+    const res = await request(app)
+      .post('/api/vehiculos/1/mantenimientos/1/finalizar')
+      .send({});
+    expect(res.status).toBe(401);
+  });
+});
