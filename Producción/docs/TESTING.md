@@ -192,7 +192,7 @@ npm run smoke:s4
 
 ## 19) CI — suite SQL
 
-El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-20)**:
+El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-21)**:
 
 - inicia `mcr.microsoft.com/mssql/server:2022-latest`;
 - espera disponibilidad con `sqlcmd`;
@@ -200,7 +200,7 @@ El workflow `.github/workflows/ci.yml` incluye el job **SQL Server (suite 00-20)
 - publica `sql/tests/results` como artifact;
 - elimina el contenedor incluso si falla.
 
-La suite debe quedar en **202 PASS / 0 FAIL**.
+La suite debe quedar en **204 PASS / 0 FAIL**.
 
 ## 20) E2E — Playwright + axe
 
@@ -219,3 +219,4 @@ npm run test:e2e
 
 La suite debe quedar en **19 tests** (14 desktop + 5 móvil). Los reportes se
 publican como artifact del workflow.
+

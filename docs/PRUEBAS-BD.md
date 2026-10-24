@@ -7,7 +7,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **202 PASS / 0 FAIL**
+- **Resultado global:** **204 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -34,6 +34,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 | `sql/tests/18_outbox_objetos.sql` | 3 | Publicar evento y marcar notificacion enviada |
 | `sql/tests/19_mantenimiento.sql` | 4 | Registro, vista activa, duplicado y finalizacion de mantenimiento |
 | `sql/tests/20_licencia.sql` | 3 | Registro, duplicado y vencimiento de licencia |
+| `sql/tests/21_liberar_deposito.sql` | 2 | Liberacion de deposito al cancelar reserva |
 
 ## 2. Resultados por categoría
 
@@ -210,3 +211,4 @@ El runner:
 - Agregar un job de **CI con SQL Server 2022** que ejecute `sql/tests/` en cada PR.
 - Añadir el test de concurrencia con dos conexiones y el de rendimiento.
 - Para la demo, ejecutar `npm run seed` y `npm run smoke:s2` después de la suite.
+

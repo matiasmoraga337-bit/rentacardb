@@ -19,12 +19,9 @@ Matriz de trazabilidad entre objetos SQL y su uso real en la aplicación.
 | `u_sp_RegistrarMantenimiento` | SP | Inicio de mantenimiento desde el detalle del vehículo. | `POST /api/vehiculos/:id/mantenimientos`. |
 | `u_sp_FinalizarMantenimiento` | SP | Cierre de mantenimiento y vuelta a disponible. | `POST /api/vehiculos/:id/mantenimientos/:id/finalizar`. |
 | `u_sp_RegistrarLicenciaConducir` | SP | Registro de licencia en el perfil del cliente. | `POST /api/usuarios/perfil/licencia`. |
+| `u_sp_LiberarDeposito` | SP | Liberación automática del depósito al cancelar una reserva. | `u_sp_CancelarReserva`. |
 
-## Pendientes de integrar
-
-| Objeto | Tipo | Integración planificada |
-|---|---|---|
-| `u_sp_LiberarDeposito` | SP | Liberación automática al cancelar/finalizar la reserva. |
+Todos los objetos de la matriz están integrados en la aplicación.
 
 ## Pruebas
 
