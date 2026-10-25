@@ -110,3 +110,30 @@ export const registrarLicencia = (data: LicenciaInput): Promise<Licencia> =>
     method: 'POST',
     body: JSON.stringify(data),
   });
+export interface RegistroInput {
+  rut: string;
+  nombres: string;
+  apellidoPaterno: string;
+  apellidoMaterno?: string;
+  telefono?: string;
+  email: string;
+  password: string;
+}
+
+export interface RegistroResponse {
+  message: string;
+  usuario: {
+    id: number;
+    rut: string;
+    nombres: string;
+    email: string;
+    rol: string;
+  };
+  tokenVerificacion?: string;
+}
+
+export const registro = (data: RegistroInput): Promise<RegistroResponse> =>
+  apiFetch<RegistroResponse>('/auth/registro', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
