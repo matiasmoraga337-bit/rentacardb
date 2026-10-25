@@ -18,3 +18,25 @@ atribución obligatoria). Se conservan los enlaces de origen para trazabilidad.
 
 Las imágenes fueron redimensionadas y convertidas a WebP para el seed. No se
 usan como fotografías oficiales de los vehículos reales.
+
+## Flota QA
+
+Imágenes de stock para los vehículos de prueba. Licencia Pexels. Se conservan los enlaces de origen.
+
+- FLAA01: https://www.pexels.com/photo/170811/
+- FLAA02: https://www.pexels.com/photo/116675/
+- FLAA03: https://www.pexels.com/photo/210019/
+- FLAA04: https://www.pexels.com/photo/358070/
+- FLAA05: https://www.pexels.com/photo/305070/
+- FLAA06: https://www.pexels.com/photo/112460/
+- FLAA07: https://www.pexels.com/photo/244206/
+- FLAA08: https://www.pexels.com/photo/1149137/
+- FLAA09: https://www.pexels.com/photo/1592384/
+- FLAA10: https://www.pexels.com/photo/120049/
+- FLAA11: https://www.pexels.com/photo/1035108/
+- FLAA12: https://www.pexels.com/photo/1545743/
+- FLAA13: https://www.pexels.com/photo/2127733/
+- FLAA14: https://www.pexels.com/photo/3752165/
+- FLAA15: https://www.pexels.com/photo/3802510/
+- FLAA16: https://www.pexels.com/photo/193999/
+- UNAA01: https://www.pexels.com/photo/164634/

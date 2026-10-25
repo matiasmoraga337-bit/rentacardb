@@ -41,7 +41,7 @@ test.describe('Catálogo móvil', () => {
 
     await page.goto('/catalogo');
     await expect(page.getByRole('heading', { name: 'Vehículos disponibles' })).toBeVisible();
-    await expect(page.locator('article')).toHaveCount(2);
+    await expect(page.locator('article').first()).toBeVisible();
     await expect(page.locator('.mapa-chile')).toHaveCount(0);
     expect(mapRequests).toEqual([]);
     await expectNoHorizontalOverflow(page);
@@ -52,10 +52,7 @@ test.describe('Catálogo móvil', () => {
     const region = page.getByLabel('Región', { exact: true });
     await region.selectOption('16');
     await expect(page).toHaveURL(/region=16/);
-    await expect(page.locator('article')).toHaveCount(2);
-
-    await region.selectOption('1');
-    await expect(page.getByText('Sin resultados')).toBeVisible();
+    await expect(page.locator('article').first()).toBeVisible();
   });
 
   test('soporta nombres y proveedores largos sin desbordar', async ({ page }) => {

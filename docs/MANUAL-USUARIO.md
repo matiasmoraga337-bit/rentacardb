@@ -13,7 +13,10 @@ Credenciales demo (seed):
 |---|---|---|
 | Admin | `admin@rentacar.cl` | `Admin1234!` |
 | Cliente | `demo@rentacar.cl` | `Demo1234!` |
-| Proveedor | `proveedor@rentacar.cl` | `Proveedor1234!` |
+| Cliente 2 | `cliente2@rentacar.cl` | `Cliente1234!` |
+| Proveedor AutoDemo | `proveedor@rentacar.cl` | `Proveedor1234!` |
+| Proveedor flota | `flota@rentacar.cl` | `Flota1234!` |
+| Proveedor único | `unico@rentacar.cl` | `Unico1234!` |
 
 ## 2. Cliente
 
@@ -50,7 +53,7 @@ Credenciales demo (seed):
 
 ## 5. Flujo recomendado de demo
 
-1. `npm run seed`.
+1. `npm run seed` y `npm run seed:qa` (este último para las cuentas y flotas extendidas).
 2. `npm run smoke:s3` para dejar un arriendo finalizado con cargos, multa y reseñas.
 3. Cliente: favoritos, busqueda guardada, reserva/pago.
 4. Proveedor: iniciar arriendo, fotos, devolucion, cargos/multas.

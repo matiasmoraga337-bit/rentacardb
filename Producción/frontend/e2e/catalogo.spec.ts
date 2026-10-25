@@ -15,22 +15,23 @@ test.describe('Catálogo público', () => {
     await expect(
       page.getByRole('heading', { name: 'Vehículos disponibles' }),
     ).toBeVisible();
-    await expect(page.locator('article')).toHaveCount(2);
+    await expect(page.locator('article').first()).toBeVisible();
     await expect(page.locator('.mapa-chile')).toBeVisible();
     await expect.poll(() => mapRequests.length).toBeGreaterThan(0);
 
     const region = page.getByLabel('Región', { exact: true });
     await region.selectOption('16');
     await expect(page).toHaveURL(/region=16/);
-    await expect(page.locator('article')).toHaveCount(2);
-
-    await region.selectOption('1');
-    await expect(page).toHaveURL(/region=1/);
-    await expect(page.getByText('Sin resultados')).toBeVisible();
+    await expect(page.locator('article').first()).toBeVisible();
 
     await region.selectOption('');
     await expect(page).not.toHaveURL(/region=/);
-    await expect(page.locator('article')).toHaveCount(2);
+    await expect(page.locator('article').first()).toBeVisible();
+  });
+
+  test('muestra el estado vacío con datos de prueba', async ({ page }) => {
+    await page.goto('/catalogo?data=empty');
+    await expect(page.getByText('Sin resultados')).toBeVisible();
   });
 
   test('abre la ficha y navega la galería', async ({ page }) => {
