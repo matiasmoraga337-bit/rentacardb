@@ -18,7 +18,15 @@ Credenciales demo (seed):
 | Proveedor flota | `flota@rentacar.cl` | `Flota1234!` |
 | Proveedor único | `unico@rentacar.cl` | `Unico1234!` |
 
-## 2. Cliente
+## 2. Crear cuenta
+
+1. Ir a `/registro` desde el boton **Crear cuenta** del login.
+2. Completar RUT, nombres, apellidos, email y contrasena.
+3. Confirmar la contrasena y enviar el formulario.
+4. Revisar el correo en Mailpit o usar el enlace de verificacion de desarrollo.
+5. Iniciar sesion con el email y la contrasena registrados.
+
+## 3. Cliente
 
 1. **Buscar vehiculos** en `/catalogo`; filtrar por fechas, comuna, tipo y precio.
 2. **Guardar busqueda** con un nombre; verlas en `/busquedas`.
@@ -31,7 +39,7 @@ Credenciales demo (seed):
 9. **Disputas**: abrir una disputa sobre un arriendo finalizado.
 10. **Notificaciones**: campana y `/notificaciones`.
 
-## 3. Proveedor / operador
+## 4. Proveedor / operador
 
 1. **Panel** `/panel`: metricas y actividad.
 2. **Mis vehiculos**: crear/editar, fotos, tarifas, caracteristicas y documentos.
@@ -41,7 +49,7 @@ Credenciales demo (seed):
 6. **Liquidaciones** en `/proveedor/liquidaciones`.
 7. **Chat** y **Disputas**.
 
-## 4. Administracion
+## 5. Administracion
 
 1. **Proveedores**: aprobar pendientes.
 2. **Catalogos** `/admin/catalogos`: crear/editar/desactivar catalogos de negocio.
@@ -51,7 +59,7 @@ Credenciales demo (seed):
 6. **Auditoria** `/admin/auditoria`: eventos del sistema.
 7. **Reporte de ingresos** `/admin/reportes`.
 
-## 5. Flujo recomendado de demo
+## 6. Flujo recomendado de demo
 
 1. `npm run seed` y `npm run seed:qa` (este último para las cuentas y flotas extendidas).
 2. `npm run smoke:s3` para dejar un arriendo finalizado con cargos, multa y reseñas.
@@ -61,7 +69,7 @@ Credenciales demo (seed):
 6. Admin: resolver disputa, generar/aprobar/pagar liquidacion, revisar outbox.
 7. Ver correos en Mailpit.
 
-## 6. Problemas frecuentes
+## 7. Problemas frecuentes
 
 | Sintoma | Causa probable | Solucion |
 |---|---|---|

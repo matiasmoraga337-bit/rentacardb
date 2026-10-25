@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
 import { RecuperarPage } from '@/features/auth/RecuperarPage';
+import { RegistroPage } from '@/features/auth/RegistroPage';
 import { RequireRole } from '@/features/auth/RequireRole';
 import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage';
 import { VerificarEmailPage } from '@/features/auth/VerificarEmailPage';
@@ -164,6 +165,7 @@ const prototypeRoutes: RouteObject[] = import.meta.env.DEV
 
 const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
+  { path: '/registro', element: <RegistroPage /> },
   { path: '/recuperar', element: <RecuperarPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
   { path: '/verificar-email', element: <VerificarEmailPage /> },

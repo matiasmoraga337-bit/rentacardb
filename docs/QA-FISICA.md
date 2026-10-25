@@ -135,7 +135,7 @@ pago, arriendo, devolución y mantenimiento verificados en al menos Android e iO
 
 ## Preflight ya ejecutado
 
-- Playwright: **22 tests** (17 desktop + 5 móvil).
+- Playwright: **23 tests** (18 desktop + 5 móvil).
 - axe: catálogo, worst-case, login y ficha.
 - SQL: **204 PASS**.
 - Backend: **143 tests**.
