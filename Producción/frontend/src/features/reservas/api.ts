@@ -125,8 +125,9 @@ export interface CancelacionResult {
 }
 
 export function nuevaIdempotencyKey(prefijo = 'res'): string {
-  const randomUuid = globalThis.crypto?.randomUUID;
-  if (typeof randomUuid === 'function') return `${prefijo}-${randomUuid()}`;
+  if (typeof globalThis.crypto?.randomUUID === 'function') {
+    return `${prefijo}-${globalThis.crypto.randomUUID()}`;
+  }
   return `${prefijo}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 

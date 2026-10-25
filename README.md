@@ -80,6 +80,7 @@ Manual de usuario: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 - Objetos SQL integrados: [`docs/OBJETOS-SQL.md`](docs/OBJETOS-SQL.md).
+- QA física: [`docs/QA-FISICA.md`](docs/QA-FISICA.md).
 
 ## Contribuir
 

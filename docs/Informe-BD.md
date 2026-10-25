@@ -1073,7 +1073,7 @@ Sistema web de **reserva y arriendo de vehículos** con:
 
 ## 4) Supuestos
 
-- Motor: **Microsoft SQL Server 2025** (`COMPATIBILITY_LEVEL = 170`), base `RentaCarDB`.
+- Motor: **Microsoft SQL Server 2022/2025** (`COMPATIBILITY_LEVEL = 160`), base `RentaCarDB`.
 - Los montos se manejan en **pesos chilenos (CLP)** con `decimal` (sin centavos fraccionarios).
 - Las fechas de reserva son por **día** (`date`); los instantes operativos usan `datetime2(0)`.
 - Los proveedores deben estar **APROBADOS** y sus vehículos **PUBLICADOS** para poder reservar.
@@ -1092,7 +1092,7 @@ Sistema web de **reserva y arriendo de vehículos** con:
 
 1. **Modelo relacional** (este directorio `docs/`): diccionario, relaciones, 3FN, clasificación, alcance y ERD.
 2. **Script de creación** de la base (`estesiscript.sql` + complementos `sql/`).
-3. **Lógica de negocio** en base de datos: 54 procedimientos, 3 funciones, 4 triggers, 6 vistas.
+3. **Lógica de negocio** en base de datos: 84 procedimientos, 3 funciones, 4 triggers, 6 vistas.
 4. **Datos de referencia** sembrados: geografía de Chile y catálogos del dominio.
 
 ---
