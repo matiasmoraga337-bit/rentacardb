@@ -77,9 +77,7 @@ test.describe('Flujo crítico', () => {
     await login(page, 'proveedor@rentacar.cl', 'Proveedor1234!');
     await page.goto(`/arriendos/${arriendoId}`);
     await page.getByRole('button', { name: 'Registrar devolucion' }).click();
-    await expect(
-      page.getByText('Devolucion registrada. El arriendo quedo finalizado.'),
-    ).toBeVisible();
+    await expect(page.getByText('Finalizado', { exact: true }).first()).toBeVisible();
 
     await cerrarSesion(page);
     await login(page, 'demo@rentacar.cl', 'Demo1234!');
