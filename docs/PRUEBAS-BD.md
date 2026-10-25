@@ -3,7 +3,7 @@
 Resultados de la suite de pruebas ejecutada sobre el script final (`RentacarFinal.sql`)
 en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de demo.
 
-- **Última ejecución:** 24-oct-2026
+- **Última ejecución:** 25-oct-2026
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
