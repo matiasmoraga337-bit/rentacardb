@@ -82,6 +82,7 @@ Manual de usuario: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md).
 - Objetos SQL integrados: [`docs/OBJETOS-SQL.md`](docs/OBJETOS-SQL.md).
 - QA física: [`docs/QA-FISICA.md`](docs/QA-FISICA.md).
 - Defensa técnica: [`docs/DEFENSA-TECNICA.md`](docs/DEFENSA-TECNICA.md).
+- Cuentas y datos de prueba: [`docs/CUENTAS-PRUEBA.md`](docs/CUENTAS-PRUEBA.md).
 
 ## Contribuir
 

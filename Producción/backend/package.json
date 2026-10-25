@@ -12,12 +12,14 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "jest --passWithNoTests",
     "seed": "tsx scripts/seed-demo.ts",
+    "seed:qa": "tsx scripts/seed-qa.ts",
     "seed:s4": "tsx scripts/seed-s4.ts",
     "seed:fotos": "tsx scripts/seed-fotos.ts",
     "smoke:s2": "tsx scripts/smoke-s2.ts",
     "smoke:s3": "tsx scripts/smoke-s3.ts",
     "smoke:chat": "tsx scripts/smoke-chat.ts",
-    "smoke:s4": "tsx scripts/smoke-s4.ts"
+    "smoke:s4": "tsx scripts/smoke-s4.ts",
+    "smoke:qa": "tsx scripts/smoke-qa.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

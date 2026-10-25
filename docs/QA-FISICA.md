@@ -24,6 +24,7 @@ Checklist para validar la aplicación en hardware real antes de la entrega.
 docker compose --env-file .env -f Producción/infra/docker-compose.yml up -d
 cd Producción/backend
 npm run seed
+npm run seed:qa
 npm run seed:fotos
 ```
 
@@ -134,7 +135,7 @@ pago, arriendo, devolución y mantenimiento verificados en al menos Android e iO
 
 ## Preflight ya ejecutado
 
-- Playwright: **20 tests** (15 desktop + 5 móvil).
+- Playwright: **21 tests** (16 desktop + 5 móvil).
 - axe: catálogo, worst-case, login y ficha.
 - SQL: **204 PASS**.
 - Backend: **143 tests**.
