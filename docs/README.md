@@ -7,7 +7,7 @@ con múltiples sedes y dueños por región de Chile.
 - **Base de datos:** `RentaCarDB`
 - **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
 - Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
-- **Conteo:** 83 tablas · 113 claves foráneas · 54 restricciones `UNIQUE` · 93 `CHECK` · 111 índices · 4 triggers · 84 procedimientos almacenados · 3 funciones · 6 vistas.
+- **Conteo:** 83 tablas · 116 claves foráneas · 54 restricciones `UNIQUE` · 94 `CHECK` · 4 triggers · 84 procedimientos almacenados · 3 funciones · 6 vistas.
 
 ## Índice
 
@@ -37,7 +37,10 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
 | — | [`DEMO-S4.md`](DEMO-S4.md) | Guion de extensiones S4: cargos, disputas, liquidaciones, notificaciones, fotos y adjuntos. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (183 PASS). |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (204 PASS). |
+| — | [`OBJETOS-SQL.md`](OBJETOS-SQL.md) | Matriz de uso real de vistas y procedimientos. |
+| — | [`QA-FISICA.md`](QA-FISICA.md) | Checklist de validación en hardware real. |
+| — | [`DEFENSA-TECNICA.md`](DEFENSA-TECNICA.md) | Guion, preguntas y respuestas para la defensa. |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres
