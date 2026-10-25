@@ -171,7 +171,7 @@ transacciones.”
 
 ### 16. ¿Cómo prueban el sistema?
 
-> “Tenemos 204 casos SQL, 143 tests de backend, 35 de frontend y 20 E2E con
+> “Tenemos 204 casos SQL, 143 tests de backend, 35 de frontend y 21 E2E con
 > Playwright y axe. Los E2E cubren catálogo, login, admin, móvil y el flujo
 > crítico completo: reserva, pago, arriendo, contrato, devolución y reseña.
 > También hay smoke scripts para S2, S3, S4 y chat.”
@@ -199,7 +199,7 @@ transacciones.”
 5. **Cliente (1 min):** reseña del vehículo.
 6. **Admin (2 min):** reportes, integridad, outbox y auditoría.
 
-Antes de la demo: `npm run seed`, `npm run seed:fotos` y verificar `/api/health`.
+Antes de la demo: `npm run seed`, `npm run seed:qa`, `npm run seed:fotos` y verificar `/api/health`.
 Tener capturas o video de respaldo por si falla la red.
 
 ## 7. Reparto equitativo
