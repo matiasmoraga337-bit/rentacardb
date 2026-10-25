@@ -52,7 +52,7 @@ stateDiagram-v2
 - `u_sp_RegistrarDanoInspeccion` solo admite inspecciones `DEVOLUCION`.
 - Para registrar daños, el operador usa el `ID_inspeccion` que devuelve `GET /arriendos/:id`.
 - Severidades permitidas: `LEVE`, `MEDIO`, `GRAVE`.
-- Las fotos de inspección quedan para S4 (no hay SP).
+- Las fotos de inspección están implementadas en S4 (`u_sp_RegistrarInspeccionFoto`).
 
 ### Contrato
 - El backend genera un texto determinístico con datos inmutables de la reserva/arriendo.

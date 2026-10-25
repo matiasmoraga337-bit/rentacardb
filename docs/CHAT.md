@@ -33,7 +33,7 @@ se permiten mensajes `TEXTO`.
 - El cliente solo puede iniciar conversaciones; no puede crear una a nombre de otro.
 - No se aceptan IDs de usuario desde el body.
 - Los mensajes se guardan con `NVARCHAR(2000)` y soportan Unicode.
-- No se implementan adjuntos (`MensajeAdjunto`) en S3; quedan para S4.
+- Los adjuntos (`MensajeAdjunto`) están implementados en el chat.
 
 ## 4. UI
 

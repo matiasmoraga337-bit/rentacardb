@@ -1,4 +1,4 @@
-﻿# PLAN — Desarrollo de la aplicación web
+# PLAN — Desarrollo de la aplicación web
 
 ## 1) Visión
 
@@ -45,7 +45,7 @@ cubra **todo el modelo** (82 tablas), desplegable con Docker.
 > incluye cargos/multas, disputas, liquidaciones, notificaciones/outbox,
 > fotos/adjuntos, hardening y demo. Ver `../docs/DEMO-S3.md`,
 > `../docs/DEMO-S4.md` y `../docs/PRUEBAS-BD.md`.
-> Pendiente menor: CRUD de catálogos (E3.2), hoy solo consulta.
+> El CRUD de catálogos, mantenimiento, licencia, depósito y reportes quedó integrado en v1.2.5.
 
 ## 5) Roadmap por sprints (detalle en `docs/CRONOGRAMA.md`)
 
@@ -60,7 +60,7 @@ cubra **todo el modelo** (82 tablas), desplegable con Docker.
 | Riesgo | Mitigación |
 |---|---|
 | Alcance grande vs. 4 semanas | Núcleo primero; extensiones como *stretch* |
-| SQL Server en Docker (`COMPATIBILITY_LEVEL = 170`) | Usar imagen 2022 y ajustar a 160, o BD en host local |
+| SQL Server en Docker (`COMPATIBILITY_LEVEL = 160`) | Usar imagen 2022; el canonical ya fija 160 |
 | Integración con SPs | Documentar contratos en `docs/API.md` antes de codificar |
 | Trabajo en equipo | Ramas por feature, PRs, tablero GitHub Projects |
 | Falta de datos | Bloque de datos de ejemplo (seed) para demo |
