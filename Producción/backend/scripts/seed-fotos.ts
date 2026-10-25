@@ -1,59 +1,93 @@
 /**
- * Sube fotos de stock a los vehiculos demo existentes.
- * Uso: npm run seed:fotos (requiere API y `npm run seed`).
+ * Sube fotos de stock a los vehiculos demo y de QA.
+ * Uso: npm run seed:fotos (requiere API, `npm run seed` y `npm run seed:qa`).
  */
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { api, login, subirArchivos } from './lib/demo-api';
 
-const PROVEEDOR_EMAIL = process.env.SMOKE_PROVEEDOR_EMAIL ?? 'proveedor@rentacar.cl';
-const PROVEEDOR_PASSWORD = process.env.SMOKE_PROVEEDOR_PASSWORD ?? 'Proveedor1234!';
-
-const FOTOS_DEMO = [
-  { patente: 'DEMA01', archivos: ['corolla-1.webp', 'corolla-2.webp', 'corolla-3.webp'] },
-  { patente: 'DEMB02', archivos: ['tucson-1.webp', 'tucson-2.webp', 'tucson-3.webp'] },
-];
-
-interface VehiculoBusqueda {
-  ID_vehiculo: number;
-  patente_vehiculo: string;
+interface VehiculoMio {
+  id: number;
+  patente: string;
 }
 
+interface GrupoFotos {
+  email: string;
+  password: string;
+  fotos: { patente: string; archivos: string[] }[];
+}
+
+const GRUPOS: GrupoFotos[] = [
+  {
+    email: 'proveedor@rentacar.cl',
+    password: 'Proveedor1234!',
+    fotos: [
+      { patente: 'DEMA01', archivos: ['corolla-1.webp', 'corolla-2.webp', 'corolla-3.webp'] },
+      { patente: 'DEMB02', archivos: ['tucson-1.webp', 'tucson-2.webp', 'tucson-3.webp'] },
+    ],
+  },
+  {
+    email: 'flota@rentacar.cl',
+    password: 'Flota1234!',
+    fotos: [
+      'FLAA01', 'FLAA02', 'FLAA03', 'FLAA04', 'FLAA05', 'FLAA06', 'FLAA07', 'FLAA08',
+      'FLAA09', 'FLAA10', 'FLAA11', 'FLAA12', 'FLAA13', 'FLAA14', 'FLAA15', 'FLAA16',
+    ].map((patente) => ({ patente, archivos: [`qa/${patente}-1.webp`] })),
+  },
+  {
+    email: 'unico@rentacar.cl',
+    password: 'Unico1234!',
+    fotos: [{ patente: 'UNAA01', archivos: ['qa/UNAA01-1.webp'] }],
+  },
+];
+
 async function main(): Promise<void> {
-  const proveedor = await login(PROVEEDOR_EMAIL, PROVEEDOR_PASSWORD);
-  const vehiculos = await api<VehiculoBusqueda[]>('/vehiculos/buscar');
-
-  for (const grupo of FOTOS_DEMO) {
-    const vehiculo = vehiculos.find((item) => item.patente_vehiculo === grupo.patente);
-    if (!vehiculo) {
-      throw new Error(`No se encontro el vehiculo ${grupo.patente}. Ejecuta npm run seed.`);
-    }
-
-    const detalle = await api<{ fotos: { id: number }[] }>(
-      `/vehiculos/${vehiculo.ID_vehiculo}`,
-    );
-    if (detalle.fotos.length > 0) {
-      console.log(`SKIP ${grupo.patente}: ya tiene ${detalle.fotos.length} foto(s).`);
+  for (const grupo of GRUPOS) {
+    let proveedor;
+    try {
+      proveedor = await login(grupo.email, grupo.password);
+    } catch (error) {
+      console.log(
+        `SKIP ${grupo.email}: ${(error as Error).message}. Ejecuta npm run seed:qa si faltan las cuentas QA.`,
+      );
       continue;
     }
+    const vehiculos = await api<VehiculoMio[]>('/vehiculos/mios', {}, proveedor.token);
 
-    const files = await Promise.all(
-      grupo.archivos.map(async (nombre) => {
-        const buffer = await readFile(path.join(__dirname, 'assets', 'vehiculos', nombre));
-        return {
-          blob: new Blob([new Uint8Array(buffer)], { type: 'image/webp' }),
-          nombre,
-        };
-      }),
-    );
+    for (const item of grupo.fotos) {
+      const vehiculo = vehiculos.find((vehiculoMio) => vehiculoMio.patente === item.patente);
+      if (!vehiculo) {
+        throw new Error(
+          `No se encontro ${item.patente} para ${grupo.email}. Ejecuta npm run seed:qa.`,
+        );
+      }
 
-    await subirArchivos(
-      `/vehiculos/${vehiculo.ID_vehiculo}/fotos`,
-      'fotos',
-      files,
-      proveedor.token,
-    );
-    console.log(`OK   ${grupo.patente}: ${files.length} fotos subidas.`);
+      const detalle = await api<{ fotos: { id: number }[] }>(
+        `/vehiculos/${vehiculo.id}`,
+      );
+      if (detalle.fotos.length > 0) {
+        console.log(`SKIP ${item.patente}: ya tiene ${detalle.fotos.length} foto(s).`);
+        continue;
+      }
+
+      const files = await Promise.all(
+        item.archivos.map(async (nombre) => {
+          const buffer = await readFile(path.join(__dirname, 'assets', 'vehiculos', nombre));
+          return {
+            blob: new Blob([new Uint8Array(buffer)], { type: 'image/webp' }),
+            nombre: path.basename(nombre),
+          };
+        }),
+      );
+
+      await subirArchivos(
+        `/vehiculos/${vehiculo.id}/fotos`,
+        'fotos',
+        files,
+        proveedor.token,
+      );
+      console.log(`OK   ${item.patente}: ${files.length} foto(s) subida(s).`);
+    }
   }
 }
 

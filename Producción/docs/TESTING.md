@@ -217,5 +217,5 @@ cd Producción/frontend
 npm run test:e2e
 ```
 
-La suite debe quedar en **20 tests** (15 desktop + 5 móvil). Los reportes se
+La suite debe quedar en **21 tests** (16 desktop + 5 móvil). Los reportes se
 publican como artifact del workflow.

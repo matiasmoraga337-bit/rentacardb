@@ -41,6 +41,7 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`OBJETOS-SQL.md`](OBJETOS-SQL.md) | Matriz de uso real de vistas y procedimientos. |
 | — | [`QA-FISICA.md`](QA-FISICA.md) | Checklist de validación en hardware real. |
 | — | [`DEFENSA-TECNICA.md`](DEFENSA-TECNICA.md) | Guion, preguntas y respuestas para la defensa. |
+| — | [`CUENTAS-PRUEBA.md`](CUENTAS-PRUEBA.md) | Cuentas, flotas y datos de prueba extendidos. |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
 
 ## Convenciones de nombres
