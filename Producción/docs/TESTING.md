@@ -209,7 +209,7 @@ Compose, carga el seed y ejecuta la suite.
 
 | Proyecto | Viewport | Cobertura |
 |---|---|---|
-| `edge` / `chromium` | Desktop | Catálogo, filtro regional, ficha, galería, login, favoritos, admin y axe. |
+| `edge` / `chromium` | Desktop | Catálogo, filtro regional, ficha, galería, login, favoritos, admin, flujo crítico completo y axe. |
 | `mobile-edge` / `mobile-chromium` | Pixel 7 | Sin desborde horizontal, filtros, peor caso, ficha, galería, focus trap y axe móvil. |
 
 ```powershell
@@ -217,6 +217,5 @@ cd Producción/frontend
 npm run test:e2e
 ```
 
-La suite debe quedar en **19 tests** (14 desktop + 5 móvil). Los reportes se
+La suite debe quedar en **20 tests** (15 desktop + 5 móvil). Los reportes se
 publican como artifact del workflow.
-
