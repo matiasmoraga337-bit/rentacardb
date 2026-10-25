@@ -26,6 +26,6 @@
 
 ## Pruebas
 
-- SQL: `sql/tests/14_favoritos_busquedas.sql` (8 casos).
+- SQL: `sql/tests/14_favoritos_busquedas.sql` (9 casos).
 - API: `Producción/backend/tests/favoritos.test.ts`.
 - UI: corazon, `/favoritos`, guardar y `/busquedas`.
