@@ -172,6 +172,13 @@ export function LoginPage() {
             </Button>
           </form>
 
+          <p className="mt-5 text-center text-sm text-slate-600">
+            ¿No tienes cuenta?{' '}
+            <Link to="/registro" className="font-medium text-brand hover:underline">
+              Crear cuenta
+            </Link>
+          </p>
+
           <div className="mt-6 border-t border-slate-200 pt-5">
             <Link
               to="/catalogo"

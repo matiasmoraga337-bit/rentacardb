@@ -209,14 +209,22 @@ export function VehiculoPublicoPage() {
                     )}
 
                     {!usuario && (
-                      <Link
-                        to="/login"
-                        state={{ from: checkoutUrl }}
-                        className={ctaClass}
-                        aria-disabled={!puedeReservar}
-                      >
-                        Inicia sesión para reservar
-                      </Link>
+                      <>
+                        <Link
+                          to="/login"
+                          state={{ from: checkoutUrl }}
+                          className={ctaClass}
+                          aria-disabled={!puedeReservar}
+                        >
+                          Inicia sesión para reservar
+                        </Link>
+                        <p className="text-center text-xs text-slate-500">
+                          ¿No tienes cuenta?{' '}
+                          <Link to="/registro" className="font-medium text-brand hover:underline">
+                            Crear cuenta
+                          </Link>
+                        </p>
+                      </>
                     )}
                     {usuario && usuario.roles.includes('CLIENTE') && (
                       <Link

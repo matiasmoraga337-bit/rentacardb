@@ -46,9 +46,17 @@ export function PublicHeader() {
               <span className="hidden sm:inline">Salir</span>
             </Button>
           ) : (
+            <>
+            <Link
+              to="/registro"
+              className="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:inline-flex"
+            >
+              Crear cuenta
+            </Link>
             <Link to="/login" className={buttonVariants({ size: 'sm' })}>
               Iniciar sesión
             </Link>
+            </>
           )}
         </nav>
         </div>

@@ -1,6 +1,17 @@
 import { expect, test } from '@playwright/test';
 import { login } from './helpers';
 
+function digitoVerificador(cuerpo: number): string {
+  let suma = 0;
+  let multiplicador = 2;
+  for (const digito of String(cuerpo).split('').reverse()) {
+    suma += Number(digito) * multiplicador;
+    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+  }
+  const resto = 11 - (suma % 11);
+  return resto === 11 ? '0' : resto === 10 ? 'K' : String(resto);
+}
+
 test.describe('Catálogo público', () => {
   test('carga vehículos y filtra por región', async ({ page }) => {
     const mapRequests: string[] = [];
@@ -80,6 +91,31 @@ test.describe('Autenticación', () => {
   test('inicia sesión como cliente', async ({ page }) => {
     await login(page, 'demo@rentacar.cl', 'Demo1234!');
     await expect(page.getByRole('heading', { name: 'Hola, Cliente' })).toBeVisible();
+  });
+
+  test('permite crear una cuenta desde el login', async ({ page }) => {
+    const cuerpoRut = 10_000_000 + (Date.now() % 80_000_000);
+    const rut = `${cuerpoRut}-${digitoVerificador(cuerpoRut)}`;
+    const email = `registro-${Date.now()}@rentacar.cl`;
+    const password = 'Registro1234!';
+
+    await page.goto('/login');
+    await page.getByRole('link', { name: 'Crear cuenta' }).click();
+    await expect(page).toHaveURL(/\/registro/);
+    await expect(page.getByRole('heading', { name: 'Crea tu cuenta' })).toBeVisible();
+
+    await page.getByLabel('RUT', { exact: true }).fill(rut);
+    await page.getByLabel('Nombres', { exact: true }).fill('Registro');
+    await page.getByLabel('Apellido paterno', { exact: true }).fill('E2E');
+    await page.getByLabel('Email', { exact: true }).fill(email);
+    await page.getByLabel('Contraseña', { exact: true }).fill(password);
+    await page.getByLabel('Confirmar contraseña', { exact: true }).fill(password);
+    await page.getByRole('button', { name: 'Crear cuenta' }).click();
+
+    await expect(page.getByText('Cuenta creada')).toBeVisible();
+    await page.getByRole('link', { name: 'Ir a iniciar sesión' }).click();
+    await login(page, email, password);
+    await expect(page.getByRole('heading', { name: 'Hola, Registro' })).toBeVisible();
   });
 
   test('el cliente ve su licencia en el perfil', async ({ page }) => {
