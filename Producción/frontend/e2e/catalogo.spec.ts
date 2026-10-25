@@ -34,6 +34,23 @@ test.describe('Catálogo público', () => {
     await expect(page.getByText('Sin resultados')).toBeVisible();
   });
 
+  test('vuelve al inicio al abrir una ficha y restaura al volver', async ({ page }) => {
+    await page.goto('/catalogo');
+    await expect(page.locator('article a').first()).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+    await page.locator('article a').first().click();
+    await page.waitForURL(/\/catalogo\/\d+/);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThan(50);
+
+    await page.goBack();
+    await expect(page.getByRole('heading', { name: 'Vehículos disponibles' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  });
+
   test('abre la ficha y navega la galería', async ({ page }) => {
     await page.goto('/catalogo/2');
 

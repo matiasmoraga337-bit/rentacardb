@@ -1,5 +1,6 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate, type RouteObject } from 'react-router-dom';
+import { RootLayout } from '@/app/RootLayout';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/features/auth/LoginPage';
 import { ProtectedRoute } from '@/features/auth/ProtectedRoute';
@@ -161,7 +162,7 @@ const prototypeRoutes: RouteObject[] = import.meta.env.DEV
     ]
   : [];
 
-export const router = createBrowserRouter([
+const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
   { path: '/recuperar', element: <RecuperarPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
@@ -352,4 +353,11 @@ export const router = createBrowserRouter([
     ],
   },
   { path: '*', element: <Navigate to="/panel" replace /> },
+];
+
+export const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: appRoutes,
+  },
 ]);
