@@ -1,4 +1,4 @@
-﻿# DESPLIEGUE
+# DESPLIEGUE
 
 ## 1) Entornos
 
@@ -23,15 +23,15 @@ services:
 - **Arranque:** `docker compose --env-file .env -f Producción/infra/docker-compose.yml up --build`.
 - Al iniciar la BD por primera vez, se ejecuta `database/RentacarFinal.sql` (init) para crear el esquema.
 
-> **Compatibilidad SQL Server:** el script fija `COMPATIBILITY_LEVEL = 170` (SQL 2025). La imagen
-> Linux `2022-latest` soporta hasta 160. Opciones: (a) ajustar el nivel a 160 en el script de
-> init; (b) correr la BD en el SQL Server local del equipo y dockerizar solo api+web.
-> **Decisión recomendada:** usar la imagen 2022 + init con nivel 160 para el contenedor.
+> **Compatibilidad SQL Server:** el script fija `COMPATIBILITY_LEVEL = 160`, compatible con la
+> imagen Linux `2022-latest` y con SQL Server 2025.
 
 ## 3) Dockerfiles
 
 - **backend:** multi‑stage (build TS → imagen node slim), `CMD node dist/server.js`.
 - **frontend:** build con Vite → servido con **nginx** (prod) o `vite` (dev).
+- **nginx:** gzip para assets, cache de `/assets` y `/images`, `no-cache` para
+  `index.html`, límite de subida de 12 MB y cabeceras de seguridad básicas.
 
 ## 4) CI (GitHub Actions)
 

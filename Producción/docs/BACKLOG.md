@@ -132,7 +132,7 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 
 > **Estado S4-E12:** E12.1 implementada y verificada. E12.3 implementada:
 > notificaciones in-app, correo y worker outbox con reintentos. Adjuntos (E12.2)
-> quedan para el siguiente PR. Ver [`../../docs/CHAT.md`](../../docs/CHAT.md) y
+> implementados en el chat. Ver [`../../docs/CHAT.md`](../../docs/CHAT.md) y
 > [`../../docs/NOTIFICACIONES.md`](../../docs/NOTIFICACIONES.md).
 
 ## E13 — Reseñas `S`

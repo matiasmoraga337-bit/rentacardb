@@ -4,7 +4,7 @@ Proyecto universitario de Base de Datos. Sistema web de reserva/renta de
 vehículos con múltiples sedes y dueños por región de Chile.
 
 ## Contexto técnico
-- Motor: Microsoft SQL Server 2025 (`COMPATIBILITY_LEVEL = 170`), base `RentaCarDB`.
+- Motor: Microsoft SQL Server 2022/2025 (`COMPATIBILITY_LEVEL = 160`), base `RentaCarDB`.
 - Script base de referencia: `Rentascript.sql` (generado por SSMS, **UTF-16 LE**).
 - Los cambios se aplican mediante un **script maestro único e idempotente**
   (ver `sql/` cuando exista).
