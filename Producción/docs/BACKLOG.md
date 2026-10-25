@@ -154,7 +154,8 @@ Prioridad **MoSCoW**: `M` = Must · `S` = Should · `C` = Could.
 
 > **Estado S3-E14:** paneles de cliente, proveedor y admin implementados sobre
 > `/panel`. Admin agrega `/admin/catalogos` (consulta) y `/admin/auditoria`.
-> Liquidaciones, disputas y edición de catálogos quedan para S4. Ver
+> Liquidaciones, disputas, edición de catálogos, mantenimiento, licencia y
+> depósito quedaron implementados en S4. Ver
 > [`../../docs/PANELES.md`](../../docs/PANELES.md).
 
 ## E15 — Calidad: testing, seguridad, docs `M`

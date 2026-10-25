@@ -2,7 +2,7 @@
 
 Matriz de trazabilidad entre objetos SQL y su uso real en la aplicación.
 
-## Integrados en Fase 1
+## Objetos integrados
 
 | Objeto | Tipo | Uso en la aplicación | Evidencia |
 |---|---|---|---|
@@ -25,6 +25,6 @@ Todos los objetos de la matriz están integrados en la aplicación.
 
 ## Pruebas
 
-- SQL: `sql/tests/17_integracion_objetos.sql`.
+- SQL: `sql/tests/17_integracion_objetos.sql` a `21_liberar_deposito.sql`.
 - API: `Producción/backend/tests/objetos-sql.test.ts` (auth y roles).
-- E2E: panel admin y alertas del proveedor.
+- E2E: panel admin, alertas del proveedor y flujo crítico completo en `e2e/flujo-critico.spec.ts`.

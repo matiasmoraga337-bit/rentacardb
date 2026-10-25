@@ -1,7 +1,7 @@
-﻿# Skills del proyecto — RentaCarDB
+# Skills del proyecto — RentaCarDB
 
 Documentación de las skills (asistentes especializados) instaladas para este
-proyecto universitario de Base de Datos (SQL Server 2025 / `RentaCarDB`).
+proyecto universitario de Base de Datos (SQL Server 2022/2025, compatibilidad 160 / `RentaCarDB`).
 
 > Las skills son instrucciones en Markdown que se cargan en el contexto del
 > agente. Se ejecutan con permisos plenos del agente: **revisar antes de usar**.
