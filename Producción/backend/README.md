@@ -13,9 +13,7 @@ API REST (Node.js + Express + TypeScript) que consume la base `RentaCarDB` media
 ```bash
 cp .env.example .env      # completar DB_PASSWORD y JWT_SECRET
 npm install
-npm run seed              # crea usuarios demo (admin@rentacar.cl / demo@rentacar.cl)
-npm run seed:qa           # agrega cliente2 y proveedores con flota/un vehiculo
-npm run seed:fotos        # sube fotos de stock a los vehiculos demo y QA
+npm run seed:demo         # seed + seed:qa + fotos + smoke (API levantada)
 npm run dev               # http://localhost:3000/api  ·  docs en /api/docs
 ```
 
@@ -29,6 +27,7 @@ npm run dev               # http://localhost:3000/api  ·  docs en /api/docs
 | `npm run lint` | ESLint. |
 | `npm run typecheck` | Chequeo de tipos sin emitir. |
 | `npm test` | Jest + Supertest. |
+| `npm run seed:demo` | Ejecuta `seed`, `seed:qa`, `seed:fotos` y `smoke:qa` (requiere API). |
 | `npm run seed` | Datos demo (usuarios ADMIN y CLIENTE). |
 | `npm run seed:qa` | Cliente2, Flota Chile (16 vehículos) y Renta Natales (1 vehículo). |
 | `npm run seed:fotos` | Fotos de stock para los vehículos demo y QA (requiere API). |
