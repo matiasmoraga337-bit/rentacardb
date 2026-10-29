@@ -23,9 +23,7 @@ Checklist para validar la aplicación en hardware real antes de la entrega.
 # Desde la raíz
 docker compose --env-file .env -f Producción/infra/docker-compose.yml up -d
 cd Producción/backend
-npm run seed
-npm run seed:qa
-npm run seed:fotos
+npm run seed:demo
 ```
 
 Credenciales demo:

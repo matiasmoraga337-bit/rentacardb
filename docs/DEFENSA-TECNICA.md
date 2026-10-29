@@ -199,7 +199,7 @@ transacciones.”
 5. **Cliente (1 min):** reseña del vehículo.
 6. **Admin (2 min):** reportes, integridad, outbox y auditoría.
 
-Antes de la demo: `npm run seed`, `npm run seed:qa`, `npm run seed:fotos` y verificar `/api/health`.
+Antes de la demo: `npm run seed:demo` y verificar `/api/health`.
 Tener capturas o video de respaldo por si falla la red.
 
 ## 7. Reparto equitativo

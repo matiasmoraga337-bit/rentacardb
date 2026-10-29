@@ -13,6 +13,7 @@
     "test": "jest --passWithNoTests",
     "seed": "tsx scripts/seed-demo.ts",
     "seed:qa": "tsx scripts/seed-qa.ts",
+    "seed:demo": "npm run seed && npm run seed:qa && npm run seed:fotos && npm run smoke:qa",
     "seed:s4": "tsx scripts/seed-s4.ts",
     "seed:fotos": "tsx scripts/seed-fotos.ts",
     "smoke:s2": "tsx scripts/smoke-s2.ts",

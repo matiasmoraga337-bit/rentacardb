@@ -67,8 +67,7 @@ El flujo H2 está implementado de punta a punta:
 ```powershell
 # Con la BD de compose levantada (puerto 14330)
 cd Producción/backend
-npm run seed          # datos demo (idempotente)
-npm run seed:qa       # datos de prueba extendidos (idempotente)
+npm run seed:demo     # datos demo + QA + fotos + smoke (idempotente)
 npm run smoke:s2      # flujo completo contra la API
 ```
 
