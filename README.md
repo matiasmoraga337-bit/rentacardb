@@ -41,6 +41,11 @@ docker compose --env-file .env -f Producción/infra/docker-compose.yml up --buil
 # API:  http://localhost:3000/api
 # Web:  http://localhost:5173
 # BD:   localhost:14330 (SQL Server en Docker)
+
+# Cargar datos demo y QA (API ya levantada)
+cd Producción/backend
+npm install
+npm run seed:demo
 ```
 
 > `Producción/infra/` y los esqueletos de `backend/` y `frontend/` se generan en las

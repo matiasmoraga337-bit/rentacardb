@@ -6,13 +6,10 @@ Datos extendidos para QA manual, demos y pruebas de flotas.
 
 ```powershell
 cd Producción/backend
-npm run seed
-npm run seed:qa
-npm run seed:fotos
-npm run smoke:qa
+npm run seed:demo
 ```
 
-`seed:qa` es idempotente y separado de `seed` para no alterar la suite E2E de CI.
+`seed:demo` es idempotente y encadena `seed`, `seed:qa`, `seed:fotos` y `smoke:qa`. Requiere la API levantada. No altera la suite E2E de CI, que usa solo `seed`.
 
 ## Cuentas
 
