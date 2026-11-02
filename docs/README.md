@@ -39,10 +39,20 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`DEMO-S4.md`](DEMO-S4.md) | Guion de extensiones S4: cargos, disputas, liquidaciones, notificaciones, fotos y adjuntos. |
 | — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (204 PASS). |
 | — | [`OBJETOS-SQL.md`](OBJETOS-SQL.md) | Matriz de uso real de vistas y procedimientos. |
+| — | [`DOCUMENTACION-TECNICA-BD.md`](DOCUMENTACION-TECNICA-BD.md) | Documentación técnica completa de los 180 objetos SQL: qué hacen, para qué se crearon, cómo se implementan y dónde se usan. |
+| — | [`presentacion-avance-60.html`](presentacion-avance-60.html) | Presentación web de página única para el avance del 60%: 19 diapositivas, navegación por teclado/swipe/dots, notas con `N` y pantalla completa con `F`. |
 | — | [`QA-FISICA.md`](QA-FISICA.md) | Checklist de validación en hardware real. |
 | — | [`DEFENSA-TECNICA.md`](DEFENSA-TECNICA.md) | Guion, preguntas y respuestas para la defensa. |
 | — | [`CUENTAS-PRUEBA.md`](CUENTAS-PRUEBA.md) | Cuentas, flotas y datos de prueba extendidos. |
 | — | [`Informe-BD.md`](Informe-BD.md) | Documento consolidado (todos los anteriores en uno). |
+
+### Abrir la presentación
+
+```powershell
+start docs\presentacion-avance-60.html
+```
+
+Atajos: `←` / `→` para navegar, `N` para notas del orador, `F` para pantalla completa y `?` para ayuda.
 
 ## Convenciones de nombres
 - Clave primaria: `ID_<entidad>` (ej. `ID_reserva`).

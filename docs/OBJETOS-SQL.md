@@ -2,6 +2,8 @@
 
 Matriz de trazabilidad entre objetos SQL y su uso real en la aplicación.
 
+> Documentación técnica completa, objeto por objeto: [`DOCUMENTACION-TECNICA-BD.md`](DOCUMENTACION-TECNICA-BD.md).
+
 ## Objetos integrados
 
 | Objeto | Tipo | Uso en la aplicación | Evidencia |

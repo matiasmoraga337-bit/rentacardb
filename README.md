@@ -3,7 +3,7 @@
 Sistema web de reserva y arriendo de vehículos con múltiples proveedores y sedes por
 región de Chile. Proyecto universitario de Base de Datos + aplicación web full‑stack.
 
-- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 113 FK, 84 SP, 3 funciones, 6 vistas).
+- **Base de datos:** Microsoft SQL Server · base `RentaCarDB` (83 tablas, 116 FK, 84 SP, 3 funciones, 6 vistas, 4 triggers).
 - **API:** Node.js + Express + TypeScript · acceso a datos con `mssql` (llamando a los SPs).
 - **Web:** React + Vite + TypeScript + Tailwind CSS + shadcn/ui.
 - **Despliegue:** Docker Compose (local). Render opcional para la demo.
@@ -61,6 +61,9 @@ npm run seed:demo
   adicionales, daños, chat, reseñas y paneles por rol.
 - **S4/H4:** cargos extra, multas, disputas, liquidaciones, notificaciones,
   worker outbox, fotos de inspección y adjuntos de chat.
+- **Avance 60%:** presentación web y documentación técnica completa en
+  [`docs/presentacion-avance-60.html`](docs/presentacion-avance-60.html) y
+  [`docs/DOCUMENTACION-TECNICA-BD.md`](docs/DOCUMENTACION-TECNICA-BD.md).
 
 Guiones: [`docs/DEMO-S2.md`](docs/DEMO-S2.md) · [`docs/DEMO-S3.md`](docs/DEMO-S3.md) · [`docs/DEMO-S4.md`](docs/DEMO-S4.md).
 Manual de usuario: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md).
@@ -85,6 +88,8 @@ Manual de usuario: [`docs/MANUAL-USUARIO.md`](docs/MANUAL-USUARIO.md).
 - Triggers y cursor: [`docs/JUSTIFICACION-TRIGGERS-CURSOR.md`](docs/JUSTIFICACION-TRIGGERS-CURSOR.md).
 - Pruebas de BD: [`docs/PRUEBAS-BD.md`](docs/PRUEBAS-BD.md).
 - Objetos SQL integrados: [`docs/OBJETOS-SQL.md`](docs/OBJETOS-SQL.md).
+- Documentación técnica completa: [`docs/DOCUMENTACION-TECNICA-BD.md`](docs/DOCUMENTACION-TECNICA-BD.md).
+- Presentación del avance 60%: [`docs/presentacion-avance-60.html`](docs/presentacion-avance-60.html).
 - QA física: [`docs/QA-FISICA.md`](docs/QA-FISICA.md).
 - Defensa técnica: [`docs/DEFENSA-TECNICA.md`](docs/DEFENSA-TECNICA.md).
 - Cuentas y datos de prueba: [`docs/CUENTAS-PRUEBA.md`](docs/CUENTAS-PRUEBA.md).

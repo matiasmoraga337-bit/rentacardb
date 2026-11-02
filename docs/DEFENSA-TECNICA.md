@@ -4,6 +4,16 @@ Guía común para que **todos los integrantes** puedan explicar la arquitectura,
 el modelo, el flujo completo y los objetos SQL críticos. La asignación por
 integrante es para liderar la respuesta, no para limitar el conocimiento.
 
+## Presentación de apoyo
+
+Archivo: [`presentacion-avance-60.html`](presentacion-avance-60.html).
+
+- 19 diapositivas alineadas con los 10 criterios de la rúbrica del 60%.
+- Navegación: `←` / `→`, `Espacio`, `Home` / `End`, swipe y dots.
+- `N`: notas del orador.
+- `F`: pantalla completa.
+- `?`: ayuda de atajos.
+
 ## 1. Respuesta de arquitectura — 60 segundos
 
 > “RentaCarDB es una aplicación full stack con tres capas: un frontend React +
