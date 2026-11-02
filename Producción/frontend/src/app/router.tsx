@@ -110,6 +110,11 @@ const PanelProveedorPage = lazy(() =>
     default: mod.PanelProveedorPage,
   })),
 );
+const RegistroProveedorPublicoPage = lazy(() =>
+  import('@/features/proveedores/RegistroProveedorPublicoPage').then((mod) => ({
+    default: mod.RegistroProveedorPublicoPage,
+  })),
+);
 const RegistrarProveedorPage = lazy(() =>
   import('@/features/proveedores/RegistrarProveedorPage').then((mod) => ({
     default: mod.RegistrarProveedorPage,
@@ -166,6 +171,7 @@ const prototypeRoutes: RouteObject[] = import.meta.env.DEV
 const appRoutes: RouteObject[] = [
   { path: '/login', element: <LoginPage /> },
   { path: '/registro', element: <RegistroPage /> },
+  { path: '/publicar', element: <RegistroProveedorPublicoPage /> },
   { path: '/recuperar', element: <RecuperarPage /> },
   { path: '/reset-password', element: <ResetPasswordPage /> },
   { path: '/verificar-email', element: <VerificarEmailPage /> },

@@ -3,11 +3,11 @@
 Resultados de la suite de pruebas ejecutada sobre el script final (`RentacarFinal.sql`)
 en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de demo.
 
-- **Última ejecución:** 25-oct-2026
+- **Última ejecución:** 02-nov-2026
 - **Script:** `RentacarFinal.sql` (compat 160)
 - **Entorno:** contenedor `rentacardb-db-test` (puerto 14331)
 - **Runner:** `sql/tests/run_tests.ps1` (reconstruye la BD y ejecuta los archivos)
-- **Resultado global:** **204 PASS / 0 FAIL**
+- **Resultado global:** **221 PASS / 0 FAIL**
 
 ## 1. Estructura de la suite
 
@@ -39,7 +39,7 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 ## 2. Resultados por categoría
 
 ### Esquema (12/12)
-- 83 tablas, 84 SPs, 6 vistas, 3 funciones, 4 triggers.
+- 83 tablas, 86 SPs, 6 vistas, 3 funciones, 4 triggers.
 - 0 procedimientos `sp_` de usuario y 0 con doble prefijo `u_u_`.
 - Triggers, CHECK y FK habilitados; compat 160; `u_sp_ValidarIntegridad` sin errores.
 
@@ -175,6 +175,13 @@ en un contenedor **SQL Server 2022** aislado (`RentaCarDB`), sin tocar la BD de 
 - Recalculo del promedio del vehiculo a partir de resenas `CLIENTE_A_VEHICULO`.
 - Arriendo inexistente rechazado (`60600`).
 
+### Registro publico y estados de proveedor (17/17)
+- Registro publico como persona y empresa.
+- Roles `CLIENTE + PROVEEDOR`, `Cliente`, `ConfiguracionProveedor` y `ProveedorUsuario`.
+- Estado inicial `PENDIENTE`.
+- Aprobacion, suspension, reactivacion y auditoria.
+- Transicion invalida y motivo obligatorio rechazados.
+
 ## 3. Defectos encontrados y corregidos durante la fase de pruebas
 1. **`u_u_sp_RegistrarVehiculoFoto`** (doble prefijo). Corregido en script y backend; se agregó prueba real de subida de foto (WebP + thumb).
 2. **Falso positivo** en “Registro email duplicado”: usaba el RUT del admin y fallaba por RUT. Corregido con un RUT nuevo.
@@ -203,7 +210,7 @@ powershell -ExecutionPolicy Bypass -File sql/tests/run_tests.ps1
 
 El runner:
 1. Reconstruye `RentaCarDB` desde `RentacarFinal.sql`.
-2. Ejecuta los archivos `00`–`05` en orden.
+2. Ejecuta los archivos `00`–`22` en orden.
 3. Guarda los logs en `sql/tests/results/` (ignorado por git).
 4. Devuelve código de salida 1 si hay algún `FAIL`.
 

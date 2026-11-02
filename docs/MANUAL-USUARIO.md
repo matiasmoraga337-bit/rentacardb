@@ -26,6 +26,16 @@ Credenciales demo (seed):
 4. Revisar el correo en Mailpit o usar el enlace de verificacion de desarrollo.
 5. Iniciar sesion con el email y la contrasena registrados.
 
+### 2.1 Publicar flota como proveedor
+
+1. Entrar a `/publicar` desde **Publica tu flota** o desde el panel/perfil.
+2. Completar la cuenta: RUT, nombres, email y contraseña.
+3. Completar los datos del proveedor: persona o empresa, nombre comercial y datos de contacto.
+4. Enviar la solicitud. La cuenta tendrá roles **CLIENTE + PROVEEDOR**.
+5. El proveedor queda **PENDIENTE** hasta que un administrador lo apruebe.
+6. Al iniciar sesión con ambos roles, elegir **Cliente** o **Proveedor**.
+7. Mientras esté pendiente, puede preparar su configuración y sedes, pero no publicar vehículos.
+
 ## 3. Cliente
 
 1. **Buscar vehiculos** en `/catalogo`; filtrar por fechas, comuna, tipo y precio.
@@ -51,7 +61,7 @@ Credenciales demo (seed):
 
 ## 5. Administracion
 
-1. **Proveedores**: aprobar pendientes.
+1. **Proveedores**: aprobar, rechazar, suspender o reactivar proveedores.
 2. **Catalogos** `/admin/catalogos`: crear/editar/desactivar catalogos de negocio.
 3. **Disputas** `/admin/disputas`: tomar en revision y resolver.
 4. **Liquidaciones** `/admin/liquidaciones`: generar, aprobar y pagar.

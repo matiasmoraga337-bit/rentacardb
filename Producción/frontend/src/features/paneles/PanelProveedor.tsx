@@ -57,6 +57,12 @@ export function PanelProveedor() {
 
   return (
     <div className="space-y-6">
+      {proveedor.data && proveedor.data.estado !== 'APROBADO' && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong className="block">Tu proveedor está en estado {proveedor.data.estado}.</strong>
+          <span className="mt-1 block">Puedes preparar tu flota, pero no publicar vehículos hasta que un administrador te apruebe.</span>
+        </div>
+      )}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         <MetricCard
           title="Vehículos"

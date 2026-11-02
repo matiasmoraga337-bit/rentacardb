@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
+import { useAuth } from '@/features/auth/AuthContext';
 import { registrarProveedor } from './api';
 
 const schema = z
@@ -27,6 +28,7 @@ type FormData = z.infer<typeof schema>;
 
 export function RegistrarProveedorPage() {
   const navigate = useNavigate();
+  const { refreshUser, setModoActivo } = useAuth();
   const {
     register,
     handleSubmit,
@@ -47,6 +49,8 @@ export function RegistrarProveedorPage() {
         telefono: data.telefono,
         email: data.email || undefined,
       });
+      await refreshUser();
+      setModoActivo('PROVEEDOR');
       navigate('/proveedor/panel');
     } catch (err) {
       setError('root', { message: err instanceof Error ? err.message : 'No se pudo registrar.' });

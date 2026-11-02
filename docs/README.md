@@ -7,7 +7,7 @@ con múltiples sedes y dueños por región de Chile.
 - **Base de datos:** `RentaCarDB`
 - **Script de creación (final):** `RentacarFinal.sql` — autosuficiente (crea la base, guarda `IF DB_ID(...) IS NULL`, triggers, permisos de esquema y opciones saneadas).
 - Complementos/auxiliares: `estesiscript.sql`, `sql/01_completar_export.sql`, `sql/02_reconciliar_triggers_permisos.sql`.
-- **Conteo:** 83 tablas · 116 claves foráneas · 54 restricciones `UNIQUE` · 94 `CHECK` · 4 triggers · 84 procedimientos almacenados · 3 funciones · 6 vistas.
+- **Conteo:** 83 tablas · 116 claves foráneas · 54 restricciones `UNIQUE` · 94 `CHECK` · 4 triggers · 86 procedimientos almacenados · 3 funciones · 6 vistas.
 
 ## Índice
 
@@ -37,9 +37,9 @@ con múltiples sedes y dueños por región de Chile.
 | — | [`DEMO-S2.md`](DEMO-S2.md) | Guion reproducible de la demo H2. |
 | — | [`DEMO-S3.md`](DEMO-S3.md) | Guion reproducible de arriendos e inspecciones. |
 | — | [`DEMO-S4.md`](DEMO-S4.md) | Guion de extensiones S4: cargos, disputas, liquidaciones, notificaciones, fotos y adjuntos. |
-| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (204 PASS). |
+| — | [`PRUEBAS-BD.md`](PRUEBAS-BD.md) | Resultados de la suite SQL (221 PASS). |
 | — | [`OBJETOS-SQL.md`](OBJETOS-SQL.md) | Matriz de uso real de vistas y procedimientos. |
-| — | [`DOCUMENTACION-TECNICA-BD.md`](DOCUMENTACION-TECNICA-BD.md) | Documentación técnica completa de los 180 objetos SQL: qué hacen, para qué se crearon, cómo se implementan y dónde se usan. |
+| — | [`DOCUMENTACION-TECNICA-BD.md`](DOCUMENTACION-TECNICA-BD.md) | Documentación técnica completa de los 182 objetos SQL: qué hacen, para qué se crearon, cómo se implementan y dónde se usan. |
 | — | [`presentacion-avance-60.html`](presentacion-avance-60.html) | Presentación web de página única para el avance del 60%: 19 diapositivas, navegación por teclado/swipe/dots, notas con `N` y pantalla completa con `F`. |
 | — | [`QA-FISICA.md`](QA-FISICA.md) | Checklist de validación en hardware real. |
 | — | [`DEFENSA-TECNICA.md`](DEFENSA-TECNICA.md) | Guion, preguntas y respuestas para la defensa. |

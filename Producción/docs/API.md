@@ -33,9 +33,11 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 | Método | Ruta | Acceso | SP / Tabla |
 |---|---|---|---|
 | POST | `/proveedores` | AUTH | `u_sp_RegistrarProveedor` |
+| POST | `/proveedores/registro-publico` | PÚBLICO | `u_sp_RegistrarProveedorPublico` | Crea cuenta `CLIENTE + PROVEEDOR`, devuelve JWT y proveedor `PENDIENTE`. |
 | GET | `/proveedores` | ADMIN | `Proveedor` (filtros por estado/tipo) |
 | GET | `/proveedores/:id` | AUTH | `Proveedor`, `ConfiguracionProveedor` |
 | PATCH | `/proveedores/:id/aprobar` | ADMIN | `u_sp_AprobarProveedor` |
+| PATCH | `/proveedores/:id/estado` | ADMIN | `u_sp_CambiarEstadoProveedor` | Body `{estado, motivo?}`. Permite aprobar, rechazar, suspender, reactivar y reabrir. |
 | PUT | `/proveedores/:id/configuracion` | ROL(PROVEEDOR) | `ConfiguracionProveedor` |
 | GET/POST/PUT/DELETE | `/proveedores/:id/sedes[/:sedeId]` | ROL(PROVEEDOR) | `SedeProveedor` |
 | GET | `/reportes/proveedores` | ADMIN | `u_sp_ReporteProveedores` |

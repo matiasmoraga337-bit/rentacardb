@@ -7,11 +7,14 @@ import { PanelCliente } from '@/features/paneles/PanelCliente';
 import { PanelProveedor } from '@/features/paneles/PanelProveedor';
 
 export function DashboardPage() {
-  const { usuario } = useAuth();
+  const { usuario, modoActivo } = useAuth();
   const roles = usuario?.roles ?? [];
   const esAdmin = roles.includes('ADMIN');
   const esProveedor = roles.includes('PROVEEDOR') || roles.includes('OPERADOR');
   const esCliente = roles.includes('CLIENTE');
+  const esAdminActivo = esAdmin && (!modoActivo || modoActivo === 'ADMIN');
+  const esProveedorActivo = esProveedor && modoActivo !== 'CLIENTE';
+  const esClienteActivo = esCliente && modoActivo !== 'PROVEEDOR';
   const sinPanel = !esAdmin && !esProveedor && !esCliente;
 
   const rol = esAdmin
@@ -72,9 +75,9 @@ export function DashboardPage() {
 
       {!sinPanel && (
         <section className="space-y-4" aria-label="Resumen de actividad">
-          {esAdmin && <PanelAdmin />}
-          {esProveedor && <PanelProveedor />}
-          {esCliente && <PanelCliente />}
+          {esAdminActivo && <PanelAdmin />}
+          {esProveedorActivo && <PanelProveedor />}
+          {esClienteActivo && <PanelCliente />}
         </section>
       )}
 

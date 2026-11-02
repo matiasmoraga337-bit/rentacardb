@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { type FormEvent, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -11,6 +12,7 @@ import { Select } from '@/components/ui/select';
 import { useToast } from '@/components/ui/toast';
 import { useCatalogo } from '@/features/catalogos/hooks';
 import { formatearFecha } from '@/features/reservas/format';
+import { useAuth } from './AuthContext';
 import { actualizarPerfil, fetchLicencia, fetchPerfil, registrarLicencia } from './api';
 
 const schema = z.object({
@@ -24,6 +26,8 @@ type FormData = z.infer<typeof schema>;
 
 export function PerfilPage() {
   const queryClient = useQueryClient();
+  const { usuario } = useAuth();
+  const puedeSerProveedor = !usuario?.roles.includes('PROVEEDOR');
   const { showToast } = useToast();
   const { data, isLoading } = useQuery({ queryKey: ['perfil'], queryFn: fetchPerfil });
   const clases = useCatalogo('clases-licencia');
@@ -226,6 +230,20 @@ export function PerfilPage() {
           </form>
         </CardContent>
       </Card>
+
+      {puedeSerProveedor && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Publica tu flota</CardTitle>
+            <CardDescription>Convierte tu cuenta en proveedor sin crear otra cuenta.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Link to="/publicar">
+              <Button variant="outline">Registrarme como proveedor</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

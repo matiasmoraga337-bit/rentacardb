@@ -27,6 +27,12 @@ export function PublicHeader() {
 
         <nav className="flex items-center gap-1 sm:gap-2" aria-label="Navegación principal">
           <Link
+            to="/publicar"
+            className="hidden rounded-full px-3 py-2 text-sm font-medium text-teal-800 hover:bg-teal-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:inline-flex"
+          >
+            Publica tu flota
+          </Link>
+          <Link
             to="/catalogo"
             className="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 sm:inline-flex"
           >

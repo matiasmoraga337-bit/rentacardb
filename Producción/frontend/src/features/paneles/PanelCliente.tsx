@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { fetchArriendos } from '@/features/arriendos/api';
+import { useAuth } from '@/features/auth/AuthContext';
 import { fetchConversaciones } from '@/features/chat/api';
 import { EstadoPagoBadge } from '@/features/pagos/EstadoPagoBadge';
 import { fetchReservas } from '@/features/reservas/api';
@@ -12,6 +13,8 @@ import { formatearCLP, formatearFecha } from '@/features/reservas/format';
 import { MetricCard } from './MetricCard';
 
 export function PanelCliente() {
+  const { usuario } = useAuth();
+  const puedeSerProveedor = !usuario?.roles.includes('PROVEEDOR');
   const reservas = useQuery({
     queryKey: ['panel-cliente-reservas'],
     queryFn: () => fetchReservas({ scope: 'cliente', page: 1, pageSize: 5 }),
@@ -166,6 +169,11 @@ export function PanelCliente() {
           <Link to="/busquedas">
             <Button variant="outline">Búsquedas guardadas</Button>
           </Link>
+          {puedeSerProveedor && (
+            <Link to="/publicar">
+              <Button variant="outline">Publicar mi flota</Button>
+            </Link>
+          )}
         </CardContent>
       </Card>
     </div>

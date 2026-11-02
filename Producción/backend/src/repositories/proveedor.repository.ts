@@ -15,6 +15,33 @@ export interface ProveedorRow {
   fecha_registro_proveedor: string;
 }
 
+export interface RegistrarProveedorPublicoParams {
+  rut: string;
+  nombres: string;
+  apellido_paterno: string;
+  apellido_materno?: string;
+  telefono?: string;
+  email: string;
+  password_hash: string;
+  tipo_proveedor: 'PERSONA' | 'EMPRESA';
+  nombre_comercial: string;
+  razon_social?: string;
+  rut_proveedor?: string;
+  telefono_proveedor?: string;
+  email_proveedor?: string;
+}
+
+export interface ProveedorPublicoRow {
+  ID_usuario: number;
+  rut_persona: string;
+  nombres_persona: string;
+  email_usuario: string;
+  ID_proveedor: number;
+  estado_proveedor: string;
+  roles: string;
+  token_verificacion: string;
+}
+
 export interface RegistrarProveedorParams {
   ID_tipo_proveedor: number;
   ID_persona_proveedor?: number | null;
@@ -91,6 +118,57 @@ export async function registrarProveedor(
   return row;
 }
 
+export async function registrarProveedorPublico(
+  params: RegistrarProveedorPublicoParams,
+): Promise<ProveedorPublicoRow> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('rut', sql.VarChar(12), params.rut)
+    .input('nombres', sql.NVarChar(80), params.nombres)
+    .input('apellido_paterno', sql.NVarChar(50), params.apellido_paterno)
+    .input('apellido_materno', sql.NVarChar(50), params.apellido_materno ?? null)
+    .input('telefono', sql.VarChar(20), params.telefono ?? null)
+    .input('email', sql.VarChar(150), params.email)
+    .input('password_hash', sql.VarChar(255), params.password_hash)
+    .input('tipo_proveedor', sql.VarChar(50), params.tipo_proveedor)
+    .input('nombre_comercial', sql.NVarChar(150), params.nombre_comercial)
+    .input('razon_social', sql.NVarChar(150), params.razon_social ?? null)
+    .input('rut_proveedor', sql.VarChar(12), params.rut_proveedor ?? null)
+    .input('telefono_proveedor', sql.VarChar(20), params.telefono_proveedor ?? null)
+    .input('email_proveedor', sql.VarChar(150), params.email_proveedor ?? null)
+    .execute<ProveedorPublicoRow>('u_sp_RegistrarProveedorPublico');
+  const row = result.recordset[0];
+  if (!row) throw new AppError(500, 'PROVEEDOR_NO_CREADO', 'No se pudo crear el proveedor.');
+  return row;
+}
+
+export interface EstadoProveedorRow {
+  ID_proveedor: number;
+  estado: string;
+  fecha_baja_proveedor: string | null;
+  motivo_baja_proveedor: string | null;
+}
+
+export async function cambiarEstadoProveedor(
+  idProveedor: number,
+  idAdmin: number,
+  estado: string,
+  motivo?: string,
+): Promise<EstadoProveedorRow> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('ID_proveedor', sql.Int, idProveedor)
+    .input('ID_usuario_admin', sql.Int, idAdmin)
+    .input('nuevo_estado', sql.VarChar(50), estado)
+    .input('motivo', sql.NVarChar(300), motivo ?? null)
+    .execute<EstadoProveedorRow>('u_sp_CambiarEstadoProveedor');
+  const row = result.recordset[0];
+  if (!row) throw new AppError(500, 'PROVEEDOR_NO_ACTUALIZADO', 'No se pudo actualizar el proveedor.');
+  return row;
+}
+
 export async function asignarRol(
   idUsuario: number,
   rol: string,
@@ -142,7 +220,9 @@ export async function listarProveedores(estado?: string): Promise<unknown[]> {
               p.email_proveedor AS email,
               tp.nombre_tipo_proveedor AS tipo,
               ep.nombre_estado_proveedor AS estado,
-              p.fecha_registro_proveedor AS fechaRegistro
+              p.fecha_registro_proveedor AS fechaRegistro,
+              p.fecha_baja_proveedor AS fechaBaja,
+              p.motivo_baja_proveedor AS motivoBaja
        FROM Proveedor p
        INNER JOIN TipoProveedor tp ON tp.ID_tipo_proveedor = p.ID_tipo_proveedor_proveedor
        INNER JOIN EstadoProveedor ep ON ep.ID_estado_proveedor = p.ID_estado_proveedor_proveedor
@@ -161,6 +241,9 @@ const PROVEEDOR_SELECT = `
          p.email_proveedor AS email,
          tp.nombre_tipo_proveedor AS tipo,
          ep.nombre_estado_proveedor AS estado,
+         p.fecha_registro_proveedor AS fechaRegistro,
+         p.fecha_baja_proveedor AS fechaBaja,
+         p.motivo_baja_proveedor AS motivoBaja,
          c.permite_devolucion_otra_sede_configuracion_proveedor AS permiteDevolucionOtraSede,
          c.permite_entrega_domicilio_configuracion_proveedor AS permiteEntregaDomicilio,
          c.permite_retiro_domicilio_configuracion_proveedor AS permiteRetiroDomicilio,

@@ -20,6 +20,46 @@ describe('POST /api/proveedores', () => {
   });
 });
 
+describe('POST /api/proveedores/registro-publico', () => {
+  it('es publico pero valida los datos', async () => {
+    const res = await request(app).post('/api/proveedores/registro-publico').send({});
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+
+  it('rechaza empresa sin razon social y RUT', async () => {
+    const res = await request(app).post('/api/proveedores/registro-publico').send({
+      cuenta: {
+        rut: '22222222-2',
+        nombres: 'QA',
+        apellidoPaterno: 'Publico',
+        email: 'publico@rentacar.cl',
+        password: 'Password123!',
+      },
+      proveedor: { tipo: 'EMPRESA', nombreComercial: 'Empresa QA' },
+    });
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
+  });
+});
+
+describe('PATCH /api/proveedores/:id/estado', () => {
+  it('exige autenticacion', async () => {
+    const res = await request(app)
+      .patch('/api/proveedores/1/estado')
+      .send({ estado: 'APROBADO' });
+    expect(res.status).toBe(401);
+  });
+
+  it('solo permite ADMIN', async () => {
+    const res = await request(app)
+      .patch('/api/proveedores/1/estado')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ estado: 'APROBADO' });
+    expect(res.status).toBe(403);
+  });
+});
+
 describe('GET /api/proveedores', () => {
   it('exige autenticacion', async () => {
     const res = await request(app).get('/api/proveedores');

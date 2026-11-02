@@ -2,7 +2,7 @@
 
 Documento de referencia de los objetos de `RentaCarDB`: qué hace cada uno, para qué se creó, cómo está implementado y dónde se usa en la aplicación web.
 
-> **Alcance:** 83 tablas, 84 procedimientos almacenados, 6 vistas, 3 funciones y 4 triggers.
+> **Alcance:** 83 tablas, 86 procedimientos almacenados, 6 vistas, 3 funciones y 4 triggers.
 > **Motor:** Microsoft SQL Server 2022/2025, base `RentaCarDB`, compatibilidad 160.
 > **Verificación:** 1 de noviembre de 2026 sobre `RentacarFinal.sql`, el backend Express/TypeScript y el frontend React.
 
@@ -39,7 +39,7 @@ Los propósitos se derivan del DDL, de los nombres, de los parámetros, de los c
 |---|---:|---:|---|
 | Tablas | 83 | 78 | 5 sin referencias en la app ni en objetos SQL. |
 | Vistas | 6 | 6 | Todas consumidas por el backend. |
-| Procedimientos | 84 | 84 | 80 invocados desde la API; 4 internos. |
+| Procedimientos | 86 | 86 | 82 invocados desde la API; 4 internos. |
 | Funciones | 3 | 3 | Usadas en constraints, SPs y consultas. |
 | Triggers | 4 | 4 | Activos sobre `Reserva`, `Pago` y `BloqueoVehiculo`. |
 
@@ -1965,7 +1965,7 @@ Las vistas encapsulan consultas de reporte y lectura que la API consume sin dupl
 
 ## Procedimientos almacenados
 
-Los 84 SP se agrupan por dominio. Los parámetros y tablas se extraen de la definición; los errores se listan por código y las pruebas se agrupan por módulo.
+Los 86 SP se agrupan por dominio. Los parámetros y tablas se extraen de la definición; los errores se listan por código y las pruebas se agrupan por módulo.
 
 ### Autenticación y seguridad
 
@@ -2182,6 +2182,47 @@ Los 84 SP se agrupan por dominio. Los parámetros y tablas se extraen de la defi
 - Endpoint: `POST /api/proveedores/:id/aprobar`.
 - Backend: `backend/src/repositories/proveedor.repository.ts`.
 - Pruebas: `sql/tests/02_functional.sql`; `backend/tests/proveedor.test.ts`.
+
+
+#### `u_sp_RegistrarProveedorPublico`
+
+**Qué hace:** Registra una cuenta de cliente y un proveedor pendiente en una sola transacción.
+
+**Para qué se creó:** Permitir el registro público de proveedores sin dejar cuentas o roles a medio crear.
+
+**Cómo se implementa:**
+
+- Parámetros: datos de cuenta, contraseña ya hasheada, tipo de proveedor y datos comerciales.
+- Tablas: `Persona`, `Usuario`, `Cliente`, `UsuarioRol`, `EmailVerificacion`, `Proveedor`, `ConfiguracionProveedor` y `ProveedorUsuario`.
+- Operaciones: INSERT en las tablas anteriores; asigna roles `CLIENTE` y `PROVEEDOR`.
+- Control: transacción explícita, `XACT_ABORT`, `TRY/CATCH` y auditoría de errores.
+- Estado: **USADO**.
+
+**Dónde se usa:**
+
+- Endpoint: `POST /api/proveedores/registro-publico`.
+- Backend: `backend/src/repositories/proveedor.repository.ts`.
+- Pruebas: `sql/tests/22_proveedor_publico.sql`; `backend/tests/proveedor.test.ts`.
+
+#### `u_sp_CambiarEstadoProveedor`
+
+**Qué hace:** Cambia el estado de un proveedor validando la transición y registrando auditoría.
+
+**Para qué se creó:** Permitir aprobar, rechazar, suspender, reactivar o reabrir proveedores desde el panel admin.
+
+**Cómo se implementa:**
+
+- Parámetros: `@ID_proveedor`, `@ID_usuario_admin`, `@nuevo_estado` y `@motivo`.
+- Tablas: `Proveedor`, `EstadoProveedor`, `UsuarioRol`, `Rol` y `Auditoria`.
+- Operaciones: UPDATE en `Proveedor`; INSERT en `Auditoria`.
+- Control: valida ADMIN, transición permitida y motivo obligatorio.
+- Estado: **USADO**.
+
+**Dónde se usa:**
+
+- Endpoint: `PATCH /api/proveedores/:id/estado`.
+- Backend: `backend/src/repositories/proveedor.repository.ts`.
+- Pruebas: `sql/tests/22_proveedor_publico.sql`; `backend/tests/proveedor.test.ts`.
 
 #### `u_sp_RegistrarSedeProveedor`
 
@@ -3853,15 +3894,15 @@ Estos SP no se invocan desde la API, pero son usados por otros SP:
 
 | Suite | Resultado | Cobertura |
 |---|---:|---|
-| SQL | 204 PASS | `sql/tests/00_schema.sql` a `21_liberar_deposito.sql`. |
-| Backend | 143 PASS | `backend/tests/*.test.ts`, incluyendo auth, objetos SQL y módulos de negocio. |
+| SQL | 221 PASS | `sql/tests/00_schema.sql` a `22_proveedor_publico.sql`. |
+| Backend | 147 PASS | `backend/tests/*.test.ts`, incluyendo auth, objetos SQL y módulos de negocio. |
 | Frontend | 35 PASS | Componentes y páginas con Vitest. |
 | E2E | 23 PASS | Playwright desktop + móvil, axe y flujo crítico. |
 
 Evidencia principal:
 
 - `RentacarFinal.sql`: DDL, SP, vistas, funciones, triggers y datos de catálogo.
-- `sql/tests/00_schema.sql`: verifica 83 tablas, 84 SP, 6 vistas, 3 funciones y 4 triggers.
+- `sql/tests/00_schema.sql`: verifica 83 tablas, 86 SP, 6 vistas, 3 funciones y 4 triggers.
 - `Producción/backend/src`: repositorios que ejecutan SPs y consultan vistas.
 - `Producción/frontend/src`: rutas y pantallas que consumen la API.
 - `docs/OBJETOS-SQL.md`: matriz corta de objetos integrados.
@@ -4023,6 +4064,8 @@ Evidencia principal:
 - `u_sp_RegistrarNotificacion`
 - `u_sp_RegistrarPago`
 - `u_sp_RegistrarProveedor`
+- `u_sp_RegistrarProveedorPublico`
+- `u_sp_CambiarEstadoProveedor`
 - `u_sp_RegistrarSedeProveedor`
 - `u_sp_RegistrarTarifaVehiculo`
 - `u_sp_RegistrarUsuario`

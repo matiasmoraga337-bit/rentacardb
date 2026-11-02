@@ -9,6 +9,9 @@ export interface Proveedor {
   email: string | null;
   tipo: string;
   estado: string;
+  fechaRegistro?: string | null;
+  fechaBaja?: string | null;
+  motivoBaja?: string | null;
   minutosExpiracionReserva?: number | null;
   requiereDeposito?: boolean | null;
   montoDeposito?: number | null;
@@ -35,6 +38,42 @@ export interface RegistrarProveedorData {
   email?: string;
 }
 
+export type EstadoProveedor = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'SUSPENDIDO' | 'INACTIVO';
+
+export interface RegistroProveedorPublicoData {
+  cuenta: {
+    rut: string;
+    nombres: string;
+    apellidoPaterno: string;
+    apellidoMaterno?: string;
+    telefono?: string;
+    email: string;
+    password: string;
+  };
+  proveedor: {
+    tipo: 'PERSONA' | 'EMPRESA';
+    nombreComercial: string;
+    razonSocial?: string;
+    rutProveedor?: string;
+    telefono?: string;
+    email?: string;
+  };
+}
+
+export interface RegistroProveedorPublicoResponse {
+  token: string;
+  usuario: {
+    id: number;
+    email: string;
+    emailConfirmado: boolean;
+    nombres: string;
+    apellidoPaterno: string | null;
+    roles: string[];
+  };
+  proveedor: { id: number; estado: EstadoProveedor };
+  tokenVerificacion?: string;
+}
+
 export interface ConfiguracionData {
   minutos_expiracion_reserva?: number;
   requiere_deposito?: boolean;
@@ -49,6 +88,24 @@ export interface SedeData {
   telefono?: string;
   email?: string;
 }
+
+export const registrarProveedorPublico = (
+  data: RegistroProveedorPublicoData,
+): Promise<RegistroProveedorPublicoResponse> =>
+  apiFetch<RegistroProveedorPublicoResponse>('/proveedores/registro-publico', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+
+export const cambiarEstadoProveedor = (
+  id: number,
+  estado: EstadoProveedor,
+  motivo?: string,
+): Promise<unknown> =>
+  apiFetch<unknown>(`/proveedores/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado, motivo }),
+  });
 
 export const registrarProveedor = (data: RegistrarProveedorData): Promise<Proveedor> =>
   apiFetch<Proveedor>('/proveedores', { method: 'POST', body: JSON.stringify(data) });

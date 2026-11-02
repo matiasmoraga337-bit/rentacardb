@@ -1,7 +1,10 @@
 import { type Request, type Response } from 'express';
+import { isNonProduction } from '../config/mailer';
 import {
+  type CambiarEstadoProveedorInput,
   type ConfiguracionInput,
   type RegistrarProveedorInput,
+  type RegistroProveedorPublicoInput,
   type SedeCreateInput,
   type SedeUpdateInput,
 } from '../schemas/proveedor.schema';
@@ -16,6 +19,26 @@ const parseId = (value: string, name: string): number => {
   }
   return id;
 };
+
+export async function registrarPublico(req: Request, res: Response): Promise<void> {
+  const result = await proveedorService.registrarPublico(
+    req.body as RegistroProveedorPublicoInput,
+  );
+  const payload: Record<string, unknown> = {
+    token: result.token,
+    usuario: result.usuario,
+    proveedor: result.proveedor,
+  };
+  if (isNonProduction()) payload.tokenVerificacion = result.tokenVerificacion;
+  res.status(201).json(payload);
+}
+
+export async function cambiarEstado(req: Request, res: Response): Promise<void> {
+  const id = parseId(req.params.id, 'id');
+  res
+    .status(200)
+    .json(await proveedorService.cambiarEstado(id, req.user!.id, req.body as CambiarEstadoProveedorInput));
+}
 
 export async function registrar(req: Request, res: Response): Promise<void> {
   const result = await proveedorService.registrar(req.user!.id, req.body as RegistrarProveedorInput);

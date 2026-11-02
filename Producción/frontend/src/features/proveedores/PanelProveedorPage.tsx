@@ -102,6 +102,21 @@ export function PanelProveedorPage() {
         </p>
       </div>
 
+      {proveedor.estado !== 'APROBADO' && (
+        <div className={`rounded-xl border p-4 text-sm ${proveedor.estado === 'RECHAZADO' || proveedor.estado === 'SUSPENDIDO' ? 'border-red-200 bg-red-50 text-red-800' : 'border-amber-200 bg-amber-50 text-amber-900'}`}>
+          <strong className="block">
+            {proveedor.estado === 'PENDIENTE' && 'Tu solicitud está pendiente de aprobación.'}
+            {proveedor.estado === 'RECHAZADO' && 'Tu solicitud fue rechazada.'}
+            {proveedor.estado === 'SUSPENDIDO' && 'Tu cuenta está suspendida.'}
+            {proveedor.estado === 'INACTIVO' && 'Tu cuenta está inactiva.'}
+          </strong>
+          <span className="mt-1 block">
+            Puedes configurar tus datos, pero no publicar vehículos hasta que un administrador habilite tu cuenta.
+            {proveedor.motivoBaja ? ` Motivo: ${proveedor.motivoBaja}` : ''}
+          </span>
+        </div>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle>Configuracion</CardTitle>

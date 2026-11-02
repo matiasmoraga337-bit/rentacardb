@@ -22,10 +22,11 @@ import {
   X,
   type LucideIcon,
 } from 'lucide-react';
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/features/auth/AuthContext';
 import { NotificationBell } from '@/features/notificaciones/NotificationBell';
+import { WorkspaceModeModal } from '@/features/auth/WorkspaceModeModal';
 import { cn } from '@/lib/utils';
 
 interface NavItem {
@@ -40,10 +41,10 @@ interface NavGroup {
   items: NavItem[];
 }
 
-function crearGrupos(roles: string[]): NavGroup[] {
-  const esCliente = roles.includes('CLIENTE');
-  const esProveedor = roles.includes('PROVEEDOR') || roles.includes('OPERADOR');
-  const esAdmin = roles.includes('ADMIN');
+function crearGrupos(roles: string[], modo: 'CLIENTE' | 'PROVEEDOR' | 'ADMIN' | null): NavGroup[] {
+  const esCliente = roles.includes('CLIENTE') && (!modo || modo === 'CLIENTE');
+  const esProveedor = (roles.includes('PROVEEDOR') || roles.includes('OPERADOR')) && (!modo || modo === 'PROVEEDOR');
+  const esAdmin = roles.includes('ADMIN') && (!modo || modo === 'ADMIN');
 
   const grupos: NavGroup[] = [
     {
@@ -63,6 +64,7 @@ function crearGrupos(roles: string[]): NavGroup[] {
         { to: '/arriendos', label: 'Mis alquileres', icon: KeyRound },
         { to: '/favoritos', label: 'Favoritos', icon: Heart },
         { to: '/busquedas', label: 'Búsquedas guardadas', icon: Search },
+        ...(!roles.includes('PROVEEDOR') ? [{ to: '/publicar', label: 'Publicar mi flota', icon: Building2 }] : []),
       ],
     });
   }
@@ -116,13 +118,17 @@ function SidebarContent({
   email,
   roles,
   grupos,
+  modo,
   onNavigate,
+  onSwitchMode,
   onLogout,
 }: {
   email: string;
   roles: string[];
   grupos: NavGroup[];
+  modo: 'CLIENTE' | 'PROVEEDOR' | 'ADMIN' | null;
   onNavigate?: () => void;
+  onSwitchMode?: () => void;
   onLogout: () => void;
 }) {
   const rol =
@@ -203,6 +209,12 @@ function SidebarContent({
           {email}
         </p>
         <p className="mb-3 text-xs text-slate-500">{rol}</p>
+        {roles.includes('CLIENTE') && roles.includes('PROVEEDOR') && onSwitchMode && (
+          <Button type="button" variant="outline" size="sm" className="mb-2 w-full justify-start" onClick={onSwitchMode}>
+            <Building2 className="h-4 w-4" aria-hidden="true" />
+            {modo === 'PROVEEDOR' ? 'Cambiar a cliente' : 'Cambiar a proveedor'}
+          </Button>
+        )}
         <Button
           type="button"
           variant="outline"
@@ -219,13 +231,21 @@ function SidebarContent({
 }
 
 export function AppLayout() {
-  const { usuario, logout } = useAuth();
+  const { usuario, logout, modoActivo, setModoActivo } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const menuRef = useRef<HTMLElement>(null);
-  const grupos = crearGrupos(usuario?.roles ?? []);
+  const grupos = crearGrupos(usuario?.roles ?? [], modoActivo);
   const email = usuario?.email ?? '';
   const roles = usuario?.roles ?? [];
+
+  const switchMode = (): void => {
+    const next = modoActivo === 'PROVEEDOR' ? 'CLIENTE' : 'PROVEEDOR';
+    setModoActivo(next);
+    navigate(next === 'PROVEEDOR' ? '/proveedor/panel' : '/panel');
+    setMenuAbierto(false);
+  };
 
   useEffect(() => {
     setMenuAbierto(false);
@@ -289,6 +309,8 @@ export function AppLayout() {
           email={email}
           roles={roles}
           grupos={grupos}
+          modo={modoActivo}
+          onSwitchMode={switchMode}
           onLogout={logout}
         />
       </aside>
@@ -357,12 +379,15 @@ export function AppLayout() {
               email={email}
               roles={roles}
               grupos={grupos}
+              modo={modoActivo}
               onNavigate={() => setMenuAbierto(false)}
+              onSwitchMode={switchMode}
               onLogout={logout}
             />
           </aside>
         </div>
       )}
+      <WorkspaceModeModal />
     </div>
   );
 }
