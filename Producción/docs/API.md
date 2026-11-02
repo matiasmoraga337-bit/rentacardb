@@ -68,7 +68,8 @@ Convención: `PÚBLICO` (sin auth) · `AUTH` (logueado) · `ROL(x)` (rol requeri
 
 | Método | Ruta | Acceso | SP / Vista / Tabla | Notas |
 |---|---|---|---|---|
-| GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_VehiculosDisponibles`, `fn_PrecioAplicable`, `ConfiguracionGlobal/Proveedor` | Devuelve `{disponible, motivo, precioDia, dias, subtotal, impuesto, deposito, total}`. |
+| GET | `/vehiculos/:id/disponibilidad?desde&hasta` | PÚBLICO | `vw_VehiculosDisponibles`, `fn_PrecioAplicable`, `ConfiguracionGlobal/Proveedor` |
+| GET | `/vehiculos/:id/calendario?desde&hasta` | PÚBLICO | `Reserva`, `BloqueoVehiculo`, `Mantenimiento` | Intervalos de días no disponibles para el calendario. | Devuelve `{disponible, motivo, precioDia, dias, subtotal, impuesto, deposito, total}`. |
 | GET | `/vehiculos/:id` | PÚBLICO | `Vehiculo` + `VehiculoSede` | Incluye `sedes[]` con flags de entrega/devolución. |
 | POST | `/reservas` | ROL(CLIENTE) | `u_sp_CrearReserva` | `Idempotency-Key` obligatorio. `ID_usuario_cliente` sale del JWT. |
 | GET | `/reservas?scope=&estado=&page=&pageSize=` | AUTH | `vw_ReservasDetalle` + `Reserva` | `scope=cliente` (propias), `scope=proveedor` (sus vehículos), `todos` (ADMIN). Respuesta `{data,page,pageSize,total}`. |

@@ -53,6 +53,8 @@ Los propósitos se derivan del DDL, de los nombres, de los parámetros, de los c
 | `MovimientoVehiculo` | Sin endpoint ni UI de traslado. | Integrar o eliminar. |
 | `VehiculoComuna` | Vacía; `VehiculoSede` cubre la ubicación. | Integrar como comunas extra o eliminar. |
 
+Decisión actual: estas cinco tablas se mantienen en el esquema y quedan documentadas como deuda de integración; no se eliminan ni se usan desde la app en esta entrega.
+
 ### Procedimientos internos
 
 | SP | Invocado por | Función |
@@ -3895,7 +3897,7 @@ Estos SP no se invocan desde la API, pero son usados por otros SP:
 | Suite | Resultado | Cobertura |
 |---|---:|---|
 | SQL | 221 PASS | `sql/tests/00_schema.sql` a `22_proveedor_publico.sql`. |
-| Backend | 147 PASS | `backend/tests/*.test.ts`, incluyendo auth, objetos SQL y módulos de negocio. |
+| Backend | 149 PASS | `backend/tests/*.test.ts`, incluyendo auth, objetos SQL y módulos de negocio. |
 | Frontend | 35 PASS | Componentes y páginas con Vitest. |
 | E2E | 23 PASS | Playwright desktop + móvil, axe y flujo crítico. |
 

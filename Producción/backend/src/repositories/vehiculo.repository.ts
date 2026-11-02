@@ -579,6 +579,57 @@ export async function listarSedesVehiculo(idVehiculo: number): Promise<SedeVehic
   return result.recordset;
 }
 
+
+export interface CalendarioIntervalo {
+  desde: string;
+  hasta: string;
+  tipo: 'RESERVADO' | 'BLOQUEADO' | 'MANTENIMIENTO';
+}
+
+export async function listarCalendarioVehiculo(
+  idVehiculo: number,
+  desde: string,
+  hasta: string,
+): Promise<CalendarioIntervalo[]> {
+  const pool = await getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, idVehiculo)
+    .input('desde', sql.Date, desde)
+    .input('hasta', sql.Date, hasta)
+    .query<CalendarioIntervalo>(
+      `SELECT CONVERT(char(10), r.fecha_inicio_reserva, 23) AS desde,
+              CONVERT(char(10), r.fecha_fin_reserva, 23) AS hasta,
+              'RESERVADO' AS tipo
+       FROM dbo.Reserva r
+       INNER JOIN dbo.EstadoReserva er ON er.ID_estado_reserva = r.ID_estado_reserva_reserva
+       WHERE r.ID_vehiculo_reserva = @id
+         AND er.nombre_estado_reserva IN ('PENDIENTE','CONFIRMADA','EN_CURSO')
+         AND r.fecha_inicio_reserva < @hasta
+         AND r.fecha_fin_reserva > @desde
+       UNION ALL
+       SELECT CONVERT(char(10), b.fecha_inicio_bloqueo, 23) AS desde,
+              CONVERT(char(10), b.fecha_fin_bloqueo, 23) AS hasta,
+              'BLOQUEADO' AS tipo
+       FROM dbo.BloqueoVehiculo b
+       WHERE b.ID_vehiculo_bloqueo = @id
+         AND b.activo_bloqueo = 1
+         AND b.fecha_inicio_bloqueo < CAST(@hasta AS datetime2)
+         AND b.fecha_fin_bloqueo > CAST(@desde AS datetime2)
+       UNION ALL
+       SELECT CONVERT(char(10), m.fecha_inicio_mantenimiento, 23) AS desde,
+              CONVERT(char(10), COALESCE(m.fecha_fin_mantenimiento, @hasta), 23) AS hasta,
+              'MANTENIMIENTO' AS tipo
+       FROM dbo.Mantenimiento m
+       WHERE m.ID_vehiculo_mantenimiento = @id
+         AND m.activo_mantenimiento = 1
+         AND m.fecha_inicio_mantenimiento < CAST(@hasta AS datetime2)
+         AND (m.fecha_fin_mantenimiento IS NULL OR m.fecha_fin_mantenimiento > CAST(@desde AS datetime2))
+       ORDER BY desde`,
+    );
+  return result.recordset;
+}
+
 export interface DisponibilidadParams {
   desde: string;
   hasta: string;

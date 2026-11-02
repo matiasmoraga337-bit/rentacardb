@@ -285,6 +285,27 @@ export async function buscar(params: repo.BusquedaParams): Promise<unknown[]> {
   return repo.buscarVehiculos(params);
 }
 
+export async function calendario(
+  idVehiculo: number,
+  desde: string,
+  hasta: string,
+): Promise<repo.CalendarioIntervalo[]> {
+  if (!esFechaValida(desde) || !esFechaValida(hasta)) {
+    throw new AppError(400, 'FECHA_INVALIDA', 'Las fechas no existen en el calendario.');
+  }
+  if (hasta <= desde) {
+    throw new AppError(400, 'FECHAS_INVALIDAS', 'La fecha de fin debe ser posterior al inicio.');
+  }
+  const dias = Math.round(
+    (new Date(`${hasta}T00:00:00`).getTime() - new Date(`${desde}T00:00:00`).getTime()) /
+      86400000,
+  );
+  if (dias > 370) {
+    throw new AppError(400, 'RANGO_DEMASIADO_LARGO', 'El calendario admite hasta 370 días.');
+  }
+  return repo.listarCalendarioVehiculo(idVehiculo, desde, hasta);
+}
+
 export interface DisponibilidadResponse {
   id: number;
   patente: string;

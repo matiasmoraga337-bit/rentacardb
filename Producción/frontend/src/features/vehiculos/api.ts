@@ -56,6 +56,12 @@ export interface VehiculoDetalle {
   }[];
 }
 
+export interface CalendarioIntervalo {
+  desde: string;
+  hasta: string;
+  tipo: 'RESERVADO' | 'BLOQUEADO' | 'MANTENIMIENTO';
+}
+
 export interface Disponibilidad {
   id: number;
   patente: string;
@@ -97,6 +103,15 @@ export const fetchMisVehiculos = (): Promise<VehiculoResumen[]> =>
 
 export const fetchVehiculo = (id: number): Promise<VehiculoDetalle> =>
   apiFetch<VehiculoDetalle>(`/vehiculos/${id}`);
+
+export const fetchCalendario = (
+  id: number,
+  desde: string,
+  hasta: string,
+): Promise<CalendarioIntervalo[]> => {
+  const qs = new URLSearchParams({ desde, hasta });
+  return apiFetch<CalendarioIntervalo[]>(`/vehiculos/${id}/calendario?${qs.toString()}`);
+};
 
 export const fetchDisponibilidad = (
   id: number,

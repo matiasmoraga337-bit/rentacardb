@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Car, Eye, EyeOff, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
+import { ArrowLeft, Car, LockKeyhole, Mail, Phone, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, Navigate } from 'react-router-dom';
 import { z } from 'zod';
+import { PasswordInput } from '@/components/forms/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,7 +34,6 @@ type RegistroForm = z.infer<typeof schema>;
 
 export function RegistroPage() {
   const { usuario } = useAuth();
-  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [resultado, setResultado] = useState<RegistroResponse | null>(null);
   const {
     register,
@@ -242,26 +242,12 @@ export function RegistroPage() {
                         className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                         aria-hidden="true"
                       />
-                      <Input
+                      <PasswordInput
                         id="password"
-                        type={mostrarPassword ? 'text' : 'password'}
                         autoComplete="new-password"
-                        className="h-11 pl-9 pr-10"
+                        className="h-11 pl-9"
                         {...register('password')}
                       />
-                      <button
-                        type="button"
-                        aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                        aria-pressed={mostrarPassword}
-                        onClick={() => setMostrarPassword((visible) => !visible)}
-                        className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                      >
-                        {mostrarPassword ? (
-                          <EyeOff className="h-4 w-4" aria-hidden="true" />
-                        ) : (
-                          <Eye className="h-4 w-4" aria-hidden="true" />
-                        )}
-                      </button>
                     </div>
                     {errors.password && (
                       <p className="text-sm text-red-600">{errors.password.message}</p>
@@ -269,9 +255,8 @@ export function RegistroPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="confirmar">Confirmar contraseña</Label>
-                    <Input
+                    <PasswordInput
                       id="confirmar"
-                      type={mostrarPassword ? 'text' : 'password'}
                       autoComplete="new-password"
                       className="h-11"
                       {...register('confirmar')}

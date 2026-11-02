@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { CalendarioRango } from '@/components/forms/CalendarioRango';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select } from '@/components/ui/select';
-import { fetchDisponibilidad, fetchVehiculo } from '@/features/vehiculos/api';
+import { fetchCalendario, fetchDisponibilidad, fetchVehiculo } from '@/features/vehiculos/api';
 import { crearReserva, nuevaIdempotencyKey } from './api';
-import { fechaFutura, formatearCLP, formatearFecha } from './format';
+import { fechaFutura, formatearCLP, formatearFecha, hoyIsoLocal } from './format';
 import { CARGO_KM_EXCEDIDO, KM_INCLUIDOS_DIA } from './kmPolicy';
 
 export function CheckoutPage() {
@@ -50,6 +51,12 @@ export function CheckoutPage() {
   }, [vehiculo, idRetiro, idDevolucion]);
 
   const fechasValidas = Boolean(fechaInicio && fechaFin && fechaFin > fechaInicio);
+
+  const calendarioQuery = useQuery({
+    queryKey: ['calendario', id],
+    queryFn: () => fetchCalendario(id, hoyIsoLocal(), fechaFutura(365)),
+    enabled: Boolean(vehiculo),
+  });
 
   const disponibilidadQuery = useQuery({
     queryKey: ['disponibilidad', id, fechaInicio, fechaFin],
@@ -109,26 +116,21 @@ export function CheckoutPage() {
             <CardDescription>Selecciona cuando y donde retiras el vehiculo.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label htmlFor="checkoutDesde">Desde</Label>
-                <Input
-                  id="checkoutDesde"
-                  type="date"
-                  value={fechaInicio}
-                  onChange={(event) => setFechaInicio(event.target.value)}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="checkoutHasta">Hasta</Label>
-                <Input
-                  id="checkoutHasta"
-                  type="date"
-                  value={fechaFin}
-                  onChange={(event) => setFechaFin(event.target.value)}
-                />
-              </div>
-            </div>
+            <CalendarioRango
+              desde={fechaInicio}
+              hasta={fechaFin}
+              min={hoyIsoLocal()}
+              intervalos={calendarioQuery.data ?? []}
+              onChange={(desde, hasta) => {
+                setFechaInicio(desde);
+                setFechaFin(hasta);
+              }}
+            />
+            <p className="text-sm text-slate-600">
+              {fechaInicio ? formatearFecha(fechaInicio) : 'Elige retiro'}
+              {' → '}
+              {fechaFin ? formatearFecha(fechaFin) : 'elige devolución'}
+            </p>
             <div className="space-y-1">
               <Label htmlFor="sedeRetiro">Sede de retiro</Label>
               <Select

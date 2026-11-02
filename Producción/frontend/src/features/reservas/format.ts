@@ -43,6 +43,11 @@ export function diasEntre(desde: string, hasta: string): number {
   return Math.max(0, Math.round((fin.getTime() - inicio.getTime()) / 86400000));
 }
 
+export function hoyIsoLocal(): string {
+  const date = new Date();
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 export function fechaFutura(dias: number): string {
   const date = new Date();
   date.setDate(date.getDate() + dias);

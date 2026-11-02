@@ -4,6 +4,7 @@ import { ComunaCombobox } from '@/components/forms/ComunaCombobox';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { hoyIsoLocal } from '@/features/reservas/format';
 
 interface CatalogoHeroProps {
   fechaInicio: string;
@@ -68,7 +69,12 @@ export function CatalogoHero({
               id="hero-desde"
               type="date"
               value={fechaInicio}
-              onChange={(event) => onFechaInicio(event.target.value)}
+              min={hoyIsoLocal()}
+              onChange={(event) => {
+                const value = event.target.value;
+                onFechaInicio(value);
+                if (fechaFin && value >= fechaFin) onFechaFin('');
+              }}
               className="h-11 rounded-lg"
             />
           </div>
@@ -78,6 +84,7 @@ export function CatalogoHero({
               id="hero-hasta"
               type="date"
               value={fechaFin}
+              min={fechaInicio || hoyIsoLocal()}
               onChange={(event) => onFechaFin(event.target.value)}
               className="h-11 rounded-lg"
             />

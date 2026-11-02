@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Building2, Car, Check, LockKeyhole, Mail, UserRound } from 'lucide-react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { PasswordInput } from '@/components/forms/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -153,8 +154,8 @@ export function RegistroProveedorPublicoPage() {
                   <div className="relative"><Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" /><Input id="publicoEmail" type="email" value={cuenta.email} onChange={(e) => setCuentaField('email', e.target.value)} className="h-11 pl-9" /></div>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2"><Label htmlFor="publicoPassword">Contrasena</Label><div className="relative"><LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" /><Input id="publicoPassword" type="password" value={cuenta.password} onChange={(e) => setCuentaField('password', e.target.value)} className="h-11 pl-9" /></div></div>
-                  <div className="space-y-2"><Label htmlFor="publicoConfirmar">Confirmar contrasena</Label><Input id="publicoConfirmar" type="password" value={cuenta.confirmar} onChange={(e) => setCuentaField('confirmar', e.target.value)} className="h-11" /></div>
+                  <div className="space-y-2"><Label htmlFor="publicoPassword">Contrasena</Label><div className="relative"><LockKeyhole className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" /><PasswordInput id="publicoPassword" autoComplete="new-password" value={cuenta.password} onChange={(e) => setCuentaField('password', e.target.value)} className="h-11 pl-9" /></div></div>
+                  <div className="space-y-2"><Label htmlFor="publicoConfirmar">Confirmar contrasena</Label><PasswordInput id="publicoConfirmar" autoComplete="new-password" value={cuenta.confirmar} onChange={(e) => setCuentaField('confirmar', e.target.value)} className="h-11" /></div>
                 </div>
                 {error && <p className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</p>}
                 <div className="flex flex-wrap items-center justify-between gap-3"><span className="text-sm text-slate-500">Ya tienes cuenta? <Link to="/login" className="font-medium text-brand hover:underline">Inicia sesion</Link></span><Button type="button" onClick={continuar}>Continuar <span aria-hidden="true">→</span></Button></div>

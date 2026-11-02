@@ -1,9 +1,9 @@
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Car, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
+import { ArrowLeft, Car, LockKeyhole, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
+import { PasswordInput } from '@/components/forms/PasswordInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +20,6 @@ export function LoginPage() {
   const { usuario, login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [mostrarPassword, setMostrarPassword] = useState(false);
   const rawFrom = (location.state as { from?: string } | null)?.from;
   const from = typeof rawFrom === 'string' && rawFrom.startsWith('/') ? rawFrom : undefined;
   const {
@@ -134,27 +133,13 @@ export function LoginPage() {
                   className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
                   aria-hidden="true"
                 />
-                <Input
+                <PasswordInput
                   id="password"
-                  type={mostrarPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   placeholder="Tu contraseña"
-                  className="h-11 pl-9 pr-10"
+                  className="h-11 pl-9"
                   {...register('password')}
                 />
-                <button
-                  type="button"
-                  aria-label={mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-                  aria-pressed={mostrarPassword}
-                  onClick={() => setMostrarPassword((visible) => !visible)}
-                  className="absolute right-2 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                >
-                  {mostrarPassword ? (
-                    <EyeOff className="h-4 w-4" aria-hidden="true" />
-                  ) : (
-                    <Eye className="h-4 w-4" aria-hidden="true" />
-                  )}
-                </button>
               </div>
               {errors.password && (
                 <p className="text-sm text-red-600">{errors.password.message}</p>

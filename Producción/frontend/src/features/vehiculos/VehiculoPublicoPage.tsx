@@ -4,17 +4,16 @@ import { MapPin } from 'lucide-react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { PublicHeader } from '@/components/layout/PublicHeader';
 import { Button, buttonVariants } from '@/components/ui/button';
+import { CalendarioRango } from '@/components/forms/CalendarioRango';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { RatingStars, formatRating } from '@/components/ui/rating-stars';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/features/auth/AuthContext';
 import { crearConversacion } from '@/features/chat/api';
-import { fechaFutura, formatearCLP, formatearFecha } from '@/features/reservas/format';
+import { fechaFutura, formatearCLP, formatearFecha, hoyIsoLocal } from '@/features/reservas/format';
 import { FavoritoButton } from '@/features/favoritos/FavoritoButton';
 import { fetchResenasProveedor, fetchResenasVehiculo } from '@/features/resenas/api';
-import { fetchDisponibilidad, fetchVehiculo } from './api';
+import { fetchCalendario, fetchDisponibilidad, fetchVehiculo } from './api';
 import { ResenasCard } from './ResenasCard';
 import { VehiculoGaleria } from './VehiculoGaleria';
 import { cn } from '@/lib/utils';
@@ -37,6 +36,12 @@ export function VehiculoPublicoPage() {
   });
 
   const fechasValidas = Boolean(fechaInicio && fechaFin && fechaFin > fechaInicio);
+  const calendario = useQuery({
+    queryKey: ['calendario', vehiculoId],
+    queryFn: () => fetchCalendario(vehiculoId, hoyIsoLocal(), fechaFutura(365)),
+    enabled: Boolean(query.data),
+  });
+
   const disponibilidad = useQuery({
     queryKey: ['disponibilidad', vehiculoId, fechaInicio, fechaFin],
     queryFn: () => fetchDisponibilidad(vehiculoId, fechaInicio, fechaFin),
@@ -147,26 +152,21 @@ export function VehiculoPublicoPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div className="space-y-1">
-                        <Label htmlFor="detalleDesde">Desde</Label>
-                        <Input
-                          id="detalleDesde"
-                          type="date"
-                          value={fechaInicio}
-                          onChange={(event) => setFechaInicio(event.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <Label htmlFor="detalleHasta">Hasta</Label>
-                        <Input
-                          id="detalleHasta"
-                          type="date"
-                          value={fechaFin}
-                          onChange={(event) => setFechaFin(event.target.value)}
-                        />
-                      </div>
-                    </div>
+                    <CalendarioRango
+                      desde={fechaInicio}
+                      hasta={fechaFin}
+                      min={hoyIsoLocal()}
+                      intervalos={calendario.data ?? []}
+                      onChange={(desde, hasta) => {
+                        setFechaInicio(desde);
+                        setFechaFin(hasta);
+                      }}
+                    />
+                    <p className="text-sm text-slate-600">
+                      {fechaInicio ? formatearFecha(fechaInicio) : 'Elige retiro'}
+                      {' → '}
+                      {fechaFin ? formatearFecha(fechaFin) : 'elige devolución'}
+                    </p>
 
                     {!fechasValidas && (
                       <p className="text-sm text-amber-700">Revisa el rango de fechas.</p>

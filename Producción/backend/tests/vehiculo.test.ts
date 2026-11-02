@@ -30,6 +30,20 @@ describe('POST /api/vehiculos', () => {
   });
 });
 
+describe('GET /api/vehiculos/:id/calendario', () => {
+  it('exige desde y hasta', async () => {
+    const res = await request(app).get('/api/vehiculos/1/calendario');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('FECHAS_REQUERIDAS');
+  });
+
+  it('rechaza un rango invertido', async () => {
+    const res = await request(app).get('/api/vehiculos/1/calendario?desde=2026-12-31&hasta=2026-12-01');
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('FECHAS_INVALIDAS');
+  });
+});
+
 describe('GET /api/vehiculos/:id', () => {
   it('rechaza un id invalido', async () => {
     const res = await request(app).get('/api/vehiculos/abc');
