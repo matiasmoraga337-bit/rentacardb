@@ -1,6 +1,7 @@
-import type { FormEvent } from 'react';
+﻿import type { FormEvent } from 'react';
 import { Search } from 'lucide-react';
 import { ComunaCombobox } from '@/components/forms/ComunaCombobox';
+import { HeroCar3D } from '@/components/hero/HeroCar3D';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -40,11 +41,10 @@ export function CatalogoHero({
         className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-[linear-gradient(180deg,transparent,rgba(2,6,23,0.32))]"
         aria-hidden="true"
       />
-      <img
-        src="/images/hero-car.svg"
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-6 right-0 hidden w-[500px] opacity-80 xl:block"
+      <HeroCar3D
+        minWidth={1280}
+        variant="catalogo"
+        className="absolute -top-6 right-0 z-20 w-[500px]"
       />
       <div className="relative mx-auto max-w-[1440px] px-4 py-12 sm:px-6 sm:py-16">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-teal-200">
@@ -60,7 +60,7 @@ export function CatalogoHero({
 
         <form
           onSubmit={submit}
-          className="mt-7 grid gap-3 rounded-2xl border border-white/20 bg-white/95 p-3 text-slate-900 shadow-2xl shadow-teal-950/30 backdrop-blur sm:p-4 lg:grid-cols-[1.25fr_1fr_1fr_auto] lg:items-end"
+          className="relative z-30 mt-7 grid gap-3 rounded-2xl border border-white/20 bg-white/95 p-3 text-slate-900 shadow-2xl shadow-teal-950/30 backdrop-blur sm:p-4 lg:grid-cols-[1.25fr_1fr_1fr_auto] lg:items-end"
         >
           <ComunaCombobox value={idComuna} onChange={onComuna} />
           <div className="space-y-1">

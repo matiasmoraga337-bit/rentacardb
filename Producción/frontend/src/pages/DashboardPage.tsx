@@ -1,5 +1,6 @@
-import { ArrowRight, UserRound } from 'lucide-react';
+﻿import { ArrowRight, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { HeroCar3D } from '@/components/hero/HeroCar3D';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/features/auth/AuthContext';
 import { PanelAdmin } from '@/features/paneles/PanelAdmin';
@@ -40,11 +41,10 @@ export function DashboardPage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_10%,rgba(94,234,212,0.28),transparent_38%),linear-gradient(120deg,#042f2e_0%,#115e59_58%,#0f766e_100%)]"
           aria-hidden="true"
         />
-        <img
-          src="/images/hero-car.svg"
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-6 bottom-0 hidden w-[360px] opacity-60 md:block"
+        <HeroCar3D
+          minWidth={768}
+          variant="dashboard"
+          className="absolute -right-6 bottom-0 z-20 w-[360px] opacity-80"
         />
         <div className="relative">
           <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-teal-200">

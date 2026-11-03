@@ -15,7 +15,7 @@ export function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ToastProvider>
-          <RouterProvider router={router} />
+          <RouterProvider router={router} future={{ v7_startTransition: true }} />
         </ToastProvider>
       </AuthProvider>
     </QueryClientProvider>

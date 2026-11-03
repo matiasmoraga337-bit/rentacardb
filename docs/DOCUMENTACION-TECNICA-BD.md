@@ -1,4 +1,4 @@
-# Documentación técnica de la base de datos RentaCarDB
+﻿# Documentación técnica de la base de datos RentaCarDB
 
 Documento de referencia de los objetos de `RentaCarDB`: qué hace cada uno, para qué se creó, cómo está implementado y dónde se usa en la aplicación web.
 
@@ -3898,7 +3898,7 @@ Estos SP no se invocan desde la API, pero son usados por otros SP:
 |---|---:|---|
 | SQL | 221 PASS | `sql/tests/00_schema.sql` a `22_proveedor_publico.sql`. |
 | Backend | 149 PASS | `backend/tests/*.test.ts`, incluyendo auth, objetos SQL y módulos de negocio. |
-| Frontend | 35 PASS | Componentes y páginas con Vitest. |
+| Frontend | 37 PASS | Componentes y páginas con Vitest. |
 | E2E | 23 PASS | Playwright desktop + móvil, axe y flujo crítico. |
 
 Evidencia principal:

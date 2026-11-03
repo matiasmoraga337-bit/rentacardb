@@ -40,6 +40,43 @@ test.describe('Catálogo público', () => {
     await expect(page.locator('article').first()).toBeVisible();
   });
 
+  test('muestra el vehículo 3D interactivo en desktop', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    const webgl = await page.evaluate(() => {
+      const canvas = document.createElement('canvas');
+      return Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
+    });
+    test.skip(!webgl, 'WebGL no disponible en este navegador');
+
+    await page.goto('/catalogo');
+    const heroCar = page.getByRole('group', { name: 'Vehículo 3D interactivo' });
+    await expect(heroCar).toBeVisible({ timeout: 20_000 });
+    await expect(heroCar.locator('canvas')).toBeVisible();
+    await expect(heroCar.getByRole('button')).toHaveCount(0);
+  });
+
+  test('navega a publicar sin error de Suspense en el primer clic', async ({ page }) => {
+    let delayed = false;
+    await page.route(/RegistroProveedorPublicoPage/, async (route) => {
+      delayed = true;
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      await route.continue();
+    });
+
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+
+    await page.goto('/catalogo');
+    await page.getByRole('link', { name: 'Publica tu flota' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Publica tu flota' })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText('Unexpected Application Error!')).toHaveCount(0);
+    expect(errors, errors.join('\n')).toEqual([]);
+    expect(delayed).toBe(true);
+  });
+
   test('muestra el estado vacío con datos de prueba', async ({ page }) => {
     await page.goto('/catalogo?data=empty');
     await expect(page.getByText('Sin resultados')).toBeVisible();

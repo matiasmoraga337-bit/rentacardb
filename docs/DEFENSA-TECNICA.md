@@ -1,4 +1,4 @@
-# Defensa técnica — RentaCarDB
+﻿# Defensa técnica — RentaCarDB
 
 Guía común para que **todos los integrantes** puedan explicar la arquitectura,
 el modelo, el flujo completo y los objetos SQL críticos. La asignación por
@@ -21,7 +21,7 @@ Archivo: [`presentacion-avance-60.html`](presentacion-avance-60.html).
 > consume la API; nunca se conecta a la base. La API usa el driver `mssql`,
 > sentencias SQL explícitas y procedimientos almacenados, sin ORM. La
 > autenticación es JWT con roles CLIENTE, PROVEEDOR, OPERADOR y ADMIN. La base
-> tiene 83 tablas, 86 procedimientos, 6 vistas, 3 funciones y 4 triggers.”
+> tiene 83 tablas, 86 procedimientos, 6 vistas, 3 funciones y 4 triggers. El hero usa un vehículo 3D procedural con Three.js, cargado de forma diferida y con fallback SVG.”
 
 ## 2. Respuesta del flujo completo — 60 segundos
 
@@ -181,7 +181,7 @@ transacciones.”
 
 ### 16. ¿Cómo prueban el sistema?
 
-> “Tenemos 221 casos SQL, 149 tests de backend, 35 de frontend y 23 E2E con
+> “Tenemos 221 casos SQL, 149 tests de backend, 37 de frontend y 25 E2E con
 > Playwright y axe. Los E2E cubren catálogo, login, admin, móvil y el flujo
 > crítico completo: reserva, pago, arriendo, contrato, devolución y reseña.
 > También hay smoke scripts para S2, S3, S4 y chat.”

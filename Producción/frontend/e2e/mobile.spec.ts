@@ -43,6 +43,7 @@ test.describe('Catálogo móvil', () => {
     await expect(page.getByRole('heading', { name: 'Vehículos disponibles' })).toBeVisible();
     await expect(page.locator('article').first()).toBeVisible();
     await expect(page.locator('.mapa-chile')).toHaveCount(0);
+    await expect(page.locator('canvas')).toHaveCount(0);
     expect(mapRequests).toEqual([]);
     await expectNoHorizontalOverflow(page);
 

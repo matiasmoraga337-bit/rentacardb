@@ -1,9 +1,10 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+﻿import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Car, LockKeyhole, Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { z } from 'zod';
 import { PasswordInput } from '@/components/forms/PasswordInput';
+import { HeroCar3D } from '@/components/hero/HeroCar3D';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,11 +50,10 @@ export function LoginPage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_18%_12%,rgba(94,234,212,0.3),transparent_36%),radial-gradient(circle_at_85%_0%,rgba(20,184,166,0.28),transparent_40%),linear-gradient(135deg,#042f2e_0%,#115e59_55%,#0f766e_100%)]"
           aria-hidden="true"
         />
-        <img
-          src="/images/hero-car.svg"
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute -bottom-6 -right-10 w-[520px] opacity-70"
+        <HeroCar3D
+          minWidth={1024}
+          variant="auth"
+          className="absolute -bottom-6 -right-10 z-20 w-[520px] opacity-80"
         />
 
         <Link to="/catalogo" className="relative flex items-center gap-3">
